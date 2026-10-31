@@ -1,0 +1,17 @@
+# Prolog
+*.qlf
+*.pl~
+.swipl_history
+swipl_history
+
+# Partidas guardadas y salidas generadas
+saves/
+out/
+*.sav
+
+# Editores y sistema
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
