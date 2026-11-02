@@ -1,4 +1,4 @@
 % explicar.pl
-% Meta-interprete y modo explicar (explicar/1, por_que_no/1, arbol/1).
+% Meta-interprete, arbol de derivacion y modo explicar (solve/2, por_que_no, arbol); los comandos los ejecuta juego.
 
 :- module(explicar, []).
