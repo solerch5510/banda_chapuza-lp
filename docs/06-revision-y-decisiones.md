@@ -8,7 +8,7 @@
 >
 > Convención de gravedad: **bloqueante** = hay que resolverlo antes de escribir código de la semana 1, o invalida a la vez varios documentos; **importante** = hay que resolverlo antes de la semana en la que se implementa; **menor** = cosmético o con solución obvia.
 >
-> **Estado de las decisiones (2 de noviembre de 2026):** el autor aceptó como base **todas las recomendaciones** de este documento (columna "Recomendación" de la sección 4, y el recorte "Nivel A" de la sección 5, con 10 h/semana como supuesto de partida y paso al Nivel B si se acumula un desvío mayor de 3 h un viernes). Decidido además: se desarrolla con SWI-Prolog 5.10.4 (D-02). Las preguntas a la profesora (D-34 a D-38) siguen pendientes de enviar. Los documentos 01 a 05 y `DISENO.md` se alinean con estas decisiones; cada uno lleva al final un registro de cambios.
+> **Estado de las decisiones (2 de noviembre de 2026):** el autor aceptó como base **todas las recomendaciones** de este documento (columna "Recomendación" de la sección 4, y el recorte "Nivel A" de la sección 5, con 10 h/semana como supuesto de partida y paso al Nivel B si se acumula un desvío mayor de 3 h un viernes). Decidido además: se desarrolla con SWI-Prolog 5.10.4 (D-02). Confirmado además el ajuste de recompensas de la mínima tras el recálculo de la economía en 04 §9.2: `ratas_del_granero` 9, `gato_en_el_arbol` 7 y `gallina_noble` 14 + 1 brie (con 12 cheddar iniciales; revisión provisional hasta el balance de la semana 6). Las preguntas a la profesora (D-34 a D-38) siguen pendientes de enviar. Los documentos 01 a 05 y `DISENO.md` se alinean con estas decisiones; cada uno lleva al final un registro de cambios.
 
 ---
 

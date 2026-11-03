@@ -424,7 +424,7 @@ inicio(semilla(12345)).
 ```prolog
 % --- contratos.pl: el catalogo vive aqui (canon DISENO.md 7; forma de 04, D-18) (boceto sin ejecutar) ---
 contrato(gallina_noble, camino_real, escoltar(gallina_noble, castillo),
-         recompensa([quesos(12), queso(brie, 0, 1)]),
+         recompensa([quesos(14), queso(brie, 0, 1)]),
          [requiere(rasgo_no(teme_caballos))]).
 % abreviatura aceptada: recompensa(quesos(N)) == recompensa([quesos(N)])
 ```

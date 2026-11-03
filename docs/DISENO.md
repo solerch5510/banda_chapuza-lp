@@ -128,7 +128,7 @@ Un contrato es un hecho con: identificador, zona, objetivo, recompensa y condici
 
 ```prolog
 contrato(gallina_noble, camino_real, escoltar(gallina_noble, castillo),
-         recompensa([quesos(12), queso(brie, 0, 1)]),
+         recompensa([quesos(14), queso(brie, 0, 1)]),
          [requiere(rasgo_no(teme_caballos))]).
 ```
 
@@ -448,7 +448,7 @@ Revisión del 2 de noviembre de 2026 a partir de `docs/06-revision-y-decisiones.
 | 4 | Moral 0–10 con inicio 6 y huelga con moral ≤ 2; sueldos 1+2+1+1; Tuerca en el frente; una habilidad por personaje; la venda anula el miedo de Baldomero | D-08, D-23, D-19, X-24, X-25, X-37 |
 | 5 | Aldea sin tienda; taberna sin combate | D-10, X-33, X-14 |
 | 6 | 12 cheddar iniciales; queso como única moneda (entradas y salidas); ración fresco → curado → rancio; `comer` como ración extra; `pagar` como comando con impago al salir; descanso de 2 quesos; pago en unidades; `derrota_hambre` | D-09, D-10, D-11, D-12, D-13, D-14, D-15, D-17, X-26, X-28, X-29, X-30, X-31, X-32, X-33 |
-| 7 | Recompensa de la gallina de 12 quesos y 1 brie; `escoltar/2`; forma de `contrato/5`; nombres de datos y reglas; máximo 3 contratos activos | D-18, X-27, X-36 |
+| 7 | Recompensa de la gallina de 14 quesos y 1 brie (ajuste del 2 de noviembre; antes 12), de las ratas 9 y del gato 7; `escoltar/2`; forma de `contrato/5`; nombres de datos y reglas; máximo 3 contratos activos | D-18, X-27, X-36 |
 | 8 | Caídos solo en combate; IA mínima con tres acciones especiales y gemelas; sin huida del jefe; Clotilde con contador; tabla `efecto_habilidad/2` | D-17, D-24, D-29, D-33, X-38, X-42, X-43, X-44, X-45 |
 | 9 | Dinámico con moral y 12 cheddar; solo `estado` escribe y las reglas devuelven efectos; `teme/2`, `ignora_miedo/1` y `esta_en_huelga/1`; nueva tabla de nombres canónicos | D-04, D-05, D-16, X-01, X-03, X-12 a X-20, §2.7 |
 | 10 | 12 módulos: se añaden `estado` y `juego`; parser en `juego`/`ui` y árbol en `explicar`; comandos como términos; narrador puro y azar reproducible | D-03, D-07, D-25, X-01, X-02, X-06, X-09 |

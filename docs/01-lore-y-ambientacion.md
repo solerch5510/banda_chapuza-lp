@@ -256,7 +256,7 @@ Ocho NPC. Los que están marcados **(extra)** pueden quedar como texto sin inter
 | `ricota` | **(extra)** | Ricota el Tendero | `aldea` | Comerciante risueño que cree que todo se arregla con una oferta. | Vender objetos baratos y recibir los quesos curados del contrato `silvestre_para_ricota`. **No compra ni vende queso.** | En la v1 solo aparece como texto. Con la tienda de objetos **(extra)**: `pocion`, `cataplasma_de_requeson`, `pan_duro`, `cucharon_de_hierro`, `baston_de_queso_duro`, `escudo_tapadera`, a cambio de queso por unidades. Su contrato `silvestre_para_ricota` (extra) le entrega los quesos silvestres. |
 | `alcaldesa_nata` | mínima | Alcaldesa Nata | `aldea` | Máxima autoridad de la aldea; gobierna con la ayuda de una lista de quejas. | Que alguien resuelva sus problemas sin hacer más. | Contratos pequeños: `ratas_del_granero`, `gato_en_el_arbol` (mínima); `fantasma_charlatan` (objetivo). Como recompensa especial, la `venda_de_caballos`. |
 | `ermitano_penicilio` | **(extra)** | Hermano Penicilio | `bosque` | Ex-afinador que se retiró al bosque a estudiar el moho y acabó amigo suyo. Habla con los hongos. | Que nadie queme su cabaña ni su moho. | Regala o intercambia por contrato `queso_silvestre` y `salmuera` **(extra)** (no los vende); información sobre el Gran Rancio ("viene de abajo"). |
-| `gallina_noble` | mínima | Lady Clotilde Plumífera | `camino_real` | Gallina de alta cuna que viaja con modales y un ramillete de plumas. Muy culta y muy picajosa. | Llegar al Castillo para el Baile de la Cuajada sin que nadie la despluma. | Contrato canon `gallina_noble`: pagará 12 quesos y 1 `brie` si llega entera (6 si llega malherida). Si la matan, la familia manda cartas. En la mínima su vida se mide con un contador de golpes recibidos (D-33); como combatiente aliada pasiva es opcional. |
+| `gallina_noble` | mínima | Lady Clotilde Plumífera | `camino_real` | Gallina de alta cuna que viaja con modales y un ramillete de plumas. Muy culta y muy picajosa. | Llegar al Castillo para el Baile de la Cuajada sin que nadie la despluma. | Contrato canon `gallina_noble`: pagará 14 quesos y 1 `brie` si llega entera (7 si llega malherida). Si la matan, la familia manda cartas. En la mínima su vida se mide con un contador de golpes recibidos (D-33); como combatiente aliada pasiva es opcional. |
 | `fantasma_charlatan` | objetivo | Eustaquio, el fantasma charlatán | `aldea` | Mayordomo del último príncipe de Roquefort. Murió esperando su cena. Ahora asusta casas... para tener con quien hablar. | Que alguien escuche su historia completa. | Contrato `fantasma_charlatan`. Si se le escucha (acción de diálogo sin combate), entrega la `llave_mohosa` y un mapa de las cuevas. |
 | `capitan_pecorino` | objetivo | Capitán Pecorino Duro | `camino_real` / `castillo` | Jefe de las Lanzas Parmesanas. Todo lo que dice parece un sermón. | Que la Banda se vaya y que el rey lo contrate a él. Acabará pidiendo ayuda a regañadientes. | Rumores y avisos. Entrega el `estoque_de_parmesano` como recompensa de contrato, no lo vende (rival que reconoce el mérito, con la boca pequeña). |
 | `rey_brieto` | mínima | Brieto IV "el Mal Curado" | `castillo` | Rey de Camembert. Amable, ingenuo y pegajoso. Su reinado coincide con el Gran Rancio. | Detener el moho de su despensa antes de que se entere el Gremio. | Contrato `despensa_real`, entrega `sello_real` (objetivo), paga una recompensa muy alta (40 quesos) si el jefe de las cuevas cae. |
@@ -265,12 +265,12 @@ Ocho NPC. Los que están marcados **(extra)** pueden quedar como texto sin inter
 
 Este documento solo sugiere ids y encajes; el documento de contratos decide detalles. Siguiendo el canon (`contrato(gallina_noble, camino_real, ...)`), el id del contrato puede coincidir con el del NPC.
 
-Las recompensas son las escaladas del documento 04 (D-09): con 12 cheddar iniciales y 4 de comida al día, las recompensas van de 5 a 40 quesos. El queso de recompensa entra siempre como cheddar fresco salvo que se indique otro tipo.
+Las recompensas son las escaladas del documento 04 (D-09): con 12 cheddar iniciales y 4 de comida al día, las recompensas van de 4 a 40 quesos (en la mínima: 9, 7, 14 y 40; valores confirmados por el autor el 2 de noviembre de 2026 tras el recálculo de 04 §9.2). El queso de recompensa entra siempre como cheddar fresco salvo que se indique otro tipo.
 
 | id contrato | Versión | Zona | Resumen | Quién lo da | Requisito de ejemplo | Recompensa |
 |---|---|---|---|---|---|---|
-| `ratas_del_granero` | mínima | `aldea` | Echar a las ratas queseras del granero. | `alcaldesa_nata` | Ninguno (tutorial). | 7 quesos y 1 `pocion` (X-46: sin tienda, la poción llega por recompensa). |
-| `gato_en_el_arbol` | mínima | `aldea` | Bajar un gato de un árbol (el árbol no coopera). | `alcaldesa_nata` | Ninguno. | 5 quesos y la `venda_de_caballos`. |
+| `ratas_del_granero` | mínima | `aldea` | Echar a las ratas queseras del granero. | `alcaldesa_nata` | Ninguno (tutorial). | 9 quesos y 1 `pocion` (X-46: sin tienda, la poción llega por recompensa). |
+| `gato_en_el_arbol` | mínima | `aldea` | Bajar un gato de un árbol (el árbol no coopera). | `alcaldesa_nata` | Ninguno. | 7 quesos y la `venda_de_caballos`. |
 | `gallina_noble` | mínima | `camino_real` | Escoltar a Lady Clotilde (canon). | `gallina_noble` | `rasgo_no(teme_caballos)` (canon): se evalúa contra los miembros activos que no ignoran el miedo (con la venda, Baldomero cumple; D-19). | 12 quesos y 1 `brie`. |
 | `despensa_real` | mínima | `castillo` | Parar el Gran Rancio y derrotar al `gran_roquefort`. | `rey_brieto` | `contratos_cumplidos_min(3)` (y, en la variante dura **(extra)**, tener `llave_mohosa`). | 40 quesos. |
 | `fantasma_charlatan` | objetivo | `aldea` | Convencer al fantasma de irse de la casa. | `alcaldesa_nata` | Ninguno (04 pide moral media >= 4). | 8 quesos y la `llave_mohosa`. |
@@ -645,9 +645,9 @@ Slots: `arma`, `cuerpo`, `accesorio`. Inventario: `lleva(Id, Objeto, N)` (la com
 
 | id | Versión | Recompensa |
 |---|---|---|
-| `ratas_del_granero` | mínima | 7 quesos + 1 `pocion` |
-| `gato_en_el_arbol` | mínima | 5 quesos + `venda_de_caballos` |
-| `gallina_noble` (canon) | mínima | 12 quesos + 1 `brie` |
+| `ratas_del_granero` | mínima | 9 quesos + 1 `pocion` |
+| `gato_en_el_arbol` | mínima | 7 quesos + `venda_de_caballos` |
+| `gallina_noble` (canon) | mínima | 14 quesos + 1 `brie` |
 | `despensa_real` | mínima | 40 quesos |
 | `fantasma_charlatan` | objetivo | 8 quesos + `llave_mohosa` |
 | `peaje_del_ganso` | objetivo | 9 quesos + `cucharon_de_hierro` |
@@ -685,7 +685,7 @@ Queso fuera del código: nadie define `comprar_queso` ni `vender_queso`; no exis
 
 Origen de los estados: docs/06 §3 (consolidado) y §4 (decisiones D-nn aceptadas por el autor el 2 de noviembre de 2026). La aplicación de los cambios aceptados a DISENO.md se hace en la revisión de ese documento.
 
-1. **Provisión inicial de queso insuficiente.** Con cuatro miembros comiendo una unidad por día, `queso(cheddar, 0, 5)` alcanza para poco más de un día, y la primera ida a la aldea ya cuesta un día más. Propuesta: empezar con **12 cheddar**. Motivo: que el primer contrato sea jugable y no un castigo. **Estado: ACEPTADO** (D-09, X-26). Además se aceptan las recompensas escaladas de 04 (la `gallina_noble` paga 12 quesos y 1 brie, no 5; X-27).
+1. **Provisión inicial de queso insuficiente.** Con cuatro miembros comiendo una unidad por día, `queso(cheddar, 0, 5)` alcanza para poco más de un día, y la primera ida a la aldea ya cuesta un día más. Propuesta: empezar con **12 cheddar**. Motivo: que el primer contrato sea jugable y no un castigo. **Estado: ACEPTADO** (D-09, X-26). Además se aceptan las recompensas escaladas de 04 (la `gallina_noble` paga 14 quesos y 1 brie, no 5; X-27; el recálculo de 04 §9.2 subió después ratas a 9, gato a 7 y gallina a 14, confirmado el 2 de noviembre de 2026).
 2. **Sueldos más bajos.** Sueldos de 1+2+1+1 = 5 quesos por pago; con las recompensas escaladas la economía cierra. **Estado: ACEPTADO** (01-2, 04-13). El pago es el comando explícito `pagar`, por unidades (D-14, D-13).
 3. **Escala de moral 0 a 10, inicio 6.** Entero 0-10 y huelga con moral <= 2 (equivale al antiguo "< 3"). **Estado: ACEPTADO** (D-08, X-24). La huelga se deriva **solo de la moral**, ya no depende de "deber un sueldo" (X-25).
 4. **Umbral de rancio por tipo (extra).** Se podría dar a cada tipo un `umbral_rancio/2` propio. **Estado: RECHAZADO / pospuesto**: se mantiene el canon único (0-2 fresco, 3-9 curado, 10+ rancio).
@@ -718,8 +718,8 @@ Revisión del 2 de noviembre de 2026 tras docs/06. Solo se ha editado este docum
 | 4.1: moral 0-10 (inicio 6, huelga con moral <= 2), 12 cheddar iniciales, sueldos por unidades; columna de versión del rasgo. | D-08, X-24, D-09, X-26, D-13 |
 | 4.2 a 4.5 y 10.4: una habilidad por personaje en la mínima; `raclette_curativa` (extra), `silencio_pagado` (objetivo). | D-23, X-43, X-47 |
 | 4.7: reglas con `teme/2` consciente de la venda, `ignora_miedo/1` con `equipado/2`, `cantando/1` derivado de `alterado/3`, `lleva_queso/1`. | D-19, X-37, X-15, X-16, D-16 |
-| 5: tabla de NPC con versión; Mantecosa sin deuda; Ricota no compra ni vende queso (tienda extra); ermitaño no vende; Clotilde paga 12 + 1 brie y se mide con contador de golpes; Pecorino entrega el estoque como recompensa. | D-10, D-15, D-09, X-27, D-33, X-38 |
-| 5.1: tabla de contratos con versión y recompensas escaladas (7, 5, 12, 40, 8, 9, 10); `rasgo_no` contra miembros que no ignoran el miedo; `despensa_real` con `contratos_cumplidos_min(3)` y llave solo en variante dura; 1 `pocion` de recompensa en `ratas_del_granero`. | D-09, D-19, X-37, X-41, X-46, D-21 |
+| 5: tabla de NPC con versión; Mantecosa sin deuda; Ricota no compra ni vende queso (tienda extra); ermitaño no vende; Clotilde paga 14 + 1 brie (antes 12) y se mide con contador de golpes; Pecorino entrega el estoque como recompensa. | D-10, D-15, D-09, X-27, D-33, X-38 |
+| 5.1: tabla de contratos con versión y recompensas escaladas (7, 5, 12, 40, 8, 9, 10; ajustadas después a 9, 7, 14 en ratas, gato y gallina); `rasgo_no` contra miembros que no ignoran el miedo; `despensa_real` con `contratos_cumplidos_min(3)` y llave solo en variante dura; 1 `pocion` de recompensa en `ratas_del_granero`. | D-09, D-19, X-37, X-41, X-46, D-21 |
 | 6: bestiario con columna de versión (5 mínima, 2 objetivo, resto extra), botín de 1 queso para `lleva_queso`; IA mínima = canon de 3 reglas + `robar_queso`, `embestir`, `invocar_moho`; perfiles restantes marcados; regla 3 del jefe corregida; instancias `e(Tipo, N)`. | D-24, X-42, X-49, X-19, 06 §5.1 |
 | 6.3: progresión marcada por versión. | 06 §5.1 |
 | 7.1: ración diaria fresco → curado → rancio; el efecto del tipo solo con `comer(Tipo)`; categoría con `categoria_queso/2`; criterio del rancio "como máximo el valor del fresco". | D-11, X-28, D-12, X-29, X-20, X-34 |
