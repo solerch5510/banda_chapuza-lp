@@ -82,7 +82,9 @@ mostrar_conocido(vista(inventario, Datos)) :-
 mostrar_conocido(vista(prueba, Accion, Prueba)) :-
     explicar:prueba_a_lineas(Prueba, Lineas),
     format("Por qué se pudo ~w:~n", [Accion]),
-    escribir_lineas(Lineas).
+    escribir_lineas(Lineas),
+    narrador:comentario_prueba(Prueba, ambos, 0, Comentario),
+    format("Narrador: ~w~n", [Comentario]).
 mostrar_conocido(salir) :-
     format("Hasta la próxima, Banda Chapuza.~n", []).
 mostrar_conocido(fase(_)).

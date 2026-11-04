@@ -214,13 +214,25 @@ comprobar_fin(Items) :-
 
 % etapa(+Efectos, -Mensajes): recoge los mensajes con su contador de uso (antes de
 % incrementarlo) y aplica TODO en una transaccion. ui no escribe nada en el estado.
+% El contador es por GRUPO: el mensaje entero con sus argumentos (llegada(aldea) y
+% llegada(taberna) cuentan por separado), que es lo que rota las variantes del narrador.
 etapa(Efectos, Mensajes) :-
     findall(msg(Clave, Args, Uso),
-            ( member(mensaje(Clave, Args), Efectos), uso_de(Clave, Uso) ),
+            (   member(mensaje(Clave, Args), Efectos),
+                grupo_de(Clave, Args, Grupo),
+                uso_de(Grupo, Uso)
+            ),
             Mensajes),
-    findall(uso_frase(Clave), member(mensaje(Clave, _), Efectos), Usos),
+    findall(uso_frase(Grupo),
+            (   member(mensaje(Clave, Args), Efectos),
+                grupo_de(Clave, Args, Grupo)
+            ),
+            Usos),
     append(Efectos, Usos, Todos),
     con_transaccion(estado:aplicar_efectos(Todos)).
 
-uso_de(Clave, Uso) :-
-    (   estado:usos_frase(Clave, U0) -> Uso = U0 ; Uso = 0 ).
+grupo_de(Clave, Args, Grupo) :-
+    Grupo =.. [Clave|Args].
+
+uso_de(Grupo, Uso) :-
+    (   estado:usos_frase(Grupo, U0) -> Uso = U0 ; Uso = 0 ).

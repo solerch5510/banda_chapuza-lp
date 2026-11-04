@@ -82,10 +82,14 @@ Las pruebas usan `plunit`. Desde la raíz del repositorio (PowerShell), con el e
 ```
 
 ```
+& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/narrador -g "run_tests,halt" -t "halt(1)"
+```
+
+```
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/spike_explicar -g "run_tests,halt" -t "halt(1)"
 ```
 
-Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (210 pruebas):
+Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (252 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -93,6 +97,7 @@ Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 
 | `tests/juego.pl` (70) | La compañía, la economía, los comandos (`juego:ejecutar/2`), la interfaz y sesiones completas por la entrada. |
 | `tests/pagos.pl` (49) | El informe de la compañía y la huelga, el valor del queso, el inventario, los sueldos y `pagar`, el impago y el comando `explicar`. |
 | `tests/explicar_juego.pl` (27) | El meta-intérprete sobre las **reglas reales** del juego (mismas respuestas y orden que la ejecución directa, en 10 estados distintos) y el árbol de texto. |
+| `tests/narrador.pl` (42) | El narrador: el banco de frases, la clave más específica, la rotación de variantes, los niveles, los nombres con artículo, las frases genéricas y el comentario de `explicar`. |
 | `tests/spike_explicar.pl` (17) | El meta-intérprete de `src/explicar.pl`, con dos módulos de juguete (`tests/spike/`). |
 
 Se ejecutan en procesos distintos porque los módulos de juguete del spike exportan nombres (como `vida/2`) que chocarían con los de `estado`.

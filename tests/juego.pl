@@ -488,8 +488,8 @@ test(leer_terminos_de_la_entrada) :-
 test(una_sesion_completa_de_principio_a_fin) :-
     jugar('mirar.\nir(aldea).\nir(taberna).\nsalir.\n', Salida),
     contiene(Salida, 'BANDA CHAPUZA'),
-    contiene(Salida, 'Llegas a Aldea'),
-    contiene(Salida, 'Llegas a Taberna'),
+    contiene(Salida, 'Aldea Requesón: casitas blancas'),
+    contiene(Salida, 'Llegas al Cuajo Torcido'),
     contiene(Salida, 'Hasta la pr').
 
 test(el_juego_termina_al_acabarse_la_entrada) :-
