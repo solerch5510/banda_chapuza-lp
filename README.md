@@ -44,17 +44,22 @@ Nota: en la 5.10.4 para Windows, una ruta relativa con extensión como último a
 
 ### Estado del juego
 
-Se puede **recorrer el mapa**. Cada comando se escribe como un término de Prolog **terminado en punto**:
+Se puede **recorrer el mapa, gestionar la compañía y pedir explicaciones**. Cada comando se escribe como un término de Prolog **terminado en punto**:
 
 | Comando | Qué hace |
 |---|---|
 | `ayuda.` | Lista los comandos disponibles ahora. |
 | `mirar.` | Describe la zona, las salidas, el día y el queso que queda. |
-| `ir(aldea).` | Viaja a una zona conectada; cuesta un día (el queso madura y cada miembro come una unidad). |
+| `ir(aldea).` | Viaja a una zona conectada; cuesta un día (el queso madura y cada miembro come una unidad). Salir de la taberna sin haber pagado los sueldos baja la moral. |
 | `descansar.` | Solo en la taberna: cuesta 2 quesos, cura a todos, +1 de moral y pasa un día. |
+| `pagar.` | Solo en la taberna: paga los sueldos pendientes (5 quesos) empezando por los más rancios. Llegar a la taberna deja sueldos pendientes. |
+| `compania.` | Los miembros: vida, ataque, defensa, moral, fila, sueldo, rasgo y estado (en pie, huelga o caído). |
+| `inventario.` | La despensa lote a lote (con la edad y la categoría del queso) y los objetos. |
+| `explicar.` | La prueba lógica, en árbol, de lo último que se hizo (`ir`, `descansar` o `pagar`). |
+| `explicar(ir(aldea)).` | La prueba de esa acción: la guardada si es la última; si no, se resuelve ahora. |
 | `salir.` | Termina la partida. |
 
-Si la despensa se queda vacía, la partida termina por hambre. Contratos, combate, sueldos y el modo *explicar* aún no están implementados (ver `docs/03-funcionalidades-y-etapas.md`). Los acentos dependen de la consola de Windows (comprobación pendiente en la consola de la entrega).
+Si la despensa se queda vacía, la partida termina por hambre. Contratos, combate y `por_que_no` aún no están implementados (ver `docs/03-funcionalidades-y-etapas.md`). Los acentos dependen de la consola de Windows (comprobación pendiente en la consola de la entrega).
 
 ## Pruebas
 
@@ -69,15 +74,25 @@ Las pruebas usan `plunit`. Desde la raíz del repositorio (PowerShell), con el e
 ```
 
 ```
+& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/pagos -g "run_tests,halt" -t "halt(1)"
+```
+
+```
+& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/explicar_juego -g "run_tests,halt" -t "halt(1)"
+```
+
+```
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/spike_explicar -g "run_tests,halt" -t "halt(1)"
 ```
 
-Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (134 pruebas):
+Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (210 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
 | `tests/mundo_estado.pl` (47) | Los datos del mundo (`src/mundo.pl`) y el estado y los efectos (`src/estado.pl`). |
 | `tests/juego.pl` (70) | La compañía, la economía, los comandos (`juego:ejecutar/2`), la interfaz y sesiones completas por la entrada. |
+| `tests/pagos.pl` (49) | El informe de la compañía y la huelga, el valor del queso, el inventario, los sueldos y `pagar`, el impago y el comando `explicar`. |
+| `tests/explicar_juego.pl` (27) | El meta-intérprete sobre las **reglas reales** del juego (mismas respuestas y orden que la ejecución directa, en 10 estados distintos) y el árbol de texto. |
 | `tests/spike_explicar.pl` (17) | El meta-intérprete de `src/explicar.pl`, con dos módulos de juguete (`tests/spike/`). |
 
 Se ejecutan en procesos distintos porque los módulos de juguete del spike exportan nombres (como `vida/2`) que chocarían con los de `estado`.

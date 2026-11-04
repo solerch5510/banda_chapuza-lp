@@ -7,7 +7,9 @@
 % Por ahora: lo que necesitan ir y descansar (categorias, despensa, racion y descanso).
 
 :- module(economia, [categoria_queso/2, queso_total/1, hay_queso_para/1, despensa/1,
-                     puede_descansar/0, efectos_racion/1, efectos_descanso/1]).
+                     valor_queso/3, valor_despensa/1, inventario/1,
+                     puede_descansar/0, efectos_racion/1, efectos_descanso/1,
+                     total_sueldos/1, puede_pagar_sueldos/0, efectos_sueldos/1]).
 :- use_module(mundo).
 :- use_module(estado).
 :- use_module(compania).
@@ -60,6 +62,36 @@ rango_categoria(rancio, 3).
 
 quitar_claves([], []).
 quitar_claves([_-Lote|Resto], [Lote|Lotes]) :- quitar_claves(Resto, Lotes).
+
+% ---------------------------------------------------------------------------
+% Valor (SOLO informativo: todo se paga y se cobra por unidades, no por valor).
+% fresco = valor base; curado = valor base + 2; rancio = 1 como mucho (nunca mas que el fresco).
+% valor_queso(+Tipo, +Edad, -Valor)
+% ---------------------------------------------------------------------------
+valor_queso(Tipo, Edad, Valor) :-
+    mundo:tipo_queso(Tipo, Base),
+    categoria_queso(Edad, Categoria),
+    valor_segun(Categoria, Base, Valor).
+
+valor_segun(fresco, Base, Base).
+valor_segun(curado, Base, Valor) :- Valor is Base + 2.
+valor_segun(rancio, Base, Valor) :- Valor is min(1, Base).
+
+% valor_despensa(-Total): valor informativo de toda la despensa.
+valor_despensa(Total) :-
+    findall(V, ( estado:queso(Tipo, Edad, Cant), valor_queso(Tipo, Edad, Unidad), V is Unidad * Cant ), Vs),
+    sumlist(Vs, Total).
+
+% inventario(-Datos): lo que muestra el comando inventario.
+inventario([dia(Dia), total(Total), valor(Valor), lotes(Lotes), objetos(Objetos)]) :-
+    once(estado:dia(Dia)),
+    queso_total(Total),
+    valor_despensa(Valor),
+    despensa(Despensa),
+    findall(lote(Tipo, Edad, Cant, Categoria),
+            ( member(q(Tipo, Edad, Cant), Despensa), categoria_queso(Edad, Categoria) ),
+            Lotes),
+    findall(Objeto-Cant, estado:lleva(compania, Objeto, Cant), Objetos).
 
 % ---------------------------------------------------------------------------
 % Descansar (solo en la taberna): cuesta quesos, cura a todos y sube la moral.
@@ -144,3 +176,35 @@ hambre(Id, [mensaje(sin_comida, [Id]), mod_moral(Id, Menos)|Dano]) :-
     mundo:parametro(dano_hambre, Maximo),
     Dano1 is min(Maximo, Vida - 1),
     (   Dano1 > 0 -> Dano = [dano(Id, Dano1)] ; Dano = [] ).
+
+% ---------------------------------------------------------------------------
+% Sueldos: se pagan con el comando pagar en la taberna, en quesos (unidades).
+% La bandera marca(sueldos_pagados) dice que no se debe nada: se pone al empezar y
+% al pagar, y se quita al llegar a la taberna (llegar trae sueldos pendientes).
+% ---------------------------------------------------------------------------
+% total_sueldos(-Total): suma de los sueldos de los miembros activos.
+total_sueldos(Total) :-
+    findall(S, ( compania:activo(Id), compania:sueldo_de(Id, S) ), Sueldos),
+    sumlist(Sueldos, Total).
+
+% puede_pagar_sueldos: hay sueldos pendientes y queso para cubrirlos todos
+% (no se paga a medias). Es la regla que se explica en el comando pagar.
+puede_pagar_sueldos :-
+    \+ estado:marca(sueldos_pagados),
+    total_sueldos(Total),
+    hay_queso_para(Total).
+
+% efectos_sueldos(-Efectos): marca los sueldos como pagados y gasta el total en quesos,
+% con el MAS RANCIO PRIMERO ("una forma de reciclar", dice el Gremio).
+efectos_sueldos([marcar(sueldos_pagados), mensaje(pago, [Total])|Gastos]) :-
+    total_sueldos(Total),
+    despensa_para_pago(Despensa),
+    tomar(Despensa, Total, Gastos).
+
+% despensa_para_pago(-Lotes): la despensa con el lote mas viejo primero.
+despensa_para_pago(Lista) :-
+    findall(clave(EdadNeg, Tipo)-q(Tipo, Edad, Cant),
+            ( estado:queso(Tipo, Edad, Cant), EdadNeg is -Edad ),
+            Pares),
+    msort(Pares, Ordenados),
+    quitar_claves(Ordenados, Lista).

@@ -34,6 +34,10 @@ texto(sin_comida, [Id], _, Texto) :-
 texto(come_rancio, [Id], _, Texto) :-
     nombre_de(Id, Nombre),
     format(atom(Texto), '~w mastica queso rancio con cara de resignación.', [Nombre]).
+texto(pago, [Total], _, Texto) :-
+    format(atom(Texto), 'Pagas ~w quesos de sueldos, empezando por los más rancios (el Gremio lo llama "reciclar").', [Total]).
+texto(impago, [], _,
+      'Sales de la taberna sin pagar los sueldos y la compañía no lo olvida: baja la moral.').
 texto(fin_hambre, [], _,
       'La despensa está vacía y nadie quiere pelear con el estómago vacío: la Banda Chapuza se disuelve. Fin de la partida.').
 
@@ -75,6 +79,15 @@ texto_error(fuera_de_fase(Cmd, Fase), Texto) :-
 texto_error(no_entiendo(Termino), Texto) :-
     como_texto(Termino, Dicho),
     format(atom(Texto), 'No entiendo "~w". Escribe ayuda. para ver los comandos.', [Dicho]).
+texto_error(nada_que_pagar, 'No debes nada: los sueldos ya están pagados.').
+texto_error(no_puede_pagar, 'Los sueldos no se pueden pagar a medias y la despensa no llega.').
+texto_error(nada_que_explicar, 'Todavía no has hecho nada que explicar. Prueba con explicar(ir(aldea)).').
+texto_error(no_hay_prueba(Accion), Texto) :-
+    como_texto(Accion, Dicho),
+    format(atom(Texto), 'Ahora mismo no se puede hacer ~w, así que no hay prueba que enseñar.', [Dicho]).
+texto_error(no_se_explica(Accion), Texto) :-
+    como_texto(Accion, Dicho),
+    format(atom(Texto), 'No sé explicar "~w". Puedo explicar ir(Zona), descansar y pagar.', [Dicho]).
 texto_error(falta_argumento(Termino), Texto) :-
     functor(Termino, Nombre, _),
     format(atom(Texto), 'A ~w le falta decir a dónde o a qué; escribe el nombre completo, por ejemplo: ir(aldea).', [Nombre]).
@@ -99,4 +112,8 @@ ayuda_de(descansar, Texto) :-
     mundo:parametro(coste_descanso, Coste),
     format(atom(Texto),
            'descansar.     solo en la taberna: cuesta ~w quesos, cura a todos y pasa un día', [Coste]).
+ayuda_de(pagar, 'pagar.         solo en la taberna: paga los sueldos pendientes con lo más rancio').
+ayuda_de(compania, 'compania.      muestra a los miembros, su vida, su moral y su estado').
+ayuda_de(inventario, 'inventario.    muestra la despensa (con la edad del queso) y los objetos').
+ayuda_de(explicar, 'explicar.      la prueba de lo último que hiciste; explicar(Accion). la de esa acción').
 ayuda_de(salir, 'salir.         termina la partida').

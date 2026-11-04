@@ -7,7 +7,7 @@
 
 :- module(mundo, [zona/2, descripcion_zona/2, conexion/2, adyacente/2, zona_pacifica/1,
                   personaje/7, fila_preferida/2, rasgo/2,
-                  parametro/2, inicio/1]).
+                  tipo_queso/2, parametro/2, inicio/1]).
 
 % La declaracion de modulo va PRIMERO; el archivo tiene tildes, asi que se declara UTF-8 justo despues.
 :- encoding(utf8).
@@ -75,6 +75,13 @@ rasgo(rufino,    cobra_por_callar).
 rasgo(tuerca,    manos_largas).
 
 % ---------------------------------------------------------------------------
+% Quesos que existen: tipo_queso(Tipo, ValorBase). El valor SOLO informa: sueldos,
+% recompensas y multas se cuentan por unidades, no por valor.
+% ---------------------------------------------------------------------------
+tipo_queso(cheddar, 2).
+tipo_queso(brie,    3).
+
+% ---------------------------------------------------------------------------
 % Constantes de balance: parametro(Nombre, Valor). Las reglas las leen de aqui,
 % asi ningun numero "magico" queda escondido en el codigo.
 % ---------------------------------------------------------------------------
@@ -88,7 +95,7 @@ parametro(coste_descanso,    2).    % quesos que cuesta descansar en la taberna 
 parametro(moral_impago,      2).    % moral que pierde cada miembro si se sale sin pagar
 parametro(moral_hambre,      1).    % moral que pierde quien se queda sin comer (provisional)
 parametro(dano_hambre,       2).    % vida que pierde quien se queda sin comer; nunca baja de 1 (provisional)
-parametro(moral_rancio,      1).    % moral que pierde quien come queso rancio (provisional)
+parametro(moral_rancio,      2).    % moral que pierde quien come queso rancio (lore 7.1)
 
 % ---------------------------------------------------------------------------
 % Valores iniciales de la partida: inicio(Dato)

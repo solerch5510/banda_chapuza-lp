@@ -138,7 +138,7 @@ test(la_racion_come_en_orden_y_penaliza_lo_rancio, [setup(nueva)]) :-
     Es == [gastar_queso(cheddar, 0, 1),
            gastar_queso(brie, 5, 1),
            gastar_queso(cheddar, 3, 1),
-           gastar_queso(cheddar, 10, 1), mod_moral(tuerca, -1), mensaje(come_rancio, [tuerca])].
+           gastar_queso(cheddar, 10, 1), mod_moral(tuerca, -2), mensaje(come_rancio, [tuerca])].
 
 test(la_racion_gasta_lo_que_hay_y_se_puede_aplicar, [setup(nueva)]) :-
     economia:efectos_racion(Es),
@@ -233,7 +233,7 @@ test(un_comando_con_variable_sin_ligar_pide_el_argumento) :-
 test(cada_fase_permite_sus_comandos) :-
     comandos_disponibles(exploracion, E), \+ memberchk(descansar, E), memberchk(ir, E),
     comandos_disponibles(taberna, T),     memberchk(descansar, T),    memberchk(ir, T),
-    comandos_disponibles(fin, F),         F == [ayuda, salir].
+    comandos_disponibles(fin, F),         F == [ayuda, explicar, salir].
 
 :- end_tests(juego_validar).
 
@@ -287,7 +287,7 @@ test(ir_a_una_zona_sin_conexion_da_error_y_no_cambia_nada, [setup(nueva)]) :-
     cmd(ir(castillo), Items),
     Items == [error(no_puede_viajar(castillo))],
     foto_estado(Despues),
-    Antes == Despues.
+    Antes =@= Despues.
 
 test(ir_a_una_zona_inexistente_da_error, [setup(nueva)]) :-
     cmd(ir(luna), Items),
@@ -350,7 +350,7 @@ test(descansar_fuera_de_la_taberna_no_esta_permitido, [setup(nueva)]) :-
     cmd(descansar, Items),
     Items == [error(fuera_de_fase(descansar, exploracion))],
     foto_estado(Despues),
-    Antes == Despues.
+    Antes =@= Despues.
 
 test(descansar_sin_quesos_da_error_y_no_cambia_nada, [setup(nueva)]) :-
     despensa_con(1),
@@ -358,7 +358,7 @@ test(descansar_sin_quesos_da_error_y_no_cambia_nada, [setup(nueva)]) :-
     cmd(descansar, Items),
     Items == [error(no_puede_descansar)],
     foto_estado(Despues),
-    Antes == Despues.
+    Antes =@= Despues.
 
 test(el_contador_de_uso_de_un_mensaje_aumenta, [setup(nueva)]) :-
     despensa_con(30),
@@ -381,7 +381,7 @@ test(mirar_describe_la_zona_sin_cambiar_nada, [setup(nueva)]) :-
     memberchk(queso(12), Datos),
     memberchk(descripcion(D), Datos), atom(D),
     foto_estado(Despues),
-    Antes == Despues.
+    Antes =@= Despues.
 
 test(mirar_en_otra_zona, [setup(nueva)]) :-
     cmd(ir(camino_real), _),

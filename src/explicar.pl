@@ -1,11 +1,11 @@
 % explicar.pl
 % Meta-interprete y modo explicar (explicar/1, por_que_no/1, arbol/1).
 %
-% Version del spike T-03 (docs/02-arquitectura-codigo.md, 6.4 y 6.5): solve/2,3
-% construye la prueba de un objetivo y trata el corte de forma real. Las demas
-% piezas (por_que_no, presentacion de pruebas) se anaden en tareas posteriores.
+% solve/2,3 (docs/02-arquitectura-codigo.md, 6.4 y 6.5) construye la prueba de un objetivo
+% y trata el corte de forma real; prueba_a_lineas/2 (6.11) la convierte en un arbol de texto
+% ASCII que ui escribe. por_que_no y los niveles resumido/detallado llegan mas adelante.
 
-:- module(explicar, [solve/2, solve/3]).
+:- module(explicar, [solve/2, solve/3, prueba_a_lineas/2, meta_de_prueba/2]).
 :- meta_predicate solve(0, -), solve(0, -, +).
 
 % Modulos por cuyas clausulas SI se desciende; todo lo demas es hoja.
@@ -157,3 +157,103 @@ primeros(K, L, P) :-
     (   K > 0, L = [X|R] -> K1 is K - 1, P = [X|P1], primeros(K1, R, P1)
     ;   P = []
     ).
+
+% ===========================================================================
+% Presentacion: la prueba como arbol de texto ASCII (funciones PURAS: devuelven
+% una lista de atomos; quien escribe en pantalla es ui.pl). Marcas: [ok], [hecho]...
+% ===========================================================================
+
+% meta_de_prueba(+Prueba, -Meta): la meta que demuestra esa prueba.
+meta_de_prueba(hecho(G), G).
+meta_de_prueba(regla(G, _, _), G).
+meta_de_prueba(builtin(G), G).
+meta_de_prueba(no(G), (\+ G)).
+meta_de_prueba(verdad, true).
+meta_de_prueba(si(PC, _), G) :- meta_de_prueba(PC, G).
+
+% txt(+Meta, -Atomo): una meta como texto. Las variables salen como A, B...; \+ lleva
+% parentesis si niega una conjuncion; lo muy largo se recorta con puntos suspensivos.
+txt(Meta, Texto) :-
+    quitar_modulos(Meta, SinModulos),
+    copy_term(SinModulos, Copia),
+    numbervars(Copia, 0, _),
+    t(Copia, Largo),
+    (   atom_length(Largo, N), N > 72
+    ->  sub_atom(Largo, 0, 69, _, Prefijo),
+        atom_concat(Prefijo, '...', Texto)
+    ;   Texto = Largo
+    ).
+
+% quitar_modulos(+Termino, -Termino2): borra los prefijos modulo:Meta en cualquier posicion
+% (tambien dentro de findall/3...): el modulo no aporta nada a quien lee la explicacion.
+quitar_modulos(T0, T) :-
+    (   var(T0)
+    ->  T = T0
+    ;   T0 = (M:G), atom(M)
+    ->  quitar_modulos(G, T)
+    ;   compound(T0)
+    ->  T0 =.. [F|Args0],
+        maplist(quitar_modulos, Args0, Args),
+        T =.. [F|Args]
+    ;   T = T0
+    ).
+
+t(G, Texto) :-
+    (   nonvar(G), G = (\+ X)
+    ->  t(X, TX),
+        (   nonvar(X), X = (_, _)
+        ->  format(atom(Texto), '\\+ (~w)', [TX])
+        ;   format(atom(Texto), '\\+ ~w', [TX])
+        )
+    ;   nonvar(G), G = (X, Y)
+    ->  t(X, TX), t(Y, TY),
+        format(atom(Texto), '~w, ~w', [TX, TY])
+    ;   format(atom(Texto), '~W', [G, [numbervars(true), quoted(false), spacing(next_argument)]])
+    ).
+
+% prueba_a_lineas(+Prueba, -Lineas): una linea por nodo, con sangria por nivel.
+prueba_a_lineas(Prueba, Lineas) :-
+    pl(Prueba, '', Lineas, []).
+
+% izq/der solo dicen que rama de una disyuncion se uso: no ocupan linea propia.
+% Una conjuncion de pruebas (A, B) son dos pruebas al mismo nivel.
+pl(izq(P), S, L0, L) :- pl(P, S, L0, L).
+pl(der(P), S, L0, L) :- pl(P, S, L0, L).
+pl((A, B), S, L0, L) :- pl(A, S, L0, L1), pl(B, S, L1, L).
+pl(P, Sangria, [Linea|Ls0], Ls) :-
+    P \= izq(_), P \= der(_), P \= (_, _),
+    etiqueta(P, Marca, Meta),
+    txt(Meta, Texto),
+    format(atom(Linea), '~w[ok] ~w   ~w', [Sangria, Texto, Marca]),
+    hijos(P, Hs),
+    atom_concat(Sangria, '   ', Sangria2),
+    pl_hijos(Hs, Sangria2, Ls0, Ls).
+
+pl_hijos([], _, L, L).
+pl_hijos([H|T], S, L0, L) :-
+    pl(H, S, L0, L1),
+    pl_hijos(T, S, L1, L).
+
+etiqueta(hecho(G), '[hecho]', G).
+etiqueta(builtin(G), '[builtin]', G).
+etiqueta(no(G), '[no demostrable]', (\+ G)).
+etiqueta(corte, '[corte: se descartaron las clausulas siguientes]', corte).
+etiqueta(verdad, '', true).
+etiqueta(agregado(G, T, _), Marca, G) :- format(atom(Marca), '[findall: ~w solucion(es)]', [T]).
+etiqueta(todos(G, Cs), Marca, G) :- length(Cs, N), format(atom(Marca), '[forall: ~w caso(s)]', [N]).
+etiqueta(si(PC, _), '[rama then]', G) :- meta_de_prueba(PC, G).
+etiqueta(sino(_), '[rama else]', else).
+etiqueta(regla(G, I, Hs), Marca, G) :-
+    (   memberchk(corte, Hs) -> Corte = ' + corte' ; Corte = '' ),
+    format(atom(Marca), '[clausula ~w~w]', [I, Corte]).
+
+hijos(regla(_, _, Hs), Hs).
+hijos(hecho(_), []).
+hijos(builtin(_), []).
+hijos(no(_), []).
+hijos(corte, []).
+hijos(verdad, []).
+hijos(agregado(_, _, M), Hs) :- findall(H, ( member(X, M), aplanar_y(X, L), member(H, L) ), Hs).
+hijos(todos(_, Cs), Hs) :- findall(H, ( member(PC-PA, Cs), member(H, [PC, PA]) ), Hs).
+hijos(si(_, PT), [PT]).
+hijos(sino(PE), [PE]).

@@ -159,6 +159,15 @@ aplicar_conocido(gastar_queso(T, E, N)) :-
 aplicar_conocido(envejecer_quesos) :-
     findall(q(T, E, C), retract(queso(T, E, C)), L),
     forall(member(q(T, E, C), L), ( E1 is E + 1, assertz(queso(T, E1, C)) )).
+aplicar_conocido(ganar_objeto(Id, Objeto, N)) :-         % Id = compania para el inventario comun
+    N > 0,
+    (   retract(lleva(Id, Objeto, C0)) -> C1 is C0 + N ; C1 = N ),
+    assertz(lleva(Id, Objeto, C1)).
+aplicar_conocido(gastar_objeto(Id, Objeto, N)) :-
+    N > 0, lleva(Id, Objeto, C0), C0 >= N,
+    retract(lleva(Id, Objeto, C0)),
+    C1 is C0 - N,
+    (   C1 > 0 -> assertz(lleva(Id, Objeto, C1)) ; true ).
 aplicar_conocido(marcar(F)) :-
     (   marca(F) -> true ; assertz(marca(F)) ).
 aplicar_conocido(desmarcar(F)) :-
@@ -177,6 +186,9 @@ aplicar_conocido(fijar_semilla(S)) :-
     assertz(semilla(S1)).
 aplicar_conocido(fin(Motivo)) :-         % fin(victoria) o fin(derrota(Motivo)); el primero que llega manda
     (   fin_partida(_) -> true ; assertz(fin_partida(Motivo)) ).
+aplicar_conocido(guardar_prueba(Accion, Prueba)) :-   % la ultima prueba, para explicar lo que acaba de pasar
+    retractall(ultima_prueba(_, _)),
+    assertz(ultima_prueba(Accion, Prueba)).
 aplicar_conocido(uso_frase(Grupo)) :-    % cuantas veces se ha usado un grupo de frases (rotacion del narrador)
     (   retract(usos_frase(Grupo, U0)) -> U1 is U0 + 1 ; U1 = 1 ),
     assertz(usos_frase(Grupo, U1)).
@@ -186,7 +198,8 @@ conocido(mensaje/2).      conocido(dano/2).          conocido(curar/2).
 conocido(mod_moral/2).    conocido(ganar_queso/3).   conocido(gastar_queso/3).
 conocido(envejecer_quesos/0). conocido(marcar/1).    conocido(desmarcar/1).
 conocido(avanzar_dia/0).  conocido(viajar/1).        conocido(fijar_semilla/1).
-conocido(fin/1).          conocido(uso_frase/1).
+conocido(fin/1).          conocido(uso_frase/1).     conocido(guardar_prueba/2).
+conocido(ganar_objeto/3). conocido(gastar_objeto/3).
 
 set_vida(Id, V) :-
     retractall(vida(Id, _)),

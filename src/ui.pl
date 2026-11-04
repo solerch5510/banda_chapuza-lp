@@ -9,6 +9,7 @@
 % La declaracion de modulo va primero; el archivo tiene tildes, asi que se declara UTF-8 justo despues.
 :- encoding(utf8).
 :- use_module(narrador).
+:- use_module(explicar).
 
 % iniciar: texto en UTF-8 (tildes y signos) y el indicador de entrada "> ".
 iniciar :-
@@ -63,9 +64,39 @@ mostrar_conocido(vista(ayuda, Comandos)) :-
            ->  format("  ~w~n", [Texto])
            ;   format("  ~w~n", [Nombre])
            )).
+mostrar_conocido(vista(compania, Filas)) :-
+    format("La compañía:~n", []),
+    forall(member(miembro(_, Nombre, Rol, Vida, VidaMax, Ataque, Defensa, Moral, Fila, Rasgo, Sueldo, Estado), Filas),
+           format("  ~w (~w)  vida ~w/~w  ataque ~w  defensa ~w  moral ~w/10  fila ~w  sueldo ~w  rasgo ~w  [~w]~n",
+                  [Nombre, Rol, Vida, VidaMax, Ataque, Defensa, Moral, Fila, Sueldo, Rasgo, Estado])).
+mostrar_conocido(vista(inventario, Datos)) :-
+    memberchk(dia(Dia), Datos),
+    memberchk(total(Total), Datos),
+    memberchk(valor(Valor), Datos),
+    memberchk(lotes(Lotes), Datos),
+    memberchk(objetos(Objetos), Datos),
+    format("Despensa (día ~w): ~w quesos (valor informativo: ~w)~n", [Dia, Total, Valor]),
+    forall(member(lote(Tipo, Edad, Cant, Categoria), Lotes),
+           format("  ~w x~w   edad ~w (~w)~n", [Tipo, Cant, Edad, Categoria])),
+    escribir_objetos(Objetos).
+mostrar_conocido(vista(prueba, Accion, Prueba)) :-
+    explicar:prueba_a_lineas(Prueba, Lineas),
+    format("Por qué se pudo ~w:~n", [Accion]),
+    escribir_lineas(Lineas).
 mostrar_conocido(salir) :-
     format("Hasta la próxima, Banda Chapuza.~n", []).
 mostrar_conocido(fase(_)).
+
+escribir_objetos([]) :-
+    format("Objetos: ninguno~n", []).
+escribir_objetos([O|Os]) :-
+    findall(Texto,
+            (   member(Objeto-Cant, [O|Os]),
+                format(atom(Texto), '~w x~w', [Objeto, Cant])
+            ),
+            Textos),
+    atomic_list_concat(Textos, ', ', Unidos),
+    format("Objetos: ~w~n", [Unidos]).
 
 escribir_salidas([]) :-
     format("Salidas: ninguna~n", []).
