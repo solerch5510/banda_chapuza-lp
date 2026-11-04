@@ -451,6 +451,20 @@ test(la_ayuda_lista_los_comandos, [setup(nueva)]) :-
     contiene(Salida, 'ir(Zona).'),
     contiene(Salida, 'descansar.').
 
+test(una_entrada_enorme_no_inunda_la_consola, [setup(nueva)]) :-
+    length(Cs, 5000), maplist(=(0'a), Cs), atom_codes(Enorme, Cs),
+    salida_de(resultado([error(no_puede_viajar(Enorme))]), S1),
+    salida_de(resultado([error(no_entiendo(Enorme))]), S2),
+    atom_length(S1, L1), atom_length(S2, L2),
+    L1 < 150, L2 < 150,
+    contiene(S1, '...'), contiene(S2, '...').
+
+test(una_zona_entre_comillas_dobles_se_muestra_como_texto, [setup(nueva)]) :-
+    % Prolog 5.10.4 lee "aldea" como lista de codigos: el jugador debe ver aldea, no [97,108,...]
+    salida_de(resultado([error(no_puede_viajar("luna"))]), S),
+    contiene(S, 'luna'),
+    \+ contiene(S, '[97').
+
 test(un_item_desconocido_se_muestra_sin_fallar) :-
     salida_de(resultado([algo_raro(1)]), Salida),
     contiene(Salida, 'algo_raro').

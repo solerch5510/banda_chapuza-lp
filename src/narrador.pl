@@ -37,13 +37,30 @@ texto(come_rancio, [Id], _, Texto) :-
 texto(fin_hambre, [], _,
       'La despensa está vacía y nadie quiere pelear con el estómago vacío: la Banda Chapuza se disuelve. Fin de la partida.').
 
+% como_texto(+Termino, -Texto): para repetirle al jugador lo que escribio. Una lista de
+% codigos (lo que Prolog 5.10.4 hace con "aldea" entre comillas dobles) se muestra como
+% texto y lo muy largo se recorta, para que pegar un parrafo no inunde la consola.
+como_texto(Termino, Texto) :-
+    (   is_list(Termino), Termino \== [], maplist(integer, Termino),
+        catch(atom_codes(Atomo, Termino), _, fail)
+    ->  Base = Atomo
+    ;   format(atom(Base), '~w', [Termino])
+    ),
+    atom_length(Base, Largo),
+    (   Largo > 60
+    ->  sub_atom(Base, 0, 57, _, Corto),
+        atom_concat(Corto, '...', Texto)
+    ;   Texto = Base
+    ).
+
 % ---------------------------------------------------------------------------
 % texto_error(+Motivo, -Texto): por que un comando no se pudo ejecutar.
 % ---------------------------------------------------------------------------
 texto_error(no_puede_viajar(Zona), Texto) :-
     (   mundo:zona(Zona, Nombre)
     ->  format(atom(Texto), 'No puedes ir a ~w desde aquí: no hay camino directo.', [Nombre])
-    ;   format(atom(Texto), 'No conozco ningún lugar llamado "~w".', [Zona])
+    ;   como_texto(Zona, Dicho),
+        format(atom(Texto), 'No conozco ningún lugar llamado "~w".', [Dicho])
     ).
 texto_error(no_puede_descansar, Texto) :-
     mundo:parametro(coste_descanso, Coste),
@@ -56,7 +73,8 @@ texto_error(fuera_de_fase(Cmd, Fase), Texto) :-
     ;   format(atom(Texto), 'Ahora mismo no puedes hacer eso (fase: ~w).', [Fase])
     ).
 texto_error(no_entiendo(Termino), Texto) :-
-    format(atom(Texto), 'No entiendo "~w". Escribe ayuda. para ver los comandos.', [Termino]).
+    como_texto(Termino, Dicho),
+    format(atom(Texto), 'No entiendo "~w". Escribe ayuda. para ver los comandos.', [Dicho]).
 texto_error(falta_argumento(Termino), Texto) :-
     functor(Termino, Nombre, _),
     format(atom(Texto), 'A ~w le falta decir a dónde o a qué; escribe el nombre completo, por ejemplo: ir(aldea).', [Nombre]).
@@ -65,9 +83,11 @@ texto_error(sintaxis,
 texto_error(comando_vacio,
             'Escribe un comando (ayuda. te dice cuáles hay).').
 texto_error(sin_efecto(Cmd), Texto) :-
-    format(atom(Texto), 'No he podido ejecutar ~w.', [Cmd]).
+    como_texto(Cmd, Dicho),
+    format(atom(Texto), 'No he podido ejecutar ~w.', [Dicho]).
 texto_error(interno(Causa), Texto) :-
-    format(atom(Texto), 'Algo ha fallado por dentro: ~w', [Causa]).
+    como_texto(Causa, Dicho),
+    format(atom(Texto), 'Algo ha fallado por dentro: ~w', [Dicho]).
 
 % ---------------------------------------------------------------------------
 % ayuda_de(+NombreDeComando, -Texto): lo que muestra el comando ayuda.

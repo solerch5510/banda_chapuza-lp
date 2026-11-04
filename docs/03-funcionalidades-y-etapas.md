@@ -113,7 +113,7 @@ Prioridad: **D** = Debe (versión mínima, Nivel A), **O** = Objetivo (solo con 
 ### Comandos de DISENO §13 y a qué funcionalidad pertenecen
 
 Mínimos (16): `ayuda`, `salir` → F-04 · `mirar`, `ir`, `descansar` → F-03 · `compania` → F-05 · `inventario` → F-08 · `pagar` → F-10 · `contratos`, `aceptar` → F-12 · `elegir` → F-35 · `atacar`, `defender` → F-13 · `habilidad` → F-14 · `explicar`, `por_que_no` → F-19/F-20. Meta-comando de `main`: `demo` → F-33 (entra aunque la tabla de 06 §5.1 lo lista en "objetivo": F-33 es Debe y `demo` es un meta-comando, no un comando de juego).
-Objetivo: `nivel` → F-21 · `arbol` → F-22 · `usar`, `huir` → F-15 · `comer` → F-36. Extra: `lanzar`, `equipar`, `guardar`, `cargar`, `reiniciar` (el reinicio existe como `estado:reiniciar/0` para pruebas y demo, F-02).
+Objetivo: `nivel` → F-21 · `arbol` → F-22 · `usar`, `huir` → F-15 · `comer` → F-36. Extra: `lanzar`, `equipar`, `guardar`, `cargar`, `reiniciar` (el reinicio existe como `estado:nueva_partida/0` para pruebas y demo, F-02).
 
 ---
 
@@ -126,7 +126,7 @@ Formato: *Dado … cuando … entonces …*. Un "comando ejecutado" significa `j
 - Dado el jugador en la taberna, cuando se consulta `puede_viajar(aldea)` y `puede_viajar(castillo)` (no conectada), entonces la primera es cierta y la segunda falla.
 
 **F-02 Estado**
-- Dado un estado cualquiera, cuando se ejecuta `estado:reiniciar/0`, entonces el estado es idéntico al inicial (taberna, día 1, 12 `cheddar` de edad 0, vida y moral base, semilla inicial).
+- Dado un estado cualquiera, cuando se ejecuta `estado:nueva_partida/0` (que llama antes a `reiniciar_estado/0`), entonces el estado es idéntico al inicial (taberna, día 1, 12 `cheddar` de edad 0, vida y moral base, semilla inicial).
 - Dado el código fuente, cuando se busca `assert`/`retract`/`retractall` fuera de `src/estado.pl`, entonces no aparece (se comprueba con `grep` en la lista de verificación).
 - Dado un lote de efectos en el que uno falla a mitad (p. ej. gastar más queso del disponible), cuando se aplica con `con_transaccion/1`, entonces el estado queda como antes.
 
@@ -134,7 +134,7 @@ Formato: *Dado … cuando … entonces …*. Un "comando ejecutado" significa `j
 - Dado el jugador en la taberna, cuando se ejecuta el comando `ir(aldea)`, entonces `en_zona(aldea)` es cierto y `dia` aumenta en 1.
 - Dado el jugador en la taberna, cuando se ejecuta `ir(castillo)` (no conectada), entonces el estado no cambia y el resultado contiene un error que indica que no hay camino.
 - Dado el jugador en la taberna, cuando se ejecuta `mirar`, entonces el resultado contiene el nombre de la zona, su descripción y las zonas adyacentes.
-- Dado el jugador fuera de la taberna, cuando se ejecuta `descansar`, entonces se rechaza; en la taberna con al menos 2 quesos, se gastan 2 quesos, la vida llega al máximo, la moral sube 1 (sin pasar de 10) y el día avanza en 1.
+- Dado el jugador fuera de la taberna, cuando se ejecuta `descansar`, entonces se rechaza; en la taberna con al menos 2 quesos, se gastan 2 quesos (más la ración del día, que se come igual que al viajar), la vida llega al máximo, la moral sube 1 (sin pasar de 10) y el día avanza en 1.
 - Dado el jugador en la taberna con menos de 2 quesos, cuando se ejecuta `descansar`, entonces se rechaza y `por_que_no(descansar)` indica que falla `puede_descansar` por falta de queso.
 
 **F-04 Comandos, `juego` y bucle**
