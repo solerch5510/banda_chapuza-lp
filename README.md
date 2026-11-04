@@ -44,6 +44,16 @@ Nota: en la 5.10.4 para Windows, una ruta relativa con extensión como último a
 
 El juego aún no está implementado: hoy `src/main` carga solo el esqueleto del módulo.
 
+## Pruebas
+
+Las pruebas usan `plunit`. Desde la raíz del repositorio (PowerShell), con el ejecutable por su ruta completa:
+
+```
+& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/spike_explicar -g "run_tests,halt" -t "halt(1)"
+```
+
+Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Hoy hay una sola suite: `tests/spike_explicar.pl`, que comprueba el meta-intérprete de `src/explicar.pl` con dos módulos de juguete (`tests/spike/`).
+
 ## Estructura
 
 ```
