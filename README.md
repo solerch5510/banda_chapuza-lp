@@ -46,13 +46,24 @@ El juego aún no está implementado: hoy `src/main` carga solo el esqueleto del 
 
 ## Pruebas
 
-Las pruebas usan `plunit`. Desde la raíz del repositorio (PowerShell), con el ejecutable por su ruta completa:
+Las pruebas usan `plunit`. Desde la raíz del repositorio (PowerShell), con el ejecutable por su ruta completa, cada suite se ejecuta por separado:
+
+```
+& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/mundo_estado -g "run_tests,halt" -t "halt(1)"
+```
 
 ```
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/spike_explicar -g "run_tests,halt" -t "halt(1)"
 ```
 
-Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Hoy hay una sola suite: `tests/spike_explicar.pl`, que comprueba el meta-intérprete de `src/explicar.pl` con dos módulos de juguete (`tests/spike/`).
+Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales:
+
+| Suite | Qué comprueba |
+|---|---|
+| `tests/mundo_estado.pl` | Los datos del mundo (`src/mundo.pl`) y el estado y los efectos (`src/estado.pl`). |
+| `tests/spike_explicar.pl` | El meta-intérprete de `src/explicar.pl`, con dos módulos de juguete (`tests/spike/`). |
+
+Se ejecutan en procesos distintos porque los módulos de juguete del spike exportan nombres (como `vida/2`) que chocarían con los de `estado`.
 
 ## Estructura
 
