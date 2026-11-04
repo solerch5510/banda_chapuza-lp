@@ -86,6 +86,9 @@ parametro(moral_huelga,      2).    % huelga si la moral es 2 o menos
 parametro(racion_por_miembro, 1).   % quesos que come cada miembro al dia
 parametro(coste_descanso,    2).    % quesos que cuesta descansar en la taberna (D-15)
 parametro(moral_impago,      2).    % moral que pierde cada miembro si se sale sin pagar
+parametro(moral_hambre,      1).    % moral que pierde quien se queda sin comer (provisional)
+parametro(dano_hambre,       2).    % vida que pierde quien se queda sin comer; nunca baja de 1 (provisional)
+parametro(moral_rancio,      1).    % moral que pierde quien come queso rancio (provisional)
 
 % ---------------------------------------------------------------------------
 % Valores iniciales de la partida: inicio(Dato)

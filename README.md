@@ -31,18 +31,30 @@ En Windows, SWI-Prolog 5.10.4 suele instalarse en `C:\Program Files\pl\bin`, que
 - Llamar al ejecutable con la ruta completa, desde la raíz del repositorio (PowerShell):
 
   ```
-  & "C:\Program Files\pl\bin\swipl.exe" -q -s src/main
+  & "C:\Program Files\pl\bin\swipl.exe" -q -s src/main -g main -t halt
   ```
 
 - O añadir `C:\Program Files\pl\bin` al `PATH` y escribir:
 
   ```
-  swipl -q -s src/main
+  swipl -q -s src/main -g main -t halt
   ```
 
 Nota: en la 5.10.4 para Windows, una ruta relativa con extensión como último argumento (`swipl -q -s src/main.pl`) falla con "script_file does not exist". Funcionan `src/main` (sin extensión), la ruta absoluta o poner otra opción después, por ejemplo `-s src/main.pl -g halt`.
 
-El juego aún no está implementado: hoy `src/main` carga solo el esqueleto del módulo.
+### Estado del juego
+
+Se puede **recorrer el mapa**. Cada comando se escribe como un término de Prolog **terminado en punto**:
+
+| Comando | Qué hace |
+|---|---|
+| `ayuda.` | Lista los comandos disponibles ahora. |
+| `mirar.` | Describe la zona, las salidas, el día y el queso que queda. |
+| `ir(aldea).` | Viaja a una zona conectada; cuesta un día (el queso madura y cada miembro come una unidad). |
+| `descansar.` | Solo en la taberna: cuesta 2 quesos, cura a todos, +1 de moral y pasa un día. |
+| `salir.` | Termina la partida. |
+
+Si la despensa se queda vacía, la partida termina por hambre. Contratos, combate, sueldos y el modo *explicar* aún no están implementados (ver `docs/03-funcionalidades-y-etapas.md`). Los acentos dependen de la consola de Windows (comprobación pendiente en la consola de la entrega).
 
 ## Pruebas
 
@@ -53,15 +65,20 @@ Las pruebas usan `plunit`. Desde la raíz del repositorio (PowerShell), con el e
 ```
 
 ```
+& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/juego -g "run_tests,halt" -t "halt(1)"
+```
+
+```
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/spike_explicar -g "run_tests,halt" -t "halt(1)"
 ```
 
-Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales:
+Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (132 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
-| `tests/mundo_estado.pl` | Los datos del mundo (`src/mundo.pl`) y el estado y los efectos (`src/estado.pl`). |
-| `tests/spike_explicar.pl` | El meta-intérprete de `src/explicar.pl`, con dos módulos de juguete (`tests/spike/`). |
+| `tests/mundo_estado.pl` (47) | Los datos del mundo (`src/mundo.pl`) y el estado y los efectos (`src/estado.pl`). |
+| `tests/juego.pl` (68) | La compañía, la economía, los comandos (`juego:ejecutar/2`), la interfaz y sesiones completas por la entrada. |
+| `tests/spike_explicar.pl` (17) | El meta-intérprete de `src/explicar.pl`, con dos módulos de juguete (`tests/spike/`). |
 
 Se ejecutan en procesos distintos porque los módulos de juguete del spike exportan nombres (como `vida/2`) que chocarían con los de `estado`.
 

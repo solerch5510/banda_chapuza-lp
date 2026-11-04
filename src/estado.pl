@@ -17,7 +17,7 @@
         % operaciones
         nueva_partida/0, reiniciar_estado/0,
         aplicar_efectos/1, aplicar_efecto/1, con_transaccion/1,
-        siguiente_semilla/2, tirada/4,
+        siguiente_semilla/2, tirada/4, fase/1,
         persistente/1, transitorio/1
     ]).
 :- use_module(mundo).
@@ -100,6 +100,15 @@ cargar_inicio(miembro(Id))    :-
     assertz(fila(Id, F)).
 
 % ---------------------------------------------------------------------------
+% Fase del juego: NO se guarda, se deriva de los hechos. Cuatro clausulas
+% excluyentes (sin corte), asi la fase nunca puede contradecir al estado.
+% ---------------------------------------------------------------------------
+fase(fin)         :- fin_partida(_).
+fase(combate)     :- \+ fin_partida(_), en_combate(_).
+fase(taberna)     :- \+ fin_partida(_), \+ en_combate(_), en_zona(taberna).
+fase(exploracion) :- \+ fin_partida(_), \+ en_combate(_), \+ en_zona(taberna).
+
+% ---------------------------------------------------------------------------
 % Generador pseudoaleatorio determinista (no se usa random/1: asi una partida es
 % reproducible y las pruebas son exactas). x' = (75*x + 74) mod 65537.
 % ---------------------------------------------------------------------------
@@ -166,12 +175,18 @@ aplicar_conocido(fijar_semilla(S)) :-
     S1 is S mod 65536,
     retractall(semilla(_)),
     assertz(semilla(S1)).
+aplicar_conocido(fin(Motivo)) :-         % fin(victoria) o fin(derrota(Motivo)); el primero que llega manda
+    (   fin_partida(_) -> true ; assertz(fin_partida(Motivo)) ).
+aplicar_conocido(uso_frase(Grupo)) :-    % cuantas veces se ha usado un grupo de frases (rotacion del narrador)
+    (   retract(usos_frase(Grupo, U0)) -> U1 is U0 + 1 ; U1 = 1 ),
+    assertz(usos_frase(Grupo, U1)).
 
 efecto_conocido(E) :- nonvar(E), functor(E, N, A), conocido(N/A).
 conocido(mensaje/2).      conocido(dano/2).          conocido(curar/2).
 conocido(mod_moral/2).    conocido(ganar_queso/3).   conocido(gastar_queso/3).
 conocido(envejecer_quesos/0). conocido(marcar/1).    conocido(desmarcar/1).
 conocido(avanzar_dia/0).  conocido(viajar/1).        conocido(fijar_semilla/1).
+conocido(fin/1).          conocido(uso_frase/1).
 
 set_vida(Id, V) :-
     retractall(vida(Id, _)),
