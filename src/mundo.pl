@@ -6,7 +6,8 @@
 % Los identificadores son los de docs/01-lore-y-ambientacion.md (seccion 10).
 
 :- module(mundo, [zona/2, descripcion_zona/2, conexion/2, adyacente/2, zona_pacifica/1,
-                  personaje/7, fila_preferida/2, rasgo/2,
+                  personaje/7, fila_preferida/2, alcance/2, rasgo/2,
+                  enemigo/4, clase/2, lleva_queso/1,
                   tipo_queso/2, parametro/2, inicio/1]).
 
 % La declaracion de modulo va PRIMERO; el archivo tiene tildes, asi que se declara UTF-8 justo despues.
@@ -68,11 +69,50 @@ fila_preferida(baldomero, frente).
 fila_preferida(pimentina, retaguardia).
 fila_preferida(rufino,    retaguardia).
 fila_preferida(tuerca,    frente).
+% ... y la de cada tipo de enemigo (todos los de la version minima pelean en primera fila)
+fila_preferida(rata_quesera,    frente).
+fila_preferida(bandido_torpe,   frente).
+fila_preferida(moho_saltarin,   frente).
+fila_preferida(bandido_montado, frente).
+fila_preferida(gran_roquefort,  frente).
 
 rasgo(baldomero, teme_caballos).
 rasgo(pimentina, hechizos_de_cocina).
 rasgo(rufino,    cobra_por_callar).
 rasgo(tuerca,    manos_largas).
+
+% alcance(Id, Alcance): cuerpo (solo alcanza a la primera fila) o distancia (llega tambien a la retaguardia).
+alcance(baldomero, cuerpo).
+alcance(pimentina, distancia).
+alcance(rufino,    distancia).
+alcance(tuerca,    cuerpo).
+alcance(rata_quesera,    cuerpo).
+alcance(bandido_torpe,   cuerpo).
+alcance(moho_saltarin,   cuerpo).
+alcance(bandido_montado, cuerpo).
+alcance(gran_roquefort,  cuerpo).
+
+% ---------------------------------------------------------------------------
+% Bestiario (version minima, por orden de dificultad): enemigo(Tipo, vida(V), ataque(A), defensa(D)).
+% En combate cada enemigo es una instancia e(Tipo, N). bandido_torpe es canon (12/5/2); el resto
+% son una propuesta inicial que se ajustara en el balance.
+% ---------------------------------------------------------------------------
+enemigo(rata_quesera,    vida(8),  ataque(4),  defensa(0)).
+enemigo(bandido_torpe,   vida(12), ataque(5),  defensa(2)).
+enemigo(moho_saltarin,   vida(10), ataque(4),  defensa(0)).
+enemigo(bandido_montado, vida(18), ataque(7),  defensa(3)).
+enemigo(gran_roquefort,  vida(60), ataque(11), defensa(4)).     % el jefe final
+
+% clase(Tipo, Clase): alimenta reglas como la de teme_caballos (un caballo asusta a Baldomero).
+clase(rata_quesera,    roedor).
+clase(bandido_torpe,   humano).
+clase(moho_saltarin,   hongo).
+clase(bandido_montado, caballo).
+clase(gran_roquefort,  queso_vivo).
+
+% lleva_queso(Tipo): suelta 1 queso de botin al caer (el queso entra por botin, nunca se compra).
+lleva_queso(bandido_torpe).
+lleva_queso(bandido_montado).
 
 % ---------------------------------------------------------------------------
 % Quesos que existen: tipo_queso(Tipo, ValorBase). El valor SOLO informa: sueldos,

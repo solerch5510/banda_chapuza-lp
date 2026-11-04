@@ -271,3 +271,82 @@ test(la_tirada_cae_en_el_rango) :-
            )).
 
 :- end_tests(estado).
+
+% ===========================================================================
+% T-18: el bestiario de la version minima (cinco tipos de enemigo)
+% ===========================================================================
+:- begin_tests(bestiario).
+
+test(son_los_cinco_tipos_de_la_version_minima) :-
+    findall(T, enemigo(T, _, _, _), Ts),
+    msort(Ts, Ordenados),
+    Ordenados == [bandido_montado, bandido_torpe, gran_roquefort, moho_saltarin, rata_quesera].
+
+test(cada_enemigo_tiene_clase_fila_y_alcance_unicos) :-
+    forall(enemigo(T, _, _, _),
+           (   findall(C, clase(T, C), [_]),
+               findall(F, fila_preferida(T, F), [_]),
+               findall(A, alcance(T, A), [_])
+           )).
+
+test(no_hay_datos_huerfanos) :-
+    forall(clase(T, _), enemigo(T, _, _, _)),
+    forall(lleva_queso(T), enemigo(T, _, _, _)),
+    forall(( fila_preferida(Id, _) ; alcance(Id, _) ),
+           (   enemigo(Id, _, _, _) -> true ; personaje(Id, _, _, _, _, _, _) )).
+
+test(los_atributos_son_enteros_validos) :-
+    forall(enemigo(_, vida(V), ataque(A), defensa(D)),
+           (   integer(V), V > 0, integer(A), A > 0, integer(D), D >= 0 )).
+
+test(bandido_torpe_es_el_canon) :-
+    enemigo(bandido_torpe, vida(12), ataque(5), defensa(2)),
+    clase(bandido_torpe, humano).
+
+test(las_clases_usadas_son_las_de_la_version_minima) :-
+    findall(C, clase(_, C), Cs),
+    sort(Cs, Unicas),
+    Unicas == [caballo, hongo, humano, queso_vivo, roedor].
+
+test(solo_el_bandido_montado_es_un_caballo) :-
+    findall(T, clase(T, caballo), Ts),
+    Ts == [bandido_montado].
+
+test(solo_los_bandidos_llevan_queso) :-
+    findall(T, lleva_queso(T), Ts),
+    msort(Ts, Ordenados),
+    Ordenados == [bandido_montado, bandido_torpe].
+
+test(el_orden_de_dificultad_es_el_de_la_vida) :-
+    findall(V-T, enemigo(T, vida(V), _, _), Pares),
+    msort(Pares, Ordenados),
+    findall(T, member(_-T, Ordenados), Ts),
+    Ts == [rata_quesera, moho_saltarin, bandido_torpe, bandido_montado, gran_roquefort].
+
+test(el_jefe_es_el_mas_fuerte_en_todo) :-
+    enemigo(gran_roquefort, vida(VJ), ataque(AJ), defensa(DJ)),
+    forall(( enemigo(T, vida(V), ataque(A), defensa(D)), T \== gran_roquefort ),
+           ( V < VJ, A < AJ, D =< DJ )).
+
+test(las_filas_y_los_alcances_son_validos) :-
+    forall(fila_preferida(_, F), memberchk(F, [frente, retaguardia])),
+    forall(alcance(_, A), memberchk(A, [cuerpo, distancia])).
+
+test(los_cuerpo_a_cuerpo_y_a_distancia_de_la_compania) :-
+    alcance(baldomero, cuerpo), alcance(tuerca, cuerpo),
+    alcance(pimentina, distancia), alcance(rufino, distancia).
+
+% Comprobaciones basicas de que el juego se puede jugar (el balance fino llega en la semana 6).
+test(ningun_golpe_enemigo_mata_de_una_vez_a_un_miembro_sano) :-
+    forall(( enemigo(_, _, ataque(Atq), _), personaje(_, _, _, vida(Vida), _, defensa(Def), _) ),
+           (   Dano is max(1, Atq - Def), Dano < Vida )).
+
+test(el_heroe_derriba_a_cada_enemigo_en_un_numero_razonable_de_golpes) :-
+    personaje(baldomero, _, _, _, ataque(Atq), _, _),
+    forall(enemigo(_, vida(V), _, defensa(D)),
+           (   Dano is max(1, Atq - D),
+               Golpes is (V + Dano - 1) // Dano,
+               Golpes >= 1, Golpes =< 10
+           )).
+
+:- end_tests(bestiario).

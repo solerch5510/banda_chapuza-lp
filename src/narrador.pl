@@ -92,6 +92,11 @@ nombre(castillo,    'el Castillo Camembert').
 nombre(cuevas,      'las Cuevas del Roquefort').
 nombre(cheddar,     'el cheddar').
 nombre(brie,        'el brie').
+nombre(rata_quesera,    'la Rata Quesera').
+nombre(bandido_torpe,   'el Bandido Torpe').
+nombre(moho_saltarin,   'el Moho Saltarín').
+nombre(bandido_montado, 'el Bandido Montado').
+nombre(gran_roquefort,  'el Gran Roquefort').
 
 % nombre_visible(+Id, -Texto): los numeros y lo desconocido pasan tal cual.
 nombre_visible(Id, Texto) :-

@@ -146,6 +146,19 @@ test(una_instancia_de_enemigo_se_muestra_como_su_tipo) :-
     nombre_visible(e(rata_quesera, 2), T),
     nombre_visible(rata_quesera, T).
 
+test(los_cinco_enemigos_llevan_articulo) :-
+    forall(mundo:enemigo(T, _, _, _),
+           (   nombre_visible(e(T, 1), N),
+               (   sub_atom(N, 0, _, _, 'el ') ; sub_atom(N, 0, _, _, 'la ') )
+           )).
+
+test(un_enemigo_por_su_nombre_y_por_su_instancia, [nondet]) :-
+    nombre_visible(rata_quesera, 'la Rata Quesera'),
+    nombre_visible(e(rata_quesera, 3), 'la Rata Quesera'),
+    nombre_visible(e(gran_roquefort, 1), 'el Gran Roquefort'),
+    comentario(prueba(nombres, e(bandido_torpe, 2)), ambos, 0, T),
+    T == 'Voy al Bandido Torpe.'.
+
 test(numeros_y_desconocidos_pasan_tal_cual) :-
     nombre_visible(5, 5),
     nombre_visible(algo_raro, algo_raro).
