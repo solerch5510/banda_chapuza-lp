@@ -170,6 +170,11 @@ meta_de_prueba(builtin(G), G).
 meta_de_prueba(no(G), (\+ G)).
 meta_de_prueba(verdad, true).
 meta_de_prueba(si(PC, _), G) :- meta_de_prueba(PC, G).
+meta_de_prueba(izq(P), G) :- meta_de_prueba(P, G).
+meta_de_prueba(der(P), G) :- meta_de_prueba(P, G).
+meta_de_prueba((PA, PB), (GA, GB)) :-            % la condicion de un if-then-else puede ser una conjuncion
+    meta_de_prueba(PA, GA),
+    meta_de_prueba(PB, GB).
 
 % txt(+Meta, -Atomo): una meta como texto. Las variables salen como A, B...; \+ lleva
 % parentesis si niega una conjuncion; lo muy largo se recorta con puntos suspensivos.

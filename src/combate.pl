@@ -9,12 +9,16 @@
 % Y el orden de los turnos:
 %   - iniciativa/2 y orden_turnos/1: quien actua primero en cada ronda;
 %   - efectos_inicio/2 y efectos_ronda/1: los efectos que abren el combate y cada ronda.
-% El resto del combate (dano, acciones, IA) llega en las tareas siguientes.
+% Y el dano:
+%   - dano/3 con sus modificadores (moral, miedo, venda, defender);
+%   - efectos_golpe/3: un golpe convertido en efectos.
+% El resto del combate (comandos, bucle, IA) llega en las tareas siguientes.
 
 :- module(combate, [puede_atacar/2, en_fila_alcanzable/2, aturdido/1,
                     puede_habilidad/2, tipo_de/2, clase_de/2,
                     ataque_base/2, defensa_base/2, puede_actuar/1,
                     iniciativa/2, orden_turnos/1,
+                    ataque/2, defensa/2, modificador/3, dano/3, efectos_golpe/3,
                     efectos_inicio/2, efectos_ronda/1]).
 :- use_module(mundo).
 :- use_module(estado).
@@ -100,12 +104,14 @@ puede_actuar(Id) :-
 iniciativa(Id, I) :-
     ataque_base(Id, A),
     defensa_base(Id, D),
-    bono_iniciativa(Id, M),
+    ajuste_moral(Id, M),
     mundo:parametro(base_iniciativa, B),
     I is B + A - D + M.
 
-bono_iniciativa(Id, M) :- compania:miembro(Id), compania:modificador_moral(Id, M).
-bono_iniciativa(Id, 0) :- \+ compania:miembro(Id).
+% ajuste_moral(+Id, -M): lo que suma o resta la moral; los enemigos no tienen moral, suman 0.
+% Lo usan la iniciativa y el dano.
+ajuste_moral(Id, M) :- compania:miembro(Id), compania:modificador_moral(Id, M).
+ajuste_moral(Id, 0) :- \+ compania:miembro(Id).
 
 % orden_turnos(-Ids): los que pueden actuar, de mayor a menor iniciativa. Si empatan, el jugador
 % actua primero y, entre iguales, manda el orden estandar de los identificadores: el orden es
@@ -127,6 +133,70 @@ prioridad_bando(enemigo, 1).
 
 ids_de([], []).
 ids_de([_-_-Id|Pares], [Id|Ids]) :- ids_de(Pares, Ids).
+
+% ---------------------------------------------------------------------------
+% Dano: D = max(1, ataque - defensa + modificador). Siempre se hace al menos 1 de dano.
+%   dano(baldomero, e(bandido_torpe, 1), D)   ->   D = 9   (11 - 2 + 0)
+% ---------------------------------------------------------------------------
+dano(A, B, D) :-
+    ataque(A, Atq),
+    defensa(B, Def),
+    modificador(A, B, M),
+    D is max(1, Atq - Def + M).
+
+% ataque(+Id, -A): el ataque efectivo. Hoy es el del catalogo; la moral y los rasgos entran
+% por modificador/3 (para que cada ajuste se vea por separado en la explicacion).
+ataque(Id, A) :- ataque_base(Id, A).
+
+% defensa(+Id, -D): la del catalogo, mas el bono de quien esta defendiendo.
+defensa(Id, D) :-
+    defensa_base(Id, Base),
+    bono_defensa(Id, Bono),
+    D is Base + Bono.
+
+bono_defensa(Id, Bono) :-
+    (   estado:alterado(Id, defendiendo, _)
+    ->  mundo:parametro(bono_defender, Bono)
+    ;   Bono = 0
+    ).
+
+% modificador(+Atacante, +Objetivo, -M): moral del atacante, miedo y venda de Baldomero.
+modificador(A, B, M) :-
+    ajuste_moral(A, Moral),
+    mod_miedo(A, B, Miedo),
+    mod_venda(A, B, Venda),
+    M is Moral + Miedo + Venda.
+
+% Quien teme a la clase del atacante recibe mas dano (teme_caballos: +2 de un caballo).
+mod_miedo(A, B, M) :-
+    (   compania:teme(B, Clase), clase_de(A, Clase)
+    ->  mundo:parametro(dano_miedo, M)
+    ;   M = 0
+    ).
+
+% Con la venda, Baldomero se atreve con los caballos, pero a ciegas: ataca con penalizacion.
+mod_venda(A, B, M) :-
+    (   mundo:rasgo(A, teme_caballos), compania:ignora_miedo(A), clase_de(B, caballo)
+    ->  mundo:parametro(penal_venda, P), M is -P
+    ;   M = 0
+    ).
+
+% ---------------------------------------------------------------------------
+% Un golpe como efectos: el dano al objetivo y, si lo deja sin vida, que cae.
+% efectos_golpe(+A, +B, -Efectos): falla si A no puede atacar a B. No modifica el estado.
+% ---------------------------------------------------------------------------
+efectos_golpe(A, B, Efectos) :-
+    puede_atacar(A, B),
+    dano(A, B, D),
+    efectos_caida(B, D, Caida),
+    append([dano(B, D), mensaje(golpe, [A, B, D])], Caida, Efectos).
+
+efectos_caida(B, D, Efectos) :-
+    estado:vida(B, V),
+    (   D >= V
+    ->  Efectos = [mensaje(cae, [B])]
+    ;   Efectos = []
+    ).
 
 % ---------------------------------------------------------------------------
 % Efectos que abren el combate y cada ronda (se devuelven como datos; los aplica estado).

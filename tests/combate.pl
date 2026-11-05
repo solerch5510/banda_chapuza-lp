@@ -383,7 +383,7 @@ test(una_moral_critica_resta_dos, [setup(nueva_partida)]) :-
 
 test(la_moral_no_cuenta_en_los_enemigos, [setup(nueva_partida)]) :-
     combate_con([rata_quesera]),
-    once(combate:bono_iniciativa(e(rata_quesera, 1), M)),
+    once(combate:ajuste_moral(e(rata_quesera, 1), M)),
     M == 0.
 
 test(dos_instancias_del_mismo_tipo_empatan) :-
@@ -722,7 +722,7 @@ test(la_prueba_de_la_iniciativa_muestra_la_cuenta, [nondet]) :-
     memberchk('[ok] iniciativa(baldomero, 18)   [clausula 1]', Lineas),
     memberchk('   [ok] ataque_base(baldomero, 11)   [clausula 1]', Lineas),
     memberchk('   [ok] defensa_base(baldomero, 3)   [clausula 1]', Lineas),
-    memberchk('   [ok] bono_iniciativa(baldomero, 0)   [clausula 1]', Lineas),
+    memberchk('   [ok] ajuste_moral(baldomero, 0)   [clausula 1]', Lineas),
     memberchk('   [ok] parametro(base_iniciativa, 10)   [hecho]', Lineas),
     memberchk('   [ok] 18 is 10+11-3+0   [builtin]', Lineas).
 
@@ -733,3 +733,396 @@ test(la_prueba_del_orden_cuenta_los_que_actuan, [nondet]) :-
     once(( member(L, Lineas), sub_atom(L, _, _, _, 'findall: 6 solucion(es)') )).
 
 :- end_tests(explicar_el_orden).
+
+% ===========================================================================
+% T-21: dano/3 con modificadores por rasgo y moral, y aplicar el dano
+% ===========================================================================
+
+% Un combate con un enemigo de cada tipo (e(Tipo, 1)).
+combate_completo :-
+    combate_con([rata_quesera, bandido_torpe, moho_saltarin, bandido_montado, gran_roquefort]).
+
+% dano_de(+A, +B, -D): el dano, una sola vez.
+dano_de(A, B, D) :- once(combate:dano(A, B, D)).
+
+:- begin_tests(dano_base).
+
+test(la_demo_del_canon_baldomero_contra_el_bandido_torpe) :-
+    combate_con([bandido_torpe]),
+    dano_de(baldomero, e(bandido_torpe, 1), D),
+    D == 9.                                          % 11 - 2
+
+test(los_miembros_contra_cada_enemigo) :-
+    combate_completo,
+    forall(member(A-Tipo-Esperado,
+                  [ baldomero-rata_quesera-11, baldomero-bandido_torpe-9, baldomero-moho_saltarin-11,
+                    baldomero-bandido_montado-8, baldomero-gran_roquefort-7,
+                    pimentina-rata_quesera-6, pimentina-bandido_torpe-4, pimentina-moho_saltarin-6,
+                    pimentina-bandido_montado-3, pimentina-gran_roquefort-2,
+                    rufino-rata_quesera-4, rufino-bandido_torpe-2, rufino-moho_saltarin-4,
+                    rufino-bandido_montado-1, rufino-gran_roquefort-1,
+                    tuerca-rata_quesera-7, tuerca-bandido_torpe-5, tuerca-moho_saltarin-7,
+                    tuerca-bandido_montado-4, tuerca-gran_roquefort-3 ]),
+           (   dano_de(A, e(Tipo, 1), D),
+               D == Esperado
+           )).
+
+test(los_enemigos_contra_cada_miembro) :-
+    combate_completo,
+    forall(member(Tipo-B-Esperado,
+                  [ rata_quesera-baldomero-1, rata_quesera-pimentina-3, rata_quesera-rufino-2, rata_quesera-tuerca-2,
+                    bandido_torpe-baldomero-2, bandido_torpe-pimentina-4, bandido_torpe-rufino-3, bandido_torpe-tuerca-3,
+                    moho_saltarin-baldomero-1, moho_saltarin-pimentina-3, moho_saltarin-rufino-2, moho_saltarin-tuerca-2,
+                    bandido_montado-pimentina-6, bandido_montado-rufino-5, bandido_montado-tuerca-5,
+                    gran_roquefort-baldomero-8, gran_roquefort-pimentina-10, gran_roquefort-rufino-9, gran_roquefort-tuerca-9 ]),
+           (   dano_de(e(Tipo, 1), B, D),
+               D == Esperado
+           )).
+
+test(siempre_se_hace_al_menos_un_punto) :-
+    combate_con([gran_roquefort]),
+    dano_de(rufino, e(gran_roquefort, 1), D),        % 4 - 4 = 0
+    D == 1.
+
+test(el_minimo_tambien_vale_con_el_objetivo_defendiendo) :-
+    combate_con([gran_roquefort]),
+    assertz(estado:alterado(e(gran_roquefort, 1), defendiendo, 1)),
+    dano_de(rufino, e(gran_roquefort, 1), D),        % 4 - 6 < 0
+    D == 1.
+
+test(el_dano_nunca_baja_de_uno_en_ningun_par, [nondet]) :-
+    combate_completo,
+    forall(( estado:combatiente(A, Ba), estado:combatiente(B, Bb), Ba \== Bb ),
+           (   dano_de(A, B, D), D >= 1 )).
+
+test(el_dano_es_entero) :-
+    combate_completo,
+    forall(( estado:combatiente(A, Ba), estado:combatiente(B, Bb), Ba \== Bb ),
+           (   dano_de(A, B, D), integer(D) )).
+
+test(el_dano_no_modifica_el_estado) :-
+    combate_completo,
+    foto_estado(Antes),
+    forall(( estado:combatiente(A, Ba), estado:combatiente(B, Bb), Ba \== Bb ),
+           dano_de(A, B, _)),
+    foto_estado(Despues),
+    Antes == Despues.
+
+test(quien_no_existe_no_hace_dano, [fail]) :-
+    combate_con([rata_quesera]),
+    combate:dano(fantasma, e(rata_quesera, 1), _).
+
+:- end_tests(dano_base).
+
+:- begin_tests(atributos_efectivos).
+
+test(el_ataque_efectivo_es_el_del_catalogo, [nondet]) :-
+    combate_con([bandido_torpe]),
+    combate:ataque(baldomero, 11),
+    combate:ataque(e(bandido_torpe, 1), 5).
+
+test(la_defensa_sin_defender_es_la_del_catalogo, [nondet]) :-
+    combate_con([bandido_torpe]),
+    combate:defensa(baldomero, 3),
+    combate:defensa(e(bandido_torpe, 1), 2).
+
+test(defender_sube_la_defensa, [nondet]) :-
+    combate_con([bandido_torpe]),
+    mundo:parametro(bono_defender, Bono),
+    assertz(estado:alterado(baldomero, defendiendo, 1)),
+    combate:defensa(baldomero, D),
+    D =:= 3 + Bono.
+
+test(defender_solo_ayuda_a_quien_defiende, [nondet]) :-
+    combate_con([bandido_torpe]),
+    assertz(estado:alterado(baldomero, defendiendo, 1)),
+    combate:defensa(pimentina, 1),
+    combate:defensa(e(bandido_torpe, 1), 2).
+
+test(un_golpe_contra_quien_defiende_sigue_haciendo_uno, [nondet]) :-
+    combate_con([bandido_torpe]),
+    dano_de(e(bandido_torpe, 1), baldomero, Sin),
+    assertz(estado:alterado(baldomero, defendiendo, 1)),
+    dano_de(e(bandido_torpe, 1), baldomero, Con),
+    Sin == 2,
+    Con == 1.                                        % 5 - 5 = 0, minimo 1
+
+test(defender_reduce_el_dano_recibido_en_el_bono) :-
+    combate_con([gran_roquefort]),
+    dano_de(e(gran_roquefort, 1), pimentina, Sin),
+    assertz(estado:alterado(pimentina, defendiendo, 1)),
+    dano_de(e(gran_roquefort, 1), pimentina, Con),
+    mundo:parametro(bono_defender, Bono),
+    Con =:= Sin - Bono.
+
+:- end_tests(atributos_efectivos).
+
+:- begin_tests(modificadores_de_moral).
+
+test(con_la_moral_normal_no_hay_ajuste) :-
+    combate_con([bandido_torpe]),
+    once(combate:modificador(tuerca, e(bandido_torpe, 1), M)),
+    M == 0.
+
+test(la_moral_alta_suma_uno_al_dano) :-
+    combate_con([bandido_torpe]),
+    moral_a(tuerca, 9),
+    dano_de(tuerca, e(bandido_torpe, 1), D),
+    D == 6.                                          % 7 - 2 + 1
+
+test(la_moral_baja_resta_uno_al_dano) :-
+    combate_con([bandido_torpe]),
+    moral_a(tuerca, 3),
+    dano_de(tuerca, e(bandido_torpe, 1), D),
+    D == 4.
+
+test(la_moral_critica_resta_dos_al_dano) :-
+    combate_con([bandido_torpe]),
+    moral_a(tuerca, 1),
+    dano_de(tuerca, e(bandido_torpe, 1), D),
+    D == 3.
+
+test(la_moral_del_objetivo_no_cuenta) :-
+    combate_con([rata_quesera]),
+    dano_de(e(rata_quesera, 1), rufino, Normal),
+    moral_a(rufino, 0),
+    dano_de(e(rata_quesera, 1), rufino, Hundido),
+    Normal == Hundido.
+
+test(los_enemigos_no_tienen_ajuste_de_moral) :-
+    combate_con([bandido_torpe]),
+    once(combate:modificador(e(bandido_torpe, 1), baldomero, M)),
+    M == 0.
+
+:- end_tests(modificadores_de_moral).
+
+:- begin_tests(miedo_y_venda).
+
+test(un_caballo_hace_dos_de_dano_extra_a_baldomero) :-
+    combate_con([bandido_montado]),
+    dano_de(e(bandido_montado, 1), baldomero, D),
+    D == 6.                                          % 7 - 3 + 2
+
+test(el_miedo_solo_afecta_a_baldomero) :-
+    combate_con([bandido_montado]),
+    dano_de(e(bandido_montado, 1), pimentina, D),
+    D == 6.                                          % 7 - 1, sin extra
+
+test(solo_los_caballos_asustan) :-
+    combate_con([bandido_torpe, rata_quesera]),
+    dano_de(e(bandido_torpe, 1), baldomero, T),
+    dano_de(e(rata_quesera, 1), baldomero, R),
+    T == 2,
+    R == 1.
+
+test(con_la_venda_baldomero_ya_no_sufre_el_extra) :-
+    combate_con([bandido_montado]),
+    aplicar_efecto(equipar(baldomero, venda_de_caballos)),
+    dano_de(e(bandido_montado, 1), baldomero, D),
+    D == 4.                                          % 7 - 3, sin miedo
+
+test(sin_la_venda_no_hay_penalizacion_al_atacar) :-
+    combate_con([bandido_montado]),
+    dano_de(baldomero, e(bandido_montado, 1), D),
+    D == 8.
+
+test(con_la_venda_baldomero_ataca_a_un_caballo_con_menos_ataque) :-
+    combate_con([bandido_montado]),
+    aplicar_efecto(equipar(baldomero, venda_de_caballos)),
+    dano_de(baldomero, e(bandido_montado, 1), D),
+    D == 5.                                          % 11 - 3 - 3
+
+test(la_penalizacion_de_la_venda_viene_del_parametro) :-
+    combate_con([bandido_montado]),
+    aplicar_efecto(equipar(baldomero, venda_de_caballos)),
+    mundo:parametro(penal_venda, P),
+    once(combate:modificador(baldomero, e(bandido_montado, 1), M)),
+    M =:= -P.
+
+test(la_venda_no_penaliza_contra_otras_clases) :-
+    combate_con([bandido_torpe]),
+    aplicar_efecto(equipar(baldomero, venda_de_caballos)),
+    dano_de(baldomero, e(bandido_torpe, 1), D),
+    D == 9.
+
+test(la_venda_de_otro_no_penaliza_a_quien_no_teme) :-
+    combate_con([bandido_montado]),
+    aplicar_efecto(equipar(pimentina, venda_de_caballos)),
+    dano_de(pimentina, e(bandido_montado, 1), D),
+    D == 3.
+
+test(la_moral_y_la_venda_se_suman) :-
+    combate_con([bandido_montado]),
+    aplicar_efecto(equipar(baldomero, venda_de_caballos)),
+    moral_a(baldomero, 3),                           % baja: -1
+    dano_de(baldomero, e(bandido_montado, 1), D),
+    D == 4.                                          % 11 - 3 - 1 - 3
+
+:- end_tests(miedo_y_venda).
+
+:- begin_tests(efectos_golpe).
+
+test(un_golpe_son_dano_y_mensaje, [nondet]) :-
+    combate_con([bandido_torpe]),
+    combate:efectos_golpe(baldomero, e(bandido_torpe, 1), Efs),
+    Efs == [dano(e(bandido_torpe, 1), 9), mensaje(golpe, [baldomero, e(bandido_torpe, 1), 9])].
+
+test(el_golpe_que_deja_a_cero_hace_caer, [nondet]) :-
+    combate_con([bandido_torpe]),
+    aplicar_efecto(dano(e(bandido_torpe, 1), 3)),    % le quedan 9 y el golpe es de 9
+    combate:efectos_golpe(baldomero, e(bandido_torpe, 1), Efs),
+    Efs == [dano(e(bandido_torpe, 1), 9), mensaje(golpe, [baldomero, e(bandido_torpe, 1), 9]),
+            mensaje(cae, [e(bandido_torpe, 1)])].
+
+test(el_golpe_que_deja_a_uno_no_hace_caer, [nondet]) :-
+    combate_con([bandido_torpe]),
+    aplicar_efecto(dano(e(bandido_torpe, 1), 2)),    % le quedan 10 y el golpe es de 9
+    combate:efectos_golpe(baldomero, e(bandido_torpe, 1), Efs),
+    \+ memberchk(mensaje(cae, _), Efs).
+
+test(el_golpe_de_sobra_tambien_hace_caer, [nondet]) :-
+    combate_con([rata_quesera]),
+    combate:efectos_golpe(baldomero, e(rata_quesera, 1), Efs),   % 11 contra 8 de vida
+    memberchk(mensaje(cae, [e(rata_quesera, 1)]), Efs).
+
+test(un_golpe_no_modifica_el_estado, [nondet]) :-
+    combate_con([bandido_torpe]),
+    foto_estado(Antes),
+    combate:efectos_golpe(baldomero, e(bandido_torpe, 1), _),
+    foto_estado(Despues),
+    Antes == Despues.
+
+test(aplicar_el_golpe_resta_la_vida, [nondet]) :-
+    combate_con([bandido_torpe]),
+    combate:efectos_golpe(baldomero, e(bandido_torpe, 1), Efs),
+    aplicar_efectos(Efs),
+    estado:vida(e(bandido_torpe, 1), V),
+    V == 3.                                          % 12 - 9
+
+test(aplicar_el_golpe_de_sobra_deja_la_vida_en_cero, [nondet]) :-
+    combate_con([rata_quesera]),
+    combate:efectos_golpe(baldomero, e(rata_quesera, 1), Efs),
+    aplicar_efectos(Efs),
+    estado:vida(e(rata_quesera, 1), V),
+    V == 0,
+    \+ compania:vivo(e(rata_quesera, 1)).
+
+test(un_enemigo_tambien_golpea, [nondet]) :-
+    combate_con([gran_roquefort]),
+    combate:efectos_golpe(e(gran_roquefort, 1), baldomero, Efs),
+    aplicar_efectos(Efs),
+    estado:vida(baldomero, V),
+    V == 22.                                         % 30 - 8
+
+test(un_enemigo_puede_dejar_caido_a_un_miembro, [nondet]) :-
+    combate_con([gran_roquefort]),
+    aplicar_efecto(dano(baldomero, 25)),             % le quedan 5 y el golpe es de 8
+    combate:efectos_golpe(e(gran_roquefort, 1), baldomero, Efs),
+    memberchk(mensaje(cae, [baldomero]), Efs).
+
+test(baldomero_no_golpea_al_caballo_sin_venda, [fail]) :-
+    combate_con([bandido_montado]),
+    combate:efectos_golpe(baldomero, e(bandido_montado, 1), _).
+
+test(con_la_venda_baldomero_si_golpea_al_caballo, [nondet]) :-
+    combate_con([bandido_montado]),
+    aplicar_efecto(equipar(baldomero, venda_de_caballos)),
+    combate:efectos_golpe(baldomero, e(bandido_montado, 1), Efs),
+    Efs = [dano(e(bandido_montado, 1), D)|_],
+    D == 5.
+
+test(no_se_golpea_a_un_caido, [fail]) :-
+    combate_con([rata_quesera]),
+    aplicar_efecto(dano(e(rata_quesera, 1), 99)),
+    combate:efectos_golpe(baldomero, e(rata_quesera, 1), _).
+
+test(un_caido_no_golpea, [fail]) :-
+    combate_con([rata_quesera]),
+    aplicar_efecto(dano(baldomero, 99)),
+    combate:efectos_golpe(baldomero, e(rata_quesera, 1), _).
+
+test(no_se_golpea_al_propio_bando, [fail]) :-
+    combate_con([rata_quesera]),
+    combate:efectos_golpe(baldomero, pimentina, _).
+
+test(un_aturdido_no_golpea, [fail]) :-
+    combate_con([rata_quesera]),
+    assertz(estado:alterado(baldomero, aturdido, 1)),
+    combate:efectos_golpe(baldomero, e(rata_quesera, 1), _).
+
+test(la_retaguardia_no_se_golpea_con_el_frente_en_pie, [fail]) :-
+    combate_con([bandido_torpe, rata_quesera]),
+    retractall(estado:fila(e(rata_quesera, 1), _)),
+    assertz(estado:fila(e(rata_quesera, 1), retaguardia)),
+    combate:efectos_golpe(baldomero, e(rata_quesera, 1), _).
+
+test(un_combate_se_puede_ganar_a_golpes, [nondet]) :-
+    combate_con([bandido_torpe]),
+    golpear_hasta_caer(baldomero, e(bandido_torpe, 1), Golpes),
+    Golpes == 2,                                     % 9 + 9 >= 12
+    \+ compania:vivo(e(bandido_torpe, 1)).
+
+golpear_hasta_caer(A, B, N) :- golpear_hasta_caer(A, B, 0, N).
+golpear_hasta_caer(A, B, N0, N) :-
+    (   compania:vivo(B)
+    ->  combate:efectos_golpe(A, B, Efs),
+        aplicar_efectos(Efs),
+        N1 is N0 + 1,
+        golpear_hasta_caer(A, B, N1, N)
+    ;   N = N0
+    ).
+
+:- end_tests(efectos_golpe).
+
+:- begin_tests(explicar_el_dano).
+
+test(solve_da_lo_mismo_que_ejecutar_el_dano) :-
+    combate_completo,
+    forall(( estado:combatiente(A, Ba), estado:combatiente(B, Bb), Ba \== Bb ),
+           igual(D, combate:dano(A, B, D))),
+    aplicar_efecto(equipar(baldomero, venda_de_caballos)),
+    moral_a(tuerca, 1),
+    assertz(estado:alterado(e(bandido_torpe, 1), defendiendo, 1)),
+    forall(( estado:combatiente(A, Ba), estado:combatiente(B, Bb), Ba \== Bb ),
+           igual(D, combate:dano(A, B, D))).
+
+test(solve_da_lo_mismo_que_ejecutar_efectos_golpe) :-
+    combate_completo,
+    forall(( member(A, [baldomero, pimentina, rufino, tuerca, e(bandido_montado, 1)]),
+             estado:combatiente(B, _) ),
+           igual(Efs, combate:efectos_golpe(A, B, Efs))).
+
+test(la_prueba_del_dano_muestra_la_cuenta, [nondet]) :-
+    combate_con([bandido_torpe]),
+    solve(combate:dano(baldomero, e(bandido_torpe, 1), _), P),
+    explicar:prueba_a_lineas(P, Lineas),
+    memberchk('[ok] dano(baldomero, e(bandido_torpe, 1), 9)   [clausula 1]', Lineas),
+    memberchk('   [ok] ataque(baldomero, 11)   [clausula 1]', Lineas),
+    memberchk('   [ok] defensa(e(bandido_torpe, 1), 2)   [clausula 1]', Lineas),
+    memberchk('   [ok] modificador(baldomero, e(bandido_torpe, 1), 0)   [clausula 1]', Lineas),
+    memberchk('   [ok] 9 is max(1, 11-2+0)   [builtin]', Lineas).
+
+test(la_prueba_muestra_el_miedo_como_una_rama, [nondet]) :-
+    combate_con([bandido_montado]),
+    solve(combate:dano(e(bandido_montado, 1), baldomero, _), P),
+    explicar:prueba_a_lineas(P, Lineas),
+    memberchk('      [ok] mod_miedo(e(bandido_montado, 1), baldomero, 2)   [clausula 1]', Lineas),
+    once(( member(L, Lineas), sub_atom(L, _, _, _, 'teme(baldomero, caballo), clase_de(e(bandido_montado, 1), caballo)'),
+           sub_atom(L, _, _, _, '[rama then]') )).
+
+test(la_prueba_sin_miedo_pasa_por_la_rama_else, [nondet]) :-
+    combate_con([bandido_torpe]),
+    solve(combate:dano(e(bandido_torpe, 1), baldomero, _), P),
+    explicar:prueba_a_lineas(P, Lineas),
+    memberchk('      [ok] mod_miedo(e(bandido_torpe, 1), baldomero, 0)   [clausula 1]', Lineas),
+    memberchk('         [ok] else   [rama else]', Lineas).
+
+test(la_prueba_con_defensa_muestra_el_bono, [nondet]) :-
+    combate_con([bandido_torpe]),
+    assertz(estado:alterado(e(bandido_torpe, 1), defendiendo, 1)),
+    solve(combate:dano(baldomero, e(bandido_torpe, 1), _), P),
+    explicar:prueba_a_lineas(P, Lineas),
+    memberchk('   [ok] defensa(e(bandido_torpe, 1), 4)   [clausula 1]', Lineas),
+    memberchk('   [ok] 7 is max(1, 11-4+0)   [builtin]', Lineas).
+
+:- end_tests(explicar_el_dano).

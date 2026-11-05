@@ -160,6 +160,9 @@ parametro(moral_hambre,      1).    % moral que pierde quien se queda sin comer 
 parametro(dano_hambre,       2).    % vida que pierde quien se queda sin comer; nunca baja de 1 (provisional)
 parametro(moral_rancio,      2).    % moral que pierde quien come queso rancio (lore 7.1)
 parametro(base_iniciativa,  10).    % la iniciativa es esta base + ataque - defensa + modificador de moral
+parametro(bono_defender,     2).    % defensa extra de quien esta defendiendo (provisional)
+parametro(dano_miedo,        2).    % dano extra que recibe quien teme a la clase del atacante (lore 7)
+parametro(penal_venda,       3).    % ataque que pierde Baldomero con la venda contra los caballos (lore 7)
 
 % ---------------------------------------------------------------------------
 % Valores iniciales de la partida: inicio(Dato)
