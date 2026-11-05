@@ -59,7 +59,7 @@ Se puede **recorrer el mapa, gestionar la compañía y pedir explicaciones**. Ca
 | `explicar(ir(aldea)).` | La prueba de esa acción: la guardada si es la última; si no, se resuelve ahora. |
 | `salir.` | Termina la partida. |
 
-Si la despensa se queda vacía, la partida termina por hambre. Contratos, combate y `por_que_no` aún no están implementados (ver `docs/03-funcionalidades-y-etapas.md`). Los acentos dependen de la consola de Windows (comprobación pendiente en la consola de la entrega).
+Si la despensa se queda vacía, la partida termina por hambre. En combate existen `atacar(Objetivo).` y `defender.` (actúa el miembro al que le toca el turno; el objetivo es un tipo, como `bandido_torpe`, o una instancia, como `e(bandido_torpe, 1)`), pero todavía no hay forma de iniciar un combate desde el juego. Contratos, bucle de combate y `por_que_no` aún no están implementados (ver `docs/03-funcionalidades-y-etapas.md`). Los acentos dependen de la consola de Windows (comprobación pendiente en la consola de la entrega).
 
 ## Pruebas
 
@@ -90,10 +90,14 @@ Las pruebas usan `plunit`. Desde la raíz del repositorio (PowerShell), con el e
 ```
 
 ```
+& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/acciones -g "run_tests,halt" -t "halt(1)"
+```
+
+```
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/spike_explicar -g "run_tests,halt" -t "halt(1)"
 ```
 
-Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (434 pruebas):
+Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (539 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -102,6 +106,7 @@ Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 
 | `tests/pagos.pl` (49) | El informe de la compañía y la huelga, el valor del queso, el inventario, los sueldos y `pagar`, el impago y el comando `explicar`. |
 | `tests/explicar_juego.pl` (27) | El meta-intérprete sobre las **reglas reales** del juego (mismas respuestas y orden que la ejecución directa, en 10 estados distintos) y el árbol de texto. |
 | `tests/combate.pl` (166) | Los rasgos del héroe (el miedo de Baldomero, `puede_atacar/2`, las reglas de fila, los hechizos de cocina de Pimentina), el estado de combate (niveles de moral, iniciativa, orden de turnos, `iniciar_combate`, rondas y turnos) y el daño (`dano/3` con moral, miedo, venda y defensa; `efectos_golpe/3`); y que el meta-intérprete lo explica igual que se ejecuta. |
+| `tests/acciones.pl` (105) | Las acciones del jugador en combate: el efecto `alterar`, `efectos_accion/3`, el paso de los estados, los comandos `atacar` y `defender` (turno, objetivos, fases, errores sin efecto) y su prueba guardada para `explicar`. |
 | `tests/narrador.pl` (44) | El narrador: el banco de frases, la clave más específica, la rotación de variantes, los niveles, los nombres con artículo, las frases genéricas y el comentario de `explicar`. |
 | `tests/spike_explicar.pl` (17) | El meta-intérprete de `src/explicar.pl`, con dos módulos de juguete (`tests/spike/`). |
 

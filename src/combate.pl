@@ -12,13 +12,15 @@
 % Y el dano:
 %   - dano/3 con sus modificadores (moral, miedo, venda, defender);
 %   - efectos_golpe/3: un golpe convertido en efectos.
-% El resto del combate (comandos, bucle, IA) llega en las tareas siguientes.
+% Y las acciones del jugador: efectos_accion/3 (atacar, defender).
+% El resto del combate (bucle, IA) llega en las tareas siguientes.
 
 :- module(combate, [puede_atacar/2, en_fila_alcanzable/2, aturdido/1,
                     puede_habilidad/2, tipo_de/2, clase_de/2,
                     ataque_base/2, defensa_base/2, puede_actuar/1,
                     iniciativa/2, orden_turnos/1,
                     ataque/2, defensa/2, modificador/3, dano/3, efectos_golpe/3,
+                    efectos_accion/3, puede_defender/1, efectos_inicio_turno/2,
                     efectos_inicio/2, efectos_ronda/1]).
 :- use_module(mundo).
 :- use_module(estado).
@@ -196,6 +198,41 @@ efectos_caida(B, D, Efectos) :-
     (   D >= V
     ->  Efectos = [mensaje(cae, [B])]
     ;   Efectos = []
+    ).
+
+% ---------------------------------------------------------------------------
+% Acciones de combate como efectos. efectos_accion(+Actor, +Accion, -Efectos) falla si la
+% accion no es legal; no modifica el estado.
+%   atacar(B)  : un golpe (efectos_golpe/3)
+%   defender   : durante una ronda la defensa sube (estado defendiendo, 1 turno)
+% ---------------------------------------------------------------------------
+efectos_accion(A, atacar(B), Efectos) :-
+    efectos_golpe(A, B, Efectos).
+efectos_accion(A, defender, [alterar(A, defendiendo, 1), mensaje(defiende, [A])]) :-
+    puede_defender(A).
+
+% puede_defender(+Id): esta en el combate, puede actuar y no esta aturdido.
+puede_defender(Id) :-
+    estado:combatiente(Id, _),
+    puede_actuar(Id),
+    \+ aturdido(Id).
+
+% efectos_inicio_turno(+Id, -Efectos): al empezar el turno de Id, lo que dura N turnos baja en
+% uno y lo que llegaba a cero desaparece (lo fijo no cambia). Asi defender dura hasta el
+% siguiente turno de quien defendio.
+efectos_inicio_turno(Id, Efectos) :-
+    findall(E,
+            (   estado:alterado(Id, Estado, Turnos),
+                integer(Turnos),
+                efecto_de_paso(Id, Estado, Turnos, E)
+            ),
+            Efectos).
+
+efecto_de_paso(Id, Estado, Turnos, Efecto) :-
+    (   Turnos =< 1
+    ->  Efecto = quitar_alteracion(Id, Estado)
+    ;   Menos is Turnos - 1,
+        Efecto = alterar(Id, Estado, Menos)
     ).
 
 % ---------------------------------------------------------------------------

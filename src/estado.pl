@@ -194,6 +194,16 @@ aplicar_conocido(siguiente_ronda(Ids)) :-      % ronda + 1 y la cola vuelve a ll
     retractall(cola_turnos(_)),
     assertz(en_combate(R)),
     assertz(cola_turnos(Ids)).
+% Estados alterados de un combatiente (aturdido, defendiendo...): duran N turnos o son fijos.
+% Alterar de nuevo el mismo estado lo sustituye (no se acumula).
+aplicar_conocido(alterar(Id, Estado, Turnos)) :-
+    ground(Id), ground(Estado), atom(Estado),
+    combatiente(Id, _),
+    (   Turnos == fijo ; integer(Turnos), Turnos >= 1 ),
+    retractall(alterado(Id, Estado, _)),
+    assertz(alterado(Id, Estado, Turnos)).
+aplicar_conocido(quitar_alteracion(Id, Estado)) :-
+    retractall(alterado(Id, Estado, _)).
 aplicar_conocido(marcar(F)) :-
     (   marca(F) -> true ; assertz(marca(F)) ).
 aplicar_conocido(desmarcar(F)) :-
@@ -227,6 +237,7 @@ conocido(avanzar_dia/0).  conocido(viajar/1).        conocido(fijar_semilla/1).
 conocido(fin/1).          conocido(uso_frase/1).     conocido(guardar_prueba/2).
 conocido(ganar_objeto/3). conocido(gastar_objeto/3). conocido(equipar/2).
 conocido(iniciar_combate/1). conocido(siguiente_turno/0). conocido(siguiente_ronda/1).
+conocido(alterar/3).      conocido(quitar_alteracion/2).
 
 nace_enemigo(E) :-
     E = e(Tipo, _),

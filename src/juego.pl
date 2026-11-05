@@ -31,6 +31,8 @@ comando(compania,   0).
 comando(inventario, 0).
 comando(explicar,   0).
 comando(explicar,   1).
+comando(atacar,     1).
+comando(defender,   0).
 comando(salir,      0).
 
 validar_comando(T, Res) :-
@@ -50,7 +52,7 @@ validar_comando(T, Res) :-
 % ---------------------------------------------------------------------------
 permitidos(exploracion, [ayuda, mirar, ir, compania, inventario, explicar, salir]).
 permitidos(taberna,     [ayuda, mirar, ir, descansar, pagar, compania, inventario, explicar, salir]).
-permitidos(combate,     [ayuda, mirar, compania, inventario, explicar, salir]).
+permitidos(combate,     [ayuda, mirar, atacar, defender, compania, inventario, explicar, salir]).
 permitidos(fin,         [ayuda, explicar, salir]).
 
 permitido(Fase, Nombre) :-
@@ -63,6 +65,46 @@ comandos_disponibles(Fase, Lista) :- permitidos(Fase, Lista).
 objetivo_de_accion(ir(Zona),  compania:puede_viajar(Zona)).
 objetivo_de_accion(descansar, economia:puede_descansar).
 objetivo_de_accion(pagar,     economia:puede_pagar_sueldos).
+% atacar(Objetivo) y atacar(Actor, Objetivo): el Objetivo puede ser un tipo (bandido_torpe) o una
+% instancia (e(bandido_torpe, 1)); el actor del primero es a quien le toca el turno.
+objetivo_de_accion(atacar(Actor, Objetivo), (combate:puede_atacar(Actor, B), combate:dano(Actor, B, _))) :-
+    resolver_objetivo(Objetivo, B).
+objetivo_de_accion(atacar(Objetivo), Meta) :-
+    actor_del_turno(Actor),
+    objetivo_de_accion(atacar(Actor, Objetivo), Meta).
+objetivo_de_accion(defender, combate:puede_defender(Actor)) :-
+    actor_del_turno(Actor).
+
+% actor_del_turno(-Id): el miembro al que le toca (la cabeza de la cola de turnos).
+actor_del_turno(Actor) :-
+    estado:cola_turnos([Actor|_]),
+    estado:combatiente(Actor, jugador).
+
+% resolver_objetivo(+Nombre, -Id): una instancia e(Tipo, N) o un miembro valen tal cual; un tipo
+% (bandido_torpe) es la primera instancia viva de ese tipo. Falla si no hay a quien atacar.
+resolver_objetivo(Nombre, Id) :-
+    (   nonvar(Nombre), Nombre = e(_, _)
+    ->  estado:instancia(Nombre, _),
+        Id = Nombre
+    ;   atom(Nombre), estado:combatiente(Nombre, _)
+    ->  Id = Nombre
+    ;   atom(Nombre),
+        findall(E, ( estado:instancia(E, Nombre), compania:vivo(E) ), Vivos),
+        msort(Vivos, [Id|_])
+    ).
+
+% misma_accion(+Pedida, +Guardada): explicar(atacar(bandido_torpe)) vale para la prueba guardada
+% de atacar(baldomero, e(bandido_torpe, 1)), aunque el turno ya haya pasado a otro.
+misma_accion(Pedida, Guardada) :-
+    Pedida == Guardada.
+misma_accion(atacar(Objetivo), atacar(_, B)) :-
+    atomo_o_instancia(Objetivo, B).
+misma_accion(atacar(Actor, Objetivo), atacar(Actor, B)) :-
+    atomo_o_instancia(Objetivo, B).
+misma_accion(defender, defender(_)).
+
+atomo_o_instancia(Objetivo, B) :-
+    (   Objetivo == B -> true ; B = e(Objetivo, _) ).
 
 % ---------------------------------------------------------------------------
 % ejecutar(+Comando, -Resultado): NUNCA falla ni lanza una excepcion.
@@ -141,6 +183,30 @@ ejecutar_en_fase(pagar, _, Items) :-
     ;   Items = [error(no_puede_pagar)]
     ).
 
+% atacar(Objetivo) y defender: la accion del miembro al que le toca el turno. Se comprueba la
+% regla (puede_atacar/2, puede_defender/1), se guarda su prueba ANTES de aplicar los efectos y
+% el turno pasa al siguiente. Los turnos de los enemigos los lleva el bucle de combate.
+ejecutar_en_fase(atacar(Objetivo), _, Items) :-
+    (   actor_del_turno(Actor)
+    ->  (   resolver_objetivo(Objetivo, B)
+        ->  (   combate:puede_atacar(Actor, B)
+            ->  accion_de_turno(atacar(Actor, B), Actor, atacar(B),
+                                (combate:puede_atacar(Actor, B), combate:dano(Actor, B, _)), Items)
+            ;   Items = [error(no_puede_atacar(Actor, B))]
+            )
+        ;   Items = [error(objetivo_desconocido(Objetivo))]
+        )
+    ;   Items = [error(no_es_tu_turno)]
+    ).
+ejecutar_en_fase(defender, _, Items) :-
+    (   actor_del_turno(Actor)
+    ->  (   combate:puede_defender(Actor)
+        ->  accion_de_turno(defender(Actor), Actor, defender, combate:puede_defender(Actor), Items)
+        ;   Items = [error(no_puede_defender(Actor))]
+        )
+    ;   Items = [error(no_es_tu_turno)]
+    ).
+
 % explicar. : la prueba de lo ultimo que se hizo. explicar(Accion). : la de esa accion;
 % si es la ultima, la guardada (el estado ya cambio); si no, se resuelve ahora, en hipotetico.
 ejecutar_en_fase(explicar, _, Items) :-
@@ -149,7 +215,7 @@ ejecutar_en_fase(explicar, _, Items) :-
     ;   Items = [error(nada_que_explicar)]
     ).
 ejecutar_en_fase(explicar(Accion), _, Items) :-
-    (   estado:ultima_prueba(Ultima, Guardada), Ultima == Accion
+    (   estado:ultima_prueba(Ultima, Guardada), misma_accion(Accion, Ultima)
     ->  Items = [vista(prueba, Accion, Guardada)]
     ;   objetivo_de_accion(Accion, Meta)
     ->  (   once(explicar:solve(Meta, Prueba))
@@ -158,6 +224,14 @@ ejecutar_en_fase(explicar(Accion), _, Items) :-
         )
     ;   Items = [error(no_se_explica(Accion))]
     ).
+
+% accion_de_turno(+Clave, +Actor, +Accion, +Meta, -Items): prueba de la Meta, efectos de la
+% accion y paso de turno, todo en una etapa.
+accion_de_turno(Clave, Actor, Accion, Meta, Items) :-
+    once(explicar:solve(Meta, Prueba)),
+    once(combate:efectos_accion(Actor, Accion, Efectos)),
+    append([guardar_prueba(Clave, Prueba)|Efectos], [siguiente_turno], Todos),
+    etapa(Todos, Items).
 
 % ---------------------------------------------------------------------------
 % mirar: los datos de la zona donde estas.

@@ -61,6 +61,16 @@ frase(suceso(impago), ambos,
 frase(suceso(fin_hambre), ambos,
       'La despensa está vacía y nadie quiere pelear con el estómago vacío: la Banda Chapuza se disuelve. Fin de la partida.').
 
+% --- combate: un golpe, una caida y ponerse a la defensiva (X08 a X10 de docs/05, version corta) ---
+frase(suceso(golpe(A, B, D)), ambos,
+      '~w golpea a ~w y le quita ~w de vida. Cuentas claras, modales mejorables.'-[A, B, D]).
+frase(suceso(golpe(A, B, D)), ambos,
+      '~w le suelta un golpe a ~w: ~w de vida menos. Ha sido casi técnico.'-[A, B, D]).
+frase(suceso(cae(B)), ambos,
+      '~w cae redondo. Se levantará luego con 1 de vida y ninguna dignidad.'-[B]).
+frase(suceso(defiende(A)), ambos,
+      '~w se pone a la defensiva: escudo arriba, ojos cerrados y una plegaria a medias.'-[A]).
+
 % --- comentario de explicar: la clave es la meta que se ha demostrado ---
 frase(puede_viajar(Z), ambos,
       'Hay camino hasta ~w, y tan pegajoso que cuesta un día entero. Ley de la Ruta Pegajosa.'-[Z]).
@@ -232,6 +242,13 @@ como_texto(Termino, Texto) :-
     ;   Texto = Base
     ).
 
+% con_a(+Nombre, -ConA): el complemento "a ..." con la contraccion: "al Bandido", "a Sir Baldomero".
+con_a(Nombre, ConA) :-
+    (   atom_concat('el ', Resto, Nombre)
+    ->  atom_concat('al ', Resto, ConA)
+    ;   atom_concat('a ', Nombre, ConA)
+    ).
+
 % ---------------------------------------------------------------------------
 % texto_error(+Motivo, -Texto): por que un comando no se pudo ejecutar.
 % (Aun fuera del banco: sus variantes llegan con el resto del humor.)
@@ -250,11 +267,25 @@ texto_error(fuera_de_fase(Cmd, Fase), Texto) :-
     ->  Texto = 'La partida ha terminado.'
     ;   functor(Cmd, descansar, _)
     ->  Texto = 'Solo se puede descansar en la taberna.'
+    ;   ( functor(Cmd, atacar, _) ; functor(Cmd, defender, _) )
+    ->  Texto = 'Solo se puede atacar o defender en pleno combate.'
     ;   format(atom(Texto), 'Ahora mismo no puedes hacer eso (fase: ~w).', [Fase])
     ).
 texto_error(no_entiendo(Termino), Texto) :-
     como_texto(Termino, Dicho),
     format(atom(Texto), 'No entiendo "~w". Escribe ayuda. para ver los comandos.', [Dicho]).
+texto_error(no_es_tu_turno, 'Ahora no te toca a ti: espera a tu turno.').
+texto_error(no_puede_atacar(Actor, Objetivo), Texto) :-
+    nombre_visible(Actor, A),
+    nombre_visible(Objetivo, B),
+    con_a(B, ConA),
+    format(atom(Texto), '~w no puede atacar ~w ahora mismo.', [A, ConA]).
+texto_error(no_puede_defender(Actor), Texto) :-
+    nombre_visible(Actor, A),
+    format(atom(Texto), '~w no puede defenderse ahora mismo.', [A]).
+texto_error(objetivo_desconocido(Objetivo), Texto) :-
+    como_texto(Objetivo, Dicho),
+    format(atom(Texto), 'No hay nada llamado "~w" a lo que atacar.', [Dicho]).
 texto_error(nada_que_pagar, 'No debes nada: los sueldos ya están pagados.').
 texto_error(no_puede_pagar, 'Los sueldos no se pueden pagar a medias y la despensa no llega.').
 texto_error(nada_que_explicar, 'Todavía no has hecho nada que explicar. Prueba con explicar(ir(aldea)).').
@@ -263,7 +294,7 @@ texto_error(no_hay_prueba(Accion), Texto) :-
     format(atom(Texto), 'Ahora mismo no se puede hacer ~w, así que no hay prueba que enseñar.', [Dicho]).
 texto_error(no_se_explica(Accion), Texto) :-
     como_texto(Accion, Dicho),
-    format(atom(Texto), 'No sé explicar "~w". Puedo explicar ir(Zona), descansar y pagar.', [Dicho]).
+    format(atom(Texto), 'No sé explicar "~w". Puedo explicar ir(Zona), descansar, pagar, atacar(Objetivo) y defender.', [Dicho]).
 texto_error(falta_argumento(Termino), Texto) :-
     functor(Termino, Nombre, _),
     format(atom(Texto), 'A ~w le falta decir a dónde o a qué; escribe el nombre completo, por ejemplo: ir(aldea).', [Nombre]).
@@ -289,7 +320,9 @@ ayuda_de(descansar, Texto) :-
     format(atom(Texto),
            'descansar.     solo en la taberna: cuesta ~w quesos, cura a todos y pasa un día', [Coste]).
 ayuda_de(pagar, 'pagar.         solo en la taberna: paga los sueldos pendientes con lo más rancio').
-ayuda_de(compania, 'compania.      muestra a los miembros, su vida, su moral y su estado').
+ayuda_de(atacar, 'atacar(Objetivo). solo en combate: golpea a un enemigo (un tipo o e(Tipo, N))').
+ayuda_de(defender, 'defender.      solo en combate: sube tu defensa hasta tu próximo turno').
+ayuda_de(compania,'compania.      muestra a los miembros, su vida, su moral y su estado').
 ayuda_de(inventario, 'inventario.    muestra la despensa (con la edad del queso) y los objetos').
 ayuda_de(explicar, 'explicar.      la prueba de lo último que hiciste; explicar(Accion). la de esa acción').
 ayuda_de(salir, 'salir.         termina la partida').
