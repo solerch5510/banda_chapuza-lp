@@ -171,6 +171,29 @@ aplicar_conocido(gastar_objeto(Id, Objeto, N)) :-
 aplicar_conocido(equipar(Id, Objeto)) :-                 % lo que lleva puesto (p. ej. la venda de caballos)
     retractall(equipado(Id, Objeto)),
     assertz(equipado(Id, Objeto)).
+% Empieza un combate: los miembros pasan al bando jugador y cada enemigo del grupo nace como
+% instancia e(Tipo, N) con su vida y su fila. Queda en la ronda 0 con la cola vacia: la ronda 1
+% empieza con siguiente_ronda/1. Solo fuera de combate y con un grupo de tipos conocidos.
+aplicar_conocido(iniciar_combate(Grupo)) :-
+    \+ en_combate(_),
+    ground(Grupo), Grupo = [_|_],
+    forall(member(Tipo, Grupo), mundo:enemigo(Tipo, _, _, _)),
+    mundo:numerar_grupo(Grupo, Ids),
+    forall(en_compania(Id), assertz(combatiente(Id, jugador))),
+    forall(member(E, Ids), nace_enemigo(E)),
+    assertz(cola_turnos([])),
+    assertz(en_combate(0)).
+aplicar_conocido(siguiente_turno) :-           % el que estaba al frente de la cola ya ha actuado
+    retract(cola_turnos([_|Resto])),
+    assertz(cola_turnos(Resto)).
+aplicar_conocido(siguiente_ronda(Ids)) :-      % ronda + 1 y la cola vuelve a llenarse
+    en_combate(R0),
+    ground(Ids), is_list(Ids),
+    R is R0 + 1,
+    retractall(en_combate(_)),
+    retractall(cola_turnos(_)),
+    assertz(en_combate(R)),
+    assertz(cola_turnos(Ids)).
 aplicar_conocido(marcar(F)) :-
     (   marca(F) -> true ; assertz(marca(F)) ).
 aplicar_conocido(desmarcar(F)) :-
@@ -203,14 +226,28 @@ conocido(envejecer_quesos/0). conocido(marcar/1).    conocido(desmarcar/1).
 conocido(avanzar_dia/0).  conocido(viajar/1).        conocido(fijar_semilla/1).
 conocido(fin/1).          conocido(uso_frase/1).     conocido(guardar_prueba/2).
 conocido(ganar_objeto/3). conocido(gastar_objeto/3). conocido(equipar/2).
+conocido(iniciar_combate/1). conocido(siguiente_turno/0). conocido(siguiente_ronda/1).
+
+nace_enemigo(E) :-
+    E = e(Tipo, _),
+    mundo:enemigo(Tipo, vida(V), _, _),
+    mundo:fila_preferida(Tipo, F),
+    assertz(instancia(E, Tipo)),
+    assertz(vida(E, V)),
+    assertz(fila(E, F)),
+    assertz(combatiente(E, enemigo)).
 
 set_vida(Id, V) :-
     retractall(vida(Id, _)),
     assertz(vida(Id, V)).
 
-% Vida maxima: la del catalogo. (Las instancias de enemigo e(Tipo, N) se anadiran con el combate.)
+% Vida maxima: la del catalogo, de la ficha del personaje o del tipo de la instancia de enemigo.
 tope_vida(Id, Max) :-
-    mundo:personaje(Id, _, _, vida(Max), _, _, _).
+    (   mundo:personaje(Id, _, _, vida(M), _, _, _)
+    ->  Max = M
+    ;   instancia(Id, Tipo),
+        mundo:enemigo(Tipo, vida(Max), _, _)
+    ).
 
 % ---------------------------------------------------------------------------
 % Transaccion: si Meta falla o lanza una excepcion, el estado vuelve a como estaba.

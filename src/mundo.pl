@@ -8,7 +8,7 @@
 :- module(mundo, [zona/2, descripcion_zona/2, conexion/2, adyacente/2, zona_pacifica/1,
                   personaje/7, fila_preferida/2, alcance/2, rasgo/2,
                   habilidad_de/2, coste_queso/2,
-                  enemigo/4, clase/2, lleva_queso/1,
+                  enemigo/4, clase/2, lleva_queso/1, numerar_grupo/2,
                   tipo_queso/2, parametro/2, inicio/1]).
 
 % La declaracion de modulo va PRIMERO; el archivo tiene tildes, asi que se declara UTF-8 justo despues.
@@ -125,6 +125,18 @@ clase(gran_roquefort,  queso_vivo).
 lleva_queso(bandido_torpe).
 lleva_queso(bandido_montado).
 
+% numerar_grupo(+Tipos, -Ids): un grupo de enemigos [rata_quesera, rata_quesera, bandido_torpe]
+% pasa a instancias numeradas por tipo: [e(rata_quesera,1), e(rata_quesera,2), e(bandido_torpe,1)].
+numerar_grupo(Tipos, Ids) :-
+    numerar_grupo(Tipos, [], Ids).
+
+numerar_grupo([], _, []).
+numerar_grupo([Tipo|Tipos], Vistos, [e(Tipo, N)|Ids]) :-
+    findall(x, member(Tipo, Vistos), Anteriores),
+    length(Anteriores, N0),
+    N is N0 + 1,
+    numerar_grupo(Tipos, [Tipo|Vistos], Ids).
+
 % ---------------------------------------------------------------------------
 % Quesos que existen: tipo_queso(Tipo, ValorBase). El valor SOLO informa: sueldos,
 % recompensas y multas se cuentan por unidades, no por valor.
@@ -147,6 +159,7 @@ parametro(moral_impago,      2).    % moral que pierde cada miembro si se sale s
 parametro(moral_hambre,      1).    % moral que pierde quien se queda sin comer (provisional)
 parametro(dano_hambre,       2).    % vida que pierde quien se queda sin comer; nunca baja de 1 (provisional)
 parametro(moral_rancio,      2).    % moral que pierde quien come queso rancio (lore 7.1)
+parametro(base_iniciativa,  10).    % la iniciativa es esta base + ataque - defensa + modificador de moral
 
 % ---------------------------------------------------------------------------
 % Valores iniciales de la partida: inicio(Dato)

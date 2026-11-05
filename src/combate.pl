@@ -6,10 +6,16 @@
 %   - puede_atacar/2: la regla de la primera demostracion de explicar (el miedo de Baldomero);
 %   - en_fila_alcanzable/2: las reglas de fila de las que depende;
 %   - puede_habilidad/2: el rasgo hechizos_de_cocina de Pimentina.
-% El resto del combate (iniciativa, dano, turnos, IA) llega en las tareas siguientes.
+% Y el orden de los turnos:
+%   - iniciativa/2 y orden_turnos/1: quien actua primero en cada ronda;
+%   - efectos_inicio/2 y efectos_ronda/1: los efectos que abren el combate y cada ronda.
+% El resto del combate (dano, acciones, IA) llega en las tareas siguientes.
 
 :- module(combate, [puede_atacar/2, en_fila_alcanzable/2, aturdido/1,
-                    puede_habilidad/2, tipo_de/2, clase_de/2]).
+                    puede_habilidad/2, tipo_de/2, clase_de/2,
+                    ataque_base/2, defensa_base/2, puede_actuar/1,
+                    iniciativa/2, orden_turnos/1,
+                    efectos_inicio/2, efectos_ronda/1]).
 :- use_module(mundo).
 :- use_module(estado).
 :- use_module(compania).
@@ -66,6 +72,78 @@ frente_con_vivos(B) :-
 ataca_a_distancia(A) :-
     tipo_de(A, Tipo),
     mundo:alcance(Tipo, distancia).
+
+% ---------------------------------------------------------------------------
+% Atributos base (los del catalogo, sin rasgos ni moral; los efectivos llegan con el dano).
+% ---------------------------------------------------------------------------
+ataque_base(Id, A) :-
+    mundo:personaje(Id, _, _, _, ataque(A), _, _).
+ataque_base(Id, A) :-
+    tipo_de(Id, Tipo),
+    mundo:enemigo(Tipo, _, ataque(A), _).
+
+defensa_base(Id, D) :-
+    mundo:personaje(Id, _, _, _, _, defensa(D), _).
+defensa_base(Id, D) :-
+    tipo_de(Id, Tipo),
+    mundo:enemigo(Tipo, _, _, defensa(D)).
+
+% puede_actuar(+Id): esta vivo y no esta en huelga (un enemigo no tiene moral: nunca hace huelga).
+puede_actuar(Id) :-
+    compania:vivo(Id),
+    \+ compania:esta_en_huelga(Id).
+
+% ---------------------------------------------------------------------------
+% Iniciativa: I = base + ataque - defensa + moral (la moral solo cuenta en los miembros).
+% Los mas rapidos actuan antes: un guerrero fuerte y poco protegido llega primero.
+% ---------------------------------------------------------------------------
+iniciativa(Id, I) :-
+    ataque_base(Id, A),
+    defensa_base(Id, D),
+    bono_iniciativa(Id, M),
+    mundo:parametro(base_iniciativa, B),
+    I is B + A - D + M.
+
+bono_iniciativa(Id, M) :- compania:miembro(Id), compania:modificador_moral(Id, M).
+bono_iniciativa(Id, 0) :- \+ compania:miembro(Id).
+
+% orden_turnos(-Ids): los que pueden actuar, de mayor a menor iniciativa. Si empatan, el jugador
+% actua primero y, entre iguales, manda el orden estandar de los identificadores: el orden es
+% siempre el mismo para el mismo estado. (K = -I porque msort ordena de menor a mayor.)
+orden_turnos(Ids) :-
+    findall(K-P-Id,
+            (   estado:combatiente(Id, Bando),
+                puede_actuar(Id),
+                iniciativa(Id, I),
+                K is -I,
+                prioridad_bando(Bando, P)
+            ),
+            Pares),
+    msort(Pares, Ordenados),
+    ids_de(Ordenados, Ids).
+
+prioridad_bando(jugador, 0).
+prioridad_bando(enemigo, 1).
+
+ids_de([], []).
+ids_de([_-_-Id|Pares], [Id|Ids]) :- ids_de(Pares, Ids).
+
+% ---------------------------------------------------------------------------
+% Efectos que abren el combate y cada ronda (se devuelven como datos; los aplica estado).
+% ---------------------------------------------------------------------------
+% efectos_inicio(+Grupo, -Efectos): empieza un combate contra Grupo (lista de tipos de enemigo).
+% Falla si ya hay un combate o si el grupo esta vacio o tiene un tipo desconocido.
+efectos_inicio(Grupo, [iniciar_combate(Grupo)]) :-
+    \+ estado:en_combate(_),
+    ground(Grupo), Grupo = [_|_],
+    \+ ( member(Tipo, Grupo), \+ mundo:enemigo(Tipo, _, _, _) ).
+
+% efectos_ronda(-Efectos): con la cola vacia empieza la ronda siguiente, con el orden recalculado
+% (alguien puede haber caido o entrado en huelga).
+efectos_ronda([siguiente_ronda(Orden)]) :-
+    estado:en_combate(_),
+    estado:cola_turnos([]),
+    orden_turnos(Orden).
 
 % ---------------------------------------------------------------------------
 % Rasgo hechizos_de_cocina (Pimentina): "toda magia necesita queso". Cada hechizo gasta

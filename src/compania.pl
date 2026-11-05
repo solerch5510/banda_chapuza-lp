@@ -5,7 +5,7 @@
 % regla (teme_caballos...) y el nivel de moral llegan con el combate.
 
 :- module(compania, [miembro/1, vivo/1, activo/1, en_pie/1, esta_en_huelga/1,
-                     teme/2, ignora_miedo/1,
+                     teme/2, ignora_miedo/1, nivel_moral/2, modificador_moral/2,
                      sueldo_de/2, puede_viajar/1, informe/1]).
 :- use_module(mundo).
 :- use_module(estado).
@@ -27,6 +27,26 @@ esta_en_huelga(Id) :-
     estado:moral(Id, M),
     mundo:parametro(moral_huelga, Umbral),
     M =< Umbral.
+
+% nivel_moral(+Id, -Nivel): alta (8-10), normal (4-7), baja (2-3) o critica (0-1). Cifras provisionales.
+nivel_moral(Id, Nivel) :-
+    estado:moral(Id, M),
+    nivel_de_moral(M, Nivel).
+
+nivel_de_moral(M, alta)    :- M >= 8.
+nivel_de_moral(M, normal)  :- M >= 4, M < 8.
+nivel_de_moral(M, baja)    :- M >= 2, M < 4.
+nivel_de_moral(M, critica) :- M < 2.
+
+% modificador_moral(+Id, -Mod): lo que suma o resta la moral (se usa en la iniciativa).
+modificador_moral(Id, Mod) :-
+    nivel_moral(Id, Nivel),
+    mod_de_nivel(Nivel, Mod).
+
+mod_de_nivel(alta,     1).
+mod_de_nivel(normal,   0).
+mod_de_nivel(baja,    -1).
+mod_de_nivel(critica, -2).
 
 % Rasgo teme_caballos (Baldomero): teme a la clase caballo, salvo que ignore el miedo.
 % teme(?Id, ?Clase): Id le tiene miedo a las criaturas de esa Clase.

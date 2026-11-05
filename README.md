@@ -93,7 +93,7 @@ Las pruebas usan `plunit`. Desde la raíz del repositorio (PowerShell), con el e
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/spike_explicar -g "run_tests,halt" -t "halt(1)"
 ```
 
-Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (312 pruebas):
+Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (380 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -101,7 +101,7 @@ Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 
 | `tests/juego.pl` (70) | La compañía, la economía, los comandos (`juego:ejecutar/2`), la interfaz y sesiones completas por la entrada. |
 | `tests/pagos.pl` (49) | El informe de la compañía y la huelga, el valor del queso, el inventario, los sueldos y `pagar`, el impago y el comando `explicar`. |
 | `tests/explicar_juego.pl` (27) | El meta-intérprete sobre las **reglas reales** del juego (mismas respuestas y orden que la ejecución directa, en 10 estados distintos) y el árbol de texto. |
-| `tests/combate.pl` (44) | Los rasgos del héroe: el miedo de Baldomero, `puede_atacar/2`, las reglas de fila y los hechizos de cocina de Pimentina; y que el meta-intérprete los explica igual que se ejecutan. |
+| `tests/combate.pl` (112) | Los rasgos del héroe (el miedo de Baldomero, `puede_atacar/2`, las reglas de fila, los hechizos de cocina de Pimentina) y el estado de combate: niveles de moral, iniciativa, orden de turnos, `iniciar_combate`, rondas y turnos; y que el meta-intérprete lo explica igual que se ejecuta. |
 | `tests/narrador.pl` (44) | El narrador: el banco de frases, la clave más específica, la rotación de variantes, los niveles, los nombres con artículo, las frases genéricas y el comentario de `explicar`. |
 | `tests/spike_explicar.pl` (17) | El meta-intérprete de `src/explicar.pl`, con dos módulos de juguete (`tests/spike/`). |
 
