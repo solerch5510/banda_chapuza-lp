@@ -5,6 +5,7 @@
 % regla (teme_caballos...) y el nivel de moral llegan con el combate.
 
 :- module(compania, [miembro/1, vivo/1, activo/1, en_pie/1, esta_en_huelga/1,
+                     teme/2, ignora_miedo/1,
                      sueldo_de/2, puede_viajar/1, informe/1]).
 :- use_module(mundo).
 :- use_module(estado).
@@ -26,6 +27,16 @@ esta_en_huelga(Id) :-
     estado:moral(Id, M),
     mundo:parametro(moral_huelga, Umbral),
     M =< Umbral.
+
+% Rasgo teme_caballos (Baldomero): teme a la clase caballo, salvo que ignore el miedo.
+% teme(?Id, ?Clase): Id le tiene miedo a las criaturas de esa Clase.
+teme(Id, caballo) :-
+    mundo:rasgo(Id, teme_caballos),
+    \+ ignora_miedo(Id).
+
+% ignora_miedo(+Id): lleva puesta la venda de caballos (si no ve caballos, no hay miedo).
+ignora_miedo(Id) :-
+    estado:equipado(Id, venda_de_caballos).
 
 % sueldo_de(+Id, -Sueldo): lo que cobra por cada pago, en quesos (unidades).
 sueldo_de(Id, Sueldo) :-

@@ -7,6 +7,7 @@
 
 :- module(mundo, [zona/2, descripcion_zona/2, conexion/2, adyacente/2, zona_pacifica/1,
                   personaje/7, fila_preferida/2, alcance/2, rasgo/2,
+                  habilidad_de/2, coste_queso/2,
                   enemigo/4, clase/2, lleva_queso/1,
                   tipo_queso/2, parametro/2, inicio/1]).
 
@@ -80,6 +81,16 @@ rasgo(baldomero, teme_caballos).
 rasgo(pimentina, hechizos_de_cocina).
 rasgo(rufino,    cobra_por_callar).
 rasgo(tuerca,    manos_largas).
+
+% habilidad_de(Id, Habilidad): una habilidad por personaje en la version minima.
+% (Por ahora solo se usa la de Pimentina; las demas se programan con las habilidades.)
+habilidad_de(baldomero, carga_heroica).
+habilidad_de(pimentina, fondue_flamigera).
+habilidad_de(rufino,    balada_inspiradora).
+habilidad_de(tuerca,    rebuscar_bolsillos).
+
+% coste_queso(Habilidad, N): quesos que gasta lanzar un hechizo de cocina (rasgo hechizos_de_cocina).
+coste_queso(fondue_flamigera, 1).
 
 % alcance(Id, Alcance): cuerpo (solo alcanza a la primera fila) o distancia (llega tambien a la retaguardia).
 alcance(baldomero, cuerpo).

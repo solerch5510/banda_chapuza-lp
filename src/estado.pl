@@ -168,6 +168,9 @@ aplicar_conocido(gastar_objeto(Id, Objeto, N)) :-
     retract(lleva(Id, Objeto, C0)),
     C1 is C0 - N,
     (   C1 > 0 -> assertz(lleva(Id, Objeto, C1)) ; true ).
+aplicar_conocido(equipar(Id, Objeto)) :-                 % lo que lleva puesto (p. ej. la venda de caballos)
+    retractall(equipado(Id, Objeto)),
+    assertz(equipado(Id, Objeto)).
 aplicar_conocido(marcar(F)) :-
     (   marca(F) -> true ; assertz(marca(F)) ).
 aplicar_conocido(desmarcar(F)) :-
@@ -199,7 +202,7 @@ conocido(mod_moral/2).    conocido(ganar_queso/3).   conocido(gastar_queso/3).
 conocido(envejecer_quesos/0). conocido(marcar/1).    conocido(desmarcar/1).
 conocido(avanzar_dia/0).  conocido(viajar/1).        conocido(fijar_semilla/1).
 conocido(fin/1).          conocido(uso_frase/1).     conocido(guardar_prueba/2).
-conocido(ganar_objeto/3). conocido(gastar_objeto/3).
+conocido(ganar_objeto/3). conocido(gastar_objeto/3). conocido(equipar/2).
 
 set_vida(Id, V) :-
     retractall(vida(Id, _)),
