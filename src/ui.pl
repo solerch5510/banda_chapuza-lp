@@ -93,6 +93,15 @@ mostrar_conocido(vista(prueba, accion_enemigo(E), Prueba)) :-
     narrador:nombre_visible(E, Nombre),
     explicar:prueba_a_lineas(Prueba, Lineas),
     format("Por qué ~w hizo eso:~n", [Nombre]),
+    (   predicate_property(combate:accion_enemigo(_, _), number_of_clauses(Total))
+    ->  (   Prueba = regla(_, Prioridad, _)
+        ->  format("Eligió la regla de prioridad ~w de ~w (el corte descartó las demás).~n", [Prioridad, Total])
+        ;   Prueba = hecho(_)
+        ->  format("Eligió la última regla (prioridad ~w de ~w): el comodín, cuando no hay nada mejor.~n", [Total, Total])
+        ;   true
+        )
+    ;   true
+    ),
     escribir_lineas(Lineas),
     narrador:comentario_prueba(Prueba, ambos, 0, Comentario),
     format("Narrador: ~w~n", [Comentario]).

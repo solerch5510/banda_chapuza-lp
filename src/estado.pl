@@ -183,6 +183,15 @@ aplicar_conocido(iniciar_combate(Grupo)) :-
     forall(member(E, Ids), nace_enemigo(E)),
     assertz(cola_turnos([])),
     assertz(en_combate(0)).
+% Un enemigo se une a un combate ya empezado (p. ej. el moho que invoca el jefe). Actua desde la
+% ronda siguiente, cuando el orden de turnos se recalcula.
+aplicar_conocido(invocar(Tipo)) :-
+    en_combate(_),
+    atom(Tipo), mundo:enemigo(Tipo, _, _, _),
+    findall(x, instancia(e(Tipo, _), _), Nacidos),
+    length(Nacidos, N0),
+    N is N0 + 1,
+    nace_enemigo(e(Tipo, N)).
 aplicar_conocido(siguiente_turno) :-           % el que estaba al frente de la cola ya ha actuado
     retract(cola_turnos([_|Resto])),
     assertz(cola_turnos(Resto)).
@@ -198,7 +207,7 @@ aplicar_conocido(siguiente_ronda(Ids)) :-      % ronda + 1 y la cola vuelve a ll
 % estados alterados; los miembros caidos se levantan con 1 de vida y conservan su fila.
 aplicar_conocido(terminar_combate) :-
     en_combate(_),
-    forall(instancia(E, _), ( retractall(vida(E, _)), retractall(fila(E, _)) )),
+    forall(instancia(E, _), ( retractall(vida(E, _)), retractall(fila(E, _)), retractall(lleva(E, _, _)) )),
     forall(( combatiente(Id, jugador), vida(Id, 0) ), set_vida(Id, 1)),
     retractall(instancia(_, _)),
     retractall(combatiente(_, _)),
@@ -249,6 +258,7 @@ conocido(fin/1).          conocido(uso_frase/1).     conocido(guardar_prueba/2).
 conocido(ganar_objeto/3). conocido(gastar_objeto/3). conocido(equipar/2).
 conocido(iniciar_combate/1). conocido(siguiente_turno/0). conocido(siguiente_ronda/1).
 conocido(alterar/3).      conocido(quitar_alteracion/2).  conocido(terminar_combate/0).
+conocido(invocar/1).
 
 nace_enemigo(E) :-
     E = e(Tipo, _),
@@ -257,7 +267,8 @@ nace_enemigo(E) :-
     assertz(instancia(E, Tipo)),
     assertz(vida(E, V)),
     assertz(fila(E, F)),
-    assertz(combatiente(E, enemigo)).
+    assertz(combatiente(E, enemigo)),
+    forall(mundo:lleva_inicial(Tipo, Objeto, N), assertz(lleva(E, Objeto, N))).
 
 set_vida(Id, V) :-
     retractall(vida(Id, _)),

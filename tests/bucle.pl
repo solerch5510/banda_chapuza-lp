@@ -254,11 +254,12 @@ test(sin_objetivos_se_defiende, [nondet]) :-
     combate:accion_enemigo(e(bandido_torpe, 1), Accion),
     Accion == defender.
 
-test(aturdido_no_hace_nada_pasa, [nondet]) :-
+test(el_comodin_manda_defender_aunque_no_pueda_el_corte_rojo, [nondet]) :-
     montado([bandido_torpe]),
     aplicar_efecto(alterar(e(bandido_torpe, 1), aturdido, 1)),
     combate:accion_enemigo(e(bandido_torpe, 1), Accion),
-    Accion == pasar.
+    Accion == defender,                                % el comodin no repite condiciones
+    \+ combate:efectos_accion(e(bandido_torpe, 1), defender, _).   % ...y aqui no se puede ejecutar
 
 test(siempre_hay_exactamente_una_accion) :-
     forall(member(Tipos, [[bandido_torpe], [rata_quesera, moho_saltarin], [gran_roquefort]]),
@@ -325,9 +326,8 @@ test(un_enemigo_mas_rapido_actua_antes_que_el_jugador, [nondet]) :-
     nueva_partida,
     moral_a(baldomero, 2),                            % en huelga: no actua
     comenzar_combate([gran_roquefort], Items),
-    memberchk(msg(golpe, [e(gran_roquefort, 1), tuerca, 9], _), Items),
-    estado:vida(tuerca, V),
-    V == 13,
+    memberchk(msg(invoca_moho, [e(gran_roquefort, 1)], _), Items),   % el jefe invoca antes de pegar
+    estado:instancia(e(moho_saltarin, 1), moho_saltarin),
     estado:cola_turnos([Siguiente|_]),
     Siguiente == pimentina.
 
@@ -468,8 +468,8 @@ test(una_rata_cae_de_un_golpe_y_se_gana_sin_botin, [nondet]) :-
 test(perder_acaba_la_partida, [nondet]) :-
     nueva_partida,
     solo_en_pie(baldomero, 1),
-    comenzar_combate([gran_roquefort], _),
-    ordena(defender, Items),                           % se defiende, pero 11 - 5 = 6 le basta
+    comenzar_combate([bandido_torpe], _),
+    ordena(defender, Items),                           % se defiende, pero 5 - 5 = 0 sube a 1 y le basta
     memberchk(msg(cae, [baldomero], _), Items),
     memberchk(msg(derrota_combate, [], _), Items),
     estado:fin_partida(derrota(derrota_combate)),
@@ -479,9 +479,9 @@ test(perder_acaba_la_partida, [nondet]) :-
 test(tras_perder_ya_no_se_ataca) :-
     nueva_partida,
     solo_en_pie(baldomero, 1),
-    comenzar_combate([gran_roquefort], _),
+    comenzar_combate([bandido_torpe], _),
     ordena(defender, _),
-    ordena(atacar(gran_roquefort), Items),
+    ordena(atacar(bandido_torpe), Items),
     Items = [error(fuera_de_fase(_, fin))].
 
 test(un_combate_largo_acaba_de_una_forma_u_otra, [nondet]) :-
@@ -503,7 +503,8 @@ jugar_hasta_el_final(Pasos, Final) :-
     ->  Final = sin_acabar
     ;   (   ordena(atacar(rata_quesera), I), \+ I = [error(_)|_] -> true
         ;   ordena(atacar(bandido_torpe), I2), \+ I2 = [error(_)|_] -> true
-        ;   ordena(atacar(gran_roquefort), _) -> true
+        ;   ordena(atacar(gran_roquefort), I3), \+ I3 = [error(_)|_] -> true
+        ;   ordena(atacar(moho_saltarin), I4), \+ I4 = [error(_)|_] -> true
         ;   ordena(defender, _)
         ),
         P1 is Pasos - 1,
@@ -666,7 +667,7 @@ test(la_prueba_de_la_decision_nombra_la_accion_elegida, [nondet]) :-
     ordena(defender, _), ordena(defender, _), ordena(defender, _),
     ordena(explicar, [vista(prueba, _, Prueba)]),
     explicar:prueba_a_lineas(Prueba, Lineas),
-    memberchk('[ok] accion_enemigo(e(bandido_torpe, 1), atacar(tuerca))   [clausula 1]', Lineas).
+    memberchk('[ok] accion_enemigo(e(bandido_torpe, 1), atacar(tuerca))   [clausula 5 + corte]', Lineas).
 
 test(la_prueba_ensena_el_objetivo_mas_debil, [nondet]) :-
     empieza([bandido_torpe]),

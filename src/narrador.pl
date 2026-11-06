@@ -82,6 +82,14 @@ frase(suceso(aturdido(A)), ambos,
       '~w pierde el turno, aturdido de pies a cabeza. Mira las estrellas, que hoy están muy cerca.'-[A]).
 frase(suceso(pasa(E)), ambos,
       '~w no sabe qué hacer y se queda mirando. Es su mejor táctica.'-[E]).
+frase(suceso(se_cura(E, N)), ambos,
+      '~w se bebe lo que lleva encima y recupera ~w de vida. Hasta los malos tienen botiquín.'-[E, N]).
+frase(suceso(invoca_moho(E)), ambos,
+      '~w murmura algo antiguo y de la pared se despega un moho saltarín, con ganas de conocer gente.'-[E]).
+frase(suceso(roba_queso(E)), ambos,
+      '~w se lleva un queso de la despensa mientras todos miran el combate. Roba con una técnica impecable.'-[E]).
+frase(suceso(embiste(E, B, D)), ambos,
+      '~w embiste a ~w con todo el peso del caballo y le quita ~w de vida. El jinete se lleva el mérito.'-[E, B, D]).
 frase(suceso(defiende(A)), ambos,
       '~w se pone a la defensiva: escudo arriba, ojos cerrados y una plegaria a medias.'-[A]).
 

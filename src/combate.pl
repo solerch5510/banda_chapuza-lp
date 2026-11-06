@@ -21,7 +21,8 @@
                     iniciativa/2, orden_turnos/1,
                     ataque/2, defensa/2, modificador/3, dano/3, efectos_golpe/3,
                     efectos_accion/3, puede_defender/1, efectos_inicio_turno/2,
-                    accion_enemigo/2, fin_combate/1, efectos_fin/2,
+                    accion_enemigo/2, accion_enemigo_sin_corte/2, regla_ia/3, fin_combate/1, efectos_fin/2,
+                    vida_baja/1, tiene_curativo/1, objetivo_mas_debil/2,
                     efectos_inicio/2, efectos_ronda/1]).
 :- use_module(mundo).
 :- use_module(estado).
@@ -211,6 +212,21 @@ efectos_accion(A, atacar(B), Efectos) :-
     efectos_golpe(A, B, Efectos).
 efectos_accion(A, defender, [alterar(A, defendiendo, 1), mensaje(defiende, [A])]) :-
     puede_defender(A).
+efectos_accion(E, curarse, [gastar_objeto(E, Objeto, 1), curar(E, Cura), mensaje(se_cura, [E, Cura])]) :-
+    curativos_de(E, [Objeto|_]),
+    mundo:curacion(Objeto, Cura).
+efectos_accion(E, invocar_moho, [invocar(moho_saltarin), mensaje(invoca_moho, [E])]) :-
+    debe_invocar_moho(E).
+efectos_accion(E, robar_queso, [gastar_queso(Tipo, Edad, 1), mensaje(roba_queso, [E])]) :-
+    puede_robar_queso(E),
+    economia:despensa([q(Tipo, Edad, _)|_]).                 % lo primero que ve: lo mas fresco
+efectos_accion(E, embestir(B), Efectos) :-
+    puede_embestir(E, B),
+    dano(E, B, D0),
+    mundo:parametro(dano_embestida, Extra),
+    D is D0 + Extra,
+    efectos_caida(B, D, Caida),
+    append([dano(B, D), alterar(E, embistio, fijo), mensaje(embiste, [E, B, D])], Caida, Efectos).
 efectos_accion(A, pasar, [mensaje(pasa, [A])]) :-            % lo unico que le queda a quien no puede nada
     estado:combatiente(A, _).
 
@@ -239,17 +255,73 @@ efecto_de_paso(Id, Estado, Turnos, Efecto) :-
     ).
 
 % ---------------------------------------------------------------------------
-% Turno enemigo (PROVISIONAL, hasta la IA de T-24): ataca al mas debil de los que alcanza;
-% si no alcanza a nadie, se defiende; y si ni eso, pasa. Tres clausulas excluyentes.
+% La IA enemiga: reglas por PRIORIDAD. Gana la primera cuyas condiciones se cumplen y el corte
+% (!) descarta las demas (Conferencia 4: el corte establece prioridades). La ultima, defender,
+% no repite las condiciones negadas de las anteriores: es el unico comodin. Por eso es un corte
+% "rojo": la version con corte solo es correcta en modo (+Enemigo, -Accion).
+%   1 curarse       si le queda poco de vida y lleva algo que cure (pocion, esporas del jefe)
+%   2 invocar_moho  el jefe, si no queda un moho aliado en pie (y como mucho dos por combate)
+%   3 robar_queso   la rata, si hay queso en la despensa del grupo
+%   4 embestir(O)   el bandido montado, en su primer turno (dano +2)
+%   5 atacar(O)     al mas debil de los que alcanza
+%   6 defender      si no hay nada mejor
+% Cada regla tiene su gemela sin corte en regla_ia/3 (abajo), que sirve de oraculo en las pruebas.
 % ---------------------------------------------------------------------------
-accion_enemigo(E, atacar(B)) :-
-    objetivo_mas_debil(E, B).
-accion_enemigo(E, defender) :-
-    \+ objetivo_mas_debil(E, _),
-    puede_defender(E).
-accion_enemigo(E, pasar) :-
-    \+ objetivo_mas_debil(E, _),
-    \+ puede_defender(E).
+accion_enemigo(E, curarse)      :- vida_baja(E), tiene_curativo(E), !.
+accion_enemigo(E, invocar_moho) :- debe_invocar_moho(E), !.
+accion_enemigo(E, robar_queso)  :- puede_robar_queso(E), !.
+accion_enemigo(E, embestir(O))  :- puede_embestir(E, O), !.
+accion_enemigo(E, atacar(O))    :- objetivo_mas_debil(E, O), !.
+accion_enemigo(_, defender).
+
+% La misma IA como DATOS: el numero de regla es un argumento y gana el menor que se cumple.
+regla_ia(1, E, curarse)      :- vida_baja(E), tiene_curativo(E).
+regla_ia(2, E, invocar_moho) :- debe_invocar_moho(E).
+regla_ia(3, E, robar_queso)  :- puede_robar_queso(E).
+regla_ia(4, E, embestir(O))  :- puede_embestir(E, O).
+regla_ia(5, E, atacar(O))    :- objetivo_mas_debil(E, O).
+regla_ia(6, _, defender).
+
+accion_enemigo_sin_corte(E, A) :-
+    regla_ia(N, E, A),
+    \+ ( regla_ia(M, E, _), M < N ).
+
+% --- condiciones de las reglas ---
+% vida_baja(+E): le queda el umbral (30 %) o menos de su vida maxima (aritmetica entera).
+vida_baja(E) :-
+    estado:vida(E, V),
+    tipo_de(E, Tipo),
+    mundo:enemigo(Tipo, vida(Max), _, _),
+    mundo:parametro(umbral_vida_baja, P),
+    V * 100 =< Max * P.
+
+% curativos_de(+E, -Objetos): lo que lleva E y cura, en el orden en que lo tiene.
+curativos_de(E, Objetos) :-
+    findall(Obj, ( estado:lleva(E, Obj, N), N > 0, mundo:curacion(Obj, _) ), Objetos).
+
+tiene_curativo(E) :-
+    curativos_de(E, [_|_]).
+
+% El jefe invoca un moho si no le queda ninguno aliado en pie y aun no ha invocado el maximo.
+debe_invocar_moho(E) :-
+    tipo_de(E, gran_roquefort),
+    \+ ( estado:instancia(M, moho_saltarin), compania:vivo(M) ),
+    findall(x, estado:instancia(_, moho_saltarin), Nacidos),
+    length(Nacidos, N),
+    mundo:parametro(max_mohos, Max),
+    N < Max.
+
+% La rata roba mientras haya queso que robar.
+puede_robar_queso(E) :-
+    tipo_de(E, rata_quesera),
+    economia:queso_total(N),
+    N > 0.
+
+% El bandido montado embiste una sola vez por combate (la marca embistio se borra al terminar).
+puede_embestir(E, O) :-
+    tipo_de(E, bandido_montado),
+    \+ estado:alterado(E, embistio, _),
+    objetivo_mas_debil(E, O).
 
 % objetivo_mas_debil(+Atacante, -B): de los que puede atacar, el de menos vida (empate: el id menor).
 objetivo_mas_debil(A, B) :-

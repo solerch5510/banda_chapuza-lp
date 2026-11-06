@@ -9,6 +9,7 @@
                   personaje/7, fila_preferida/2, alcance/2, rasgo/2,
                   habilidad_de/2, coste_queso/2,
                   enemigo/4, clase/2, lleva_queso/1, numerar_grupo/2,
+                  curacion/2, lleva_inicial/3,
                   tipo_queso/2, parametro/2, inicio/1]).
 
 % La declaracion de modulo va PRIMERO; el archivo tiene tildes, asi que se declara UTF-8 justo despues.
@@ -121,6 +122,13 @@ clase(moho_saltarin,   hongo).
 clase(bandido_montado, caballo).
 clase(gran_roquefort,  queso_vivo).
 
+% curacion(Objeto, Vida): lo que cura un objeto cuando un enemigo lo usa (la IA se cura con el).
+curacion(pocion,  10).
+curacion(esporas,  8).
+
+% lleva_inicial(Tipo, Objeto, N): lo que lleva encima un enemigo al empezar el combate.
+lleva_inicial(gran_roquefort, esporas, 1).        % las esporas curativas del jefe: una vez
+
 % lleva_queso(Tipo): suelta 1 queso de botin al caer (el queso entra por botin, nunca se compra).
 lleva_queso(bandido_torpe).
 lleva_queso(bandido_montado).
@@ -163,6 +171,9 @@ parametro(base_iniciativa,  10).    % la iniciativa es esta base + ataque - defe
 parametro(moral_victoria,    1).    % moral que gana cada miembro al ganar un combate (provisional)
 parametro(bono_defender,     2).    % defensa extra de quien esta defendiendo (provisional)
 parametro(dano_miedo,        2).    % dano extra que recibe quien teme a la clase del atacante (lore 7)
+parametro(umbral_vida_baja, 30).   % vida baja: 30 % o menos de la maxima (la IA se cura)
+parametro(dano_embestida,    2).    % dano extra de la primera embestida del bandido montado
+parametro(max_mohos,         2).    % mohos que el jefe puede invocar en un combate
 parametro(penal_venda,       3).    % ataque que pierde Baldomero con la venda contra los caballos (lore 7)
 
 % ---------------------------------------------------------------------------

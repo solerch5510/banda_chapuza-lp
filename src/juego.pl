@@ -320,7 +320,10 @@ seguir_combate(Previos, Limite, Items) :-
 % ANTES de aplicar los efectos (asi explicar puede contar por que lo hizo) y pasa el turno.
 turno_enemigo(E, Items) :-
     once(explicar:solve(combate:accion_enemigo(E, Accion), Prueba)),
-    once(combate:efectos_accion(E, Accion, Efectos)),
+    (   once(combate:efectos_accion(E, Accion, Efectos0))
+    ->  Efectos = Efectos0
+    ;   Efectos = [mensaje(pasa, [E])]                  % el comodin (defender) no siempre se puede: pasa
+    ),
     append([guardar_prueba(accion_enemigo(E), Prueba)|Efectos], [siguiente_turno], Todos),
     etapa(Todos, Items).
 
