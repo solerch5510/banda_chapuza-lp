@@ -194,6 +194,17 @@ aplicar_conocido(siguiente_ronda(Ids)) :-      % ronda + 1 y la cola vuelve a ll
     retractall(cola_turnos(_)),
     assertz(en_combate(R)),
     assertz(cola_turnos(Ids)).
+% Termina el combate: desaparecen los enemigos (con su vida y su fila), los bandos, la cola y los
+% estados alterados; los miembros caidos se levantan con 1 de vida y conservan su fila.
+aplicar_conocido(terminar_combate) :-
+    en_combate(_),
+    forall(instancia(E, _), ( retractall(vida(E, _)), retractall(fila(E, _)) )),
+    forall(( combatiente(Id, jugador), vida(Id, 0) ), set_vida(Id, 1)),
+    retractall(instancia(_, _)),
+    retractall(combatiente(_, _)),
+    retractall(cola_turnos(_)),
+    retractall(alterado(_, _, _)),
+    retractall(en_combate(_)).
 % Estados alterados de un combatiente (aturdido, defendiendo...): duran N turnos o son fijos.
 % Alterar de nuevo el mismo estado lo sustituye (no se acumula).
 aplicar_conocido(alterar(Id, Estado, Turnos)) :-
@@ -237,7 +248,7 @@ conocido(avanzar_dia/0).  conocido(viajar/1).        conocido(fijar_semilla/1).
 conocido(fin/1).          conocido(uso_frase/1).     conocido(guardar_prueba/2).
 conocido(ganar_objeto/3). conocido(gastar_objeto/3). conocido(equipar/2).
 conocido(iniciar_combate/1). conocido(siguiente_turno/0). conocido(siguiente_ronda/1).
-conocido(alterar/3).      conocido(quitar_alteracion/2).
+conocido(alterar/3).      conocido(quitar_alteracion/2).  conocido(terminar_combate/0).
 
 nace_enemigo(E) :-
     E = e(Tipo, _),

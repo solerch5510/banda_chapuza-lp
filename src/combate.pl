@@ -21,6 +21,7 @@
                     iniciativa/2, orden_turnos/1,
                     ataque/2, defensa/2, modificador/3, dano/3, efectos_golpe/3,
                     efectos_accion/3, puede_defender/1, efectos_inicio_turno/2,
+                    accion_enemigo/2, fin_combate/1, efectos_fin/2,
                     efectos_inicio/2, efectos_ronda/1]).
 :- use_module(mundo).
 :- use_module(estado).
@@ -210,6 +211,8 @@ efectos_accion(A, atacar(B), Efectos) :-
     efectos_golpe(A, B, Efectos).
 efectos_accion(A, defender, [alterar(A, defendiendo, 1), mensaje(defiende, [A])]) :-
     puede_defender(A).
+efectos_accion(A, pasar, [mensaje(pasa, [A])]) :-            % lo unico que le queda a quien no puede nada
+    estado:combatiente(A, _).
 
 % puede_defender(+Id): esta en el combate, puede actuar y no esta aturdido.
 puede_defender(Id) :-
@@ -234,6 +237,57 @@ efecto_de_paso(Id, Estado, Turnos, Efecto) :-
     ;   Menos is Turnos - 1,
         Efecto = alterar(Id, Estado, Menos)
     ).
+
+% ---------------------------------------------------------------------------
+% Turno enemigo (PROVISIONAL, hasta la IA de T-24): ataca al mas debil de los que alcanza;
+% si no alcanza a nadie, se defiende; y si ni eso, pasa. Tres clausulas excluyentes.
+% ---------------------------------------------------------------------------
+accion_enemigo(E, atacar(B)) :-
+    objetivo_mas_debil(E, B).
+accion_enemigo(E, defender) :-
+    \+ objetivo_mas_debil(E, _),
+    puede_defender(E).
+accion_enemigo(E, pasar) :-
+    \+ objetivo_mas_debil(E, _),
+    \+ puede_defender(E).
+
+% objetivo_mas_debil(+Atacante, -B): de los que puede atacar, el de menos vida (empate: el id menor).
+objetivo_mas_debil(A, B) :-
+    findall(V-Id, ( estado:combatiente(Id, _), puede_atacar(A, Id), estado:vida(Id, V) ), Pares),
+    Pares = [_|_],
+    msort(Pares, [_-B|_]).
+
+% ---------------------------------------------------------------------------
+% Fin del combate. Se pierde cuando todos los miembros han caido; se gana cuando no queda
+% ningun enemigo en pie. (Dentro del combate se cae; al terminar, todos se levantan.)
+% ---------------------------------------------------------------------------
+fin_combate(derrota) :-
+    estado:en_combate(_),
+    \+ bando_en_pie(jugador).
+fin_combate(victoria) :-
+    estado:en_combate(_),
+    bando_en_pie(jugador),
+    \+ bando_en_pie(enemigo).
+
+bando_en_pie(Bando) :-
+    estado:combatiente(Id, Bando),
+    compania:vivo(Id).
+
+% efectos_fin(+Resultado, -Efectos): lo que pasa al cerrar el combate.
+%   victoria: el botin (1 cheddar fresco por cada enemigo que llevaba queso), la moral sube y se
+%             termina el combate (los caidos se levantan con 1 de vida);
+%   derrota : fin de la partida.
+efectos_fin(victoria, Efectos) :-
+    findall(x, ( estado:instancia(_, Tipo), mundo:lleva_queso(Tipo) ), Botin),
+    length(Botin, N),
+    mundo:parametro(moral_victoria, Sube),
+    findall(mod_moral(Id, Sube), compania:miembro(Id), Moral),
+    (   N > 0
+    ->  Queso = [ganar_queso(cheddar, 0, N), mensaje(botin, [N])]
+    ;   Queso = []
+    ),
+    append([[mensaje(victoria, [])], Queso, Moral, [terminar_combate]], Efectos).
+efectos_fin(derrota, [fin(derrota(derrota_combate)), mensaje(derrota_combate, [])]).
 
 % ---------------------------------------------------------------------------
 % Efectos que abren el combate y cada ronda (se devuelven como datos; los aplica estado).

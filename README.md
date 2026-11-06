@@ -55,11 +55,14 @@ Se puede **recorrer el mapa, gestionar la compañía y pedir explicaciones**. Ca
 | `pagar.` | Solo en la taberna: paga los sueldos pendientes (5 quesos) empezando por los más rancios. Llegar a la taberna deja sueldos pendientes. |
 | `compania.` | Los miembros: vida, ataque, defensa, moral, fila, sueldo, rasgo y estado (en pie, huelga o caído). |
 | `inventario.` | La despensa lote a lote (con la edad y la categoría del queso) y los objetos. |
-| `explicar.` | La prueba lógica, en árbol, de lo último que se hizo (`ir`, `descansar` o `pagar`). |
+| `pelear(Tipo).` | **Provisional.** Empieza un combate de prueba contra un tipo de enemigo (`rata_quesera`, `bandido_torpe`, `moho_saltarin`, `bandido_montado`, `gran_roquefort`) o una lista de ellos, p. ej. `pelear([rata_quesera, rata_quesera]).` Solo fuera de la taberna. Desaparecerá cuando los contratos empiecen los combates. |
+| `atacar(Objetivo).` | Solo en combate: golpea con el miembro al que le toca. El objetivo es un tipo (`bandido_torpe`) o una instancia (`e(bandido_torpe, 1)`). |
+| `defender.` | Solo en combate: sube la defensa del miembro al que le toca hasta su próximo turno. |
+| `explicar.` | La prueba lógica, en árbol, de lo último que se hizo (`ir`, `descansar`, `pagar`, `atacar`, `defender` o la decisión de un enemigo). |
 | `explicar(ir(aldea)).` | La prueba de esa acción: la guardada si es la última; si no, se resuelve ahora. |
 | `salir.` | Termina la partida. |
 
-Si la despensa se queda vacía, la partida termina por hambre. En combate existen `atacar(Objetivo).` y `defender.` (actúa el miembro al que le toca el turno; el objetivo es un tipo, como `bandido_torpe`, o una instancia, como `e(bandido_torpe, 1)`), pero todavía no hay forma de iniciar un combate desde el juego. Contratos, bucle de combate y `por_que_no` aún no están implementados (ver `docs/03-funcionalidades-y-etapas.md`). Los acentos dependen de la consola de Windows (comprobación pendiente en la consola de la entrega).
+Si la despensa se queda vacía, la partida termina por hambre. El combate ya se puede jugar (`pelear(rata_quesera).`, luego `atacar(...)` y `defender.` con cada miembro por turno, y `mirar.` para ver la ronda y a los enemigos): los enemigos actúan solos, al ganar hay botín y moral, los caídos se levantan con 1 de vida y al perder termina la partida. La IA enemiga es provisional (ataca al más débil que alcanza). Contratos, habilidades y `por_que_no` aún no están implementados (ver `docs/03-funcionalidades-y-etapas.md`). Los acentos dependen de la consola de Windows (comprobación pendiente en la consola de la entrega).
 
 ## Pruebas
 
@@ -94,10 +97,14 @@ Las pruebas usan `plunit`. Desde la raíz del repositorio (PowerShell), con el e
 ```
 
 ```
+& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/bucle -g "run_tests,halt" -t "halt(1)"
+```
+
+```
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/spike_explicar -g "run_tests,halt" -t "halt(1)"
 ```
 
-Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (539 pruebas):
+Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (623 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -107,6 +114,7 @@ Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 
 | `tests/explicar_juego.pl` (27) | El meta-intérprete sobre las **reglas reales** del juego (mismas respuestas y orden que la ejecución directa, en 10 estados distintos) y el árbol de texto. |
 | `tests/combate.pl` (166) | Los rasgos del héroe (el miedo de Baldomero, `puede_atacar/2`, las reglas de fila, los hechizos de cocina de Pimentina), el estado de combate (niveles de moral, iniciativa, orden de turnos, `iniciar_combate`, rondas y turnos) y el daño (`dano/3` con moral, miedo, venda y defensa; `efectos_golpe/3`); y que el meta-intérprete lo explica igual que se ejecuta. |
 | `tests/acciones.pl` (105) | Las acciones del jugador en combate: el efecto `alterar`, `efectos_accion/3`, el paso de los estados, los comandos `atacar` y `defender` (turno, objetivos, fases, errores sin efecto) y su prueba guardada para `explicar`. |
+| `tests/bucle.pl` (84) | El combate de principio a fin: fin de combate (victoria y derrota), `terminar_combate` (los caídos se levantan con 1), el turno enemigo provisional, el bucle de turnos y rondas, `pelear`, lo que ve el jugador y `explicar` tras un turno enemigo. |
 | `tests/narrador.pl` (44) | El narrador: el banco de frases, la clave más específica, la rotación de variantes, los niveles, los nombres con artículo, las frases genéricas y el comentario de `explicar`. |
 | `tests/spike_explicar.pl` (17) | El meta-intérprete de `src/explicar.pl`, con dos módulos de juguete (`tests/spike/`). |
 

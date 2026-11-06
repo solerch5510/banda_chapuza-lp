@@ -143,7 +143,7 @@ test(atacar_son_los_efectos_del_golpe, [nondet]) :-
     combate:efectos_golpe(baldomero, e(bandido_torpe, 1), Golpe),
     Efs == Golpe.
 
-test(defender_pone_el_estado_y_avisa) :-
+test(defender_pone_el_estado_y_avisa, [nondet]) :-
     combate_listo([bandido_torpe]),
     combate:efectos_accion(baldomero, defender, Efs),
     once(Efs = [alterar(baldomero, defendiendo, 1), mensaje(defiende, [baldomero])]).
@@ -186,7 +186,7 @@ test(una_accion_desconocida_no_es_legal, [fail]) :-
     combate_listo([bandido_torpe]),
     combate:efectos_accion(baldomero, volar, _).
 
-test(aplicar_defender_sube_la_defensa) :-
+test(aplicar_defender_sube_la_defensa, [nondet]) :-
     combate_listo([bandido_torpe]),
     combate:efectos_accion(baldomero, defender, Efs),
     aplicar_efectos(Efs),
@@ -294,16 +294,15 @@ test(una_instancia_concreta_tambien_vale) :-
     Objetivo == e(rata_quesera, 2).
 
 test(el_golpe_que_derriba_avisa, [nondet]) :-
-    combate_listo([rata_quesera]),
+    combate_listo([rata_quesera, bandido_torpe]),
     ordena(atacar(rata_quesera), Items),
     memberchk(msg(cae, [e(rata_quesera, 1)], _), Items),
     estado:vida(e(rata_quesera, 1), V),
     V == 0.
 
-test(no_se_ataca_a_un_enemigo_caido) :-
-    combate_listo([rata_quesera]),
-    ordena(atacar(rata_quesera), _),
-    cola_a([baldomero]),
+test(no_se_ataca_a_un_enemigo_caido, [nondet]) :-
+    combate_listo([rata_quesera, bandido_torpe]),
+    aplicar_efecto(dano(e(rata_quesera, 1), 99)),       % cae la rata; el bandido sigue en pie
     ordena(atacar(rata_quesera), Items),
     Items == [error(objetivo_desconocido(rata_quesera))].
 
@@ -475,11 +474,12 @@ test(un_error_al_defender_no_toca_el_estado) :-
     foto_estado(Despues),
     Antes =@= Despues.
 
-test(defender_dos_veces_no_acumula) :-
+test(defender_dos_veces_no_acumula, [nondet]) :-
     combate_listo([bandido_torpe]),
-    ordena(defender, _),
-    cola_a([baldomero]),
-    ordena(defender, _),
+    combate:efectos_accion(baldomero, defender, E1),
+    aplicar_efectos(E1),
+    combate:efectos_accion(baldomero, defender, E2),
+    aplicar_efectos(E2),
     once(combate:defensa(baldomero, D)),
     D == 5.
 

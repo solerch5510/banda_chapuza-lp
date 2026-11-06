@@ -12,11 +12,12 @@
 % (explicar:solve/2): asi `explicar.` puede decir por que se pudo aunque el estado ya cambio.
 
 :- module(juego, [ejecutar/2, validar_comando/2, comandos_disponibles/2, permitido/2,
-                  objetivo_de_accion/2]).
+                  objetivo_de_accion/2, comenzar_combate/2, avanzar_combate/1]).
 :- use_module(mundo).
 :- use_module(estado).
 :- use_module(compania).
 :- use_module(economia).
+:- use_module(combate).
 :- use_module(explicar).
 
 % ---------------------------------------------------------------------------
@@ -33,6 +34,7 @@ comando(explicar,   0).
 comando(explicar,   1).
 comando(atacar,     1).
 comando(defender,   0).
+comando(pelear,     1).          % PROVISIONAL: empieza un combate de prueba hasta que lleguen los contratos
 comando(salir,      0).
 
 validar_comando(T, Res) :-
@@ -50,7 +52,7 @@ validar_comando(T, Res) :-
 % ---------------------------------------------------------------------------
 % Que comandos se pueden usar en cada fase (la fase se deriva en estado:fase/1).
 % ---------------------------------------------------------------------------
-permitidos(exploracion, [ayuda, mirar, ir, compania, inventario, explicar, salir]).
+permitidos(exploracion, [ayuda, mirar, ir, pelear, compania, inventario, explicar, salir]).
 permitidos(taberna,     [ayuda, mirar, ir, descansar, pagar, compania, inventario, explicar, salir]).
 permitidos(combate,     [ayuda, mirar, atacar, defender, compania, inventario, explicar, salir]).
 permitidos(fin,         [ayuda, explicar, salir]).
@@ -145,8 +147,13 @@ ejecutar_(Cmd, resultado(Items)) :-
 ejecutar_en_fase(ayuda, Fase, [vista(ayuda, Comandos)]) :-
     comandos_disponibles(Fase, Comandos).
 ejecutar_en_fase(salir, _, [salir]).
-ejecutar_en_fase(mirar, _, [vista(zona, Datos)]) :-
-    datos_de_zona(Datos).
+ejecutar_en_fase(mirar, Fase, Items) :-
+    datos_de_zona(Datos),
+    (   Fase == combate
+    ->  datos_de_combate(Combate),
+        Items = [vista(zona, Datos), vista(combate, Combate)]
+    ;   Items = [vista(zona, Datos)]
+    ).
 ejecutar_en_fase(compania, _, [vista(compania, Filas)]) :-
     compania:informe(Filas).
 ejecutar_en_fase(inventario, _, [vista(inventario, Datos)]) :-
@@ -207,6 +214,15 @@ ejecutar_en_fase(defender, _, Items) :-
     ;   Items = [error(no_es_tu_turno)]
     ).
 
+% pelear(Grupo) (PROVISIONAL): empieza un combate contra un tipo o una lista de tipos. Solo en
+% exploracion (en la taberna no se pelea). Desaparecera cuando los contratos y los eventos
+% empiecen los combates por su cuenta.
+ejecutar_en_fase(pelear(Grupo), _, Items) :-
+    (   grupo_de_tipos(Grupo, Tipos)
+    ->  comenzar_combate(Tipos, Items)
+    ;   Items = [error(grupo_desconocido(Grupo))]
+    ).
+
 % explicar. : la prueba de lo ultimo que se hizo. explicar(Accion). : la de esa accion;
 % si es la ultima, la guardada (el estado ya cambio); si no, se resuelve ahora, en hipotetico.
 ejecutar_en_fase(explicar, _, Items) :-
@@ -231,7 +247,95 @@ accion_de_turno(Clave, Actor, Accion, Meta, Items) :-
     once(explicar:solve(Meta, Prueba)),
     once(combate:efectos_accion(Actor, Accion, Efectos)),
     append([guardar_prueba(Clave, Prueba)|Efectos], [siguiente_turno], Todos),
+    etapa(Todos, I1),
+    avanzar_combate(I2),
+    append(I1, I2, Items).
+
+% ---------------------------------------------------------------------------
+% El combate por turnos. comenzar_combate/2 lo abre y avanzar_combate/1 lo lleva hasta que le
+% toca a un miembro (se espera su comando) o hasta que termina (victoria o derrota). Cada paso
+% es una etapa: calcula con el estado que dejo la anterior y lo aplica.
+% ---------------------------------------------------------------------------
+% comenzar_combate(+Tipos, -Items): Tipos es la lista de enemigos (p. ej. [rata_quesera, rata_quesera]).
+comenzar_combate(Tipos, Items) :-
+    once(combate:efectos_inicio(Tipos, Efectos)),
+    sort(Tipos, Distintos),
+    findall(mensaje(aparece, [Tipo]), member(Tipo, Distintos), Avisos),
+    append(Efectos, Avisos, Todos),
+    etapa(Todos, I1),
+    avanzar_combate(I2),
+    append(I1, I2, Items).
+
+% avanzar_combate(-Items): el limite evita un bucle sin fin si algo falla en el diseno.
+avanzar_combate(Items) :-
+    avanzar_combate(200, Items).
+
+avanzar_combate(Limite, Items) :-
+    (   \+ estado:en_combate(_)
+    ->  Items = []
+    ;   Limite =< 0
+    ->  Items = [error(interno(combate_sin_fin))]
+    ;   combate:fin_combate(Resultado)
+    ->  once(combate:efectos_fin(Resultado, Efectos)),
+        etapa(Efectos, Items)
+    ;   estado:cola_turnos([])
+    ->  once(combate:efectos_ronda(Efectos)),         % nadie por actuar: empieza otra ronda
+        etapa(Efectos, I1),
+        seguir_combate(I1, Limite, Items)
+    ;   estado:cola_turnos([Actor|_])
+    ->  turno_de(Actor, Limite, Items)
+    ).
+
+grupo_de_tipos(Grupo, Tipos) :-
+    (   is_list(Grupo) -> Tipos = Grupo ; atom(Grupo) -> Tipos = [Grupo] ),
+    combate:efectos_inicio(Tipos, _).
+
+% turno_de(+Actor, +Limite, -Items): quien ya no puede actuar pierde el turno sin ruido; un
+% aturdido lo pierde con aviso; a un miembro se le espera; un enemigo actua.
+turno_de(Actor, Limite, Items) :-
+    (   \+ combate:puede_actuar(Actor)
+    ->  etapa([siguiente_turno], I1),
+        seguir_combate(I1, Limite, Items)
+    ;   combate:aturdido(Actor)
+    ->  once(combate:efectos_inicio_turno(Actor, Pasos)),
+        append([mensaje(aturdido, [Actor])|Pasos], [siguiente_turno], Efectos),
+        etapa(Efectos, I1),
+        seguir_combate(I1, Limite, Items)
+    ;   once(combate:efectos_inicio_turno(Actor, Pasos)),
+        etapa(Pasos, I0),
+        (   estado:combatiente(Actor, jugador)
+        ->  Items = I0                                  % le toca al jugador
+        ;   turno_enemigo(Actor, I1),
+            append(I0, I1, Previos),
+            seguir_combate(Previos, Limite, Items)
+        )
+    ).
+
+seguir_combate(Previos, Limite, Items) :-
+    Menos is Limite - 1,
+    avanzar_combate(Menos, Siguientes),
+    append(Previos, Siguientes, Items).
+
+% turno_enemigo(+E, -Items): decide con combate:accion_enemigo/2, guarda la prueba de la decision
+% ANTES de aplicar los efectos (asi explicar puede contar por que lo hizo) y pasa el turno.
+turno_enemigo(E, Items) :-
+    once(explicar:solve(combate:accion_enemigo(E, Accion), Prueba)),
+    once(combate:efectos_accion(E, Accion, Efectos)),
+    append([guardar_prueba(accion_enemigo(E), Prueba)|Efectos], [siguiente_turno], Todos),
     etapa(Todos, Items).
+
+% datos_de_combate(-Datos): lo que enseña mirar durante un combate.
+datos_de_combate(combate(Ronda, Turno, Enemigos)) :-
+    once(estado:en_combate(Ronda)),
+    (   estado:cola_turnos([Actor|_]) -> Turno = Actor ; Turno = ninguno ),
+    findall(enemigo(E, Vida, Max, Fila),
+            (   estado:instancia(E, Tipo),
+                estado:vida(E, Vida),
+                mundo:enemigo(Tipo, vida(Max), _, _),
+                estado:fila(E, Fila)
+            ),
+            Enemigos0),
+    msort(Enemigos0, Enemigos).
 
 % ---------------------------------------------------------------------------
 % mirar: los datos de la zona donde estas.

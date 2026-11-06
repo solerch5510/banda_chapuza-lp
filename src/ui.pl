@@ -79,6 +79,23 @@ mostrar_conocido(vista(inventario, Datos)) :-
     forall(member(lote(Tipo, Edad, Cant, Categoria), Lotes),
            format("  ~w x~w   edad ~w (~w)~n", [Tipo, Cant, Edad, Categoria])),
     escribir_objetos(Objetos).
+mostrar_conocido(vista(combate, combate(Ronda, Turno, Enemigos))) :-
+    narrador:nombre_visible(Turno, QuienJuega),
+    format("Combate · ronda ~w · turno de ~w~n", [Ronda, QuienJuega]),
+    forall(member(enemigo(E, Vida, Max, Fila), Enemigos),
+           (   narrador:nombre_visible(E, Nombre),
+               (   Vida =:= 0
+               ->  format("  ~w: caído~n", [Nombre])
+               ;   format("  ~w: vida ~w/~w (~w)~n", [Nombre, Vida, Max, Fila])
+               )
+           )).
+mostrar_conocido(vista(prueba, accion_enemigo(E), Prueba)) :-
+    narrador:nombre_visible(E, Nombre),
+    explicar:prueba_a_lineas(Prueba, Lineas),
+    format("Por qué ~w hizo eso:~n", [Nombre]),
+    escribir_lineas(Lineas),
+    narrador:comentario_prueba(Prueba, ambos, 0, Comentario),
+    format("Narrador: ~w~n", [Comentario]).
 mostrar_conocido(vista(prueba, Accion, Prueba)) :-
     explicar:prueba_a_lineas(Prueba, Lineas),
     format("Por qué se pudo ~w:~n", [Accion]),

@@ -68,6 +68,20 @@ frase(suceso(golpe(A, B, D)), ambos,
       '~w le suelta un golpe a ~w: ~w de vida menos. Ha sido casi técnico.'-[A, B, D]).
 frase(suceso(cae(B)), ambos,
       '~w cae redondo. Se levantará luego con 1 de vida y ninguna dignidad.'-[B]).
+frase(suceso(aparece(T)), ambos,
+      '~w se interpone en tu camino. Nadie ha preguntado si tenía permiso.'-[T]).
+frase(suceso(victoria), ambos,
+      'Victoria. Nadie la esperaba, y menos que nadie la propia Banda.').
+frase(suceso(botin(1)), ambos,
+      'Botín: 1 queso fresco. Lo guardaba «para emergencias». Esto lo era.').
+frase(suceso(botin(N)), ambos,
+      'Botín: ~w quesos frescos. Los guardaban «para emergencias». Esto lo era.'-[N]).
+frase(suceso(derrota_combate), ambos,
+      'La Banda Chapuza cae entera. Los bardos del futuro lo cantarán mal. Fin de la partida.').
+frase(suceso(aturdido(A)), ambos,
+      '~w pierde el turno, aturdido de pies a cabeza. Mira las estrellas, que hoy están muy cerca.'-[A]).
+frase(suceso(pasa(E)), ambos,
+      '~w no sabe qué hacer y se queda mirando. Es su mejor táctica.'-[E]).
 frase(suceso(defiende(A)), ambos,
       '~w se pone a la defensiva: escudo arriba, ojos cerrados y una plegaria a medias.'-[A]).
 
@@ -274,6 +288,9 @@ texto_error(fuera_de_fase(Cmd, Fase), Texto) :-
 texto_error(no_entiendo(Termino), Texto) :-
     como_texto(Termino, Dicho),
     format(atom(Texto), 'No entiendo "~w". Escribe ayuda. para ver los comandos.', [Dicho]).
+texto_error(grupo_desconocido(Grupo), Texto) :-
+    como_texto(Grupo, Dicho),
+    format(atom(Texto), 'No conozco a esos enemigos: "~w". Prueba con pelear(rata_quesera).', [Dicho]).
 texto_error(no_es_tu_turno, 'Ahora no te toca a ti: espera a tu turno.').
 texto_error(no_puede_atacar(Actor, Objetivo), Texto) :-
     nombre_visible(Actor, A),
@@ -320,6 +337,7 @@ ayuda_de(descansar, Texto) :-
     format(atom(Texto),
            'descansar.     solo en la taberna: cuesta ~w quesos, cura a todos y pasa un día', [Coste]).
 ayuda_de(pagar, 'pagar.         solo en la taberna: paga los sueldos pendientes con lo más rancio').
+ayuda_de(pelear, 'pelear(Tipo). (provisional) empieza un combate de prueba, p. ej. pelear(rata_quesera)').
 ayuda_de(atacar, 'atacar(Objetivo). solo en combate: golpea a un enemigo (un tipo o e(Tipo, N))').
 ayuda_de(defender, 'defender.      solo en combate: sube tu defensa hasta tu próximo turno').
 ayuda_de(compania,'compania.      muestra a los miembros, su vida, su moral y su estado').
