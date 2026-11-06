@@ -18,6 +18,7 @@
 :- use_module(compania).
 :- use_module(economia).
 :- use_module(combate).
+:- use_module(contratos).
 :- use_module(explicar).
 
 % ---------------------------------------------------------------------------
@@ -34,6 +35,8 @@ comando(explicar,   0).
 comando(explicar,   1).
 comando(atacar,     1).
 comando(defender,   0).
+comando(contratos,  0).
+comando(aceptar,    1).
 comando(pelear,     1).          % PROVISIONAL: empieza un combate de prueba hasta que lleguen los contratos
 comando(salir,      0).
 
@@ -52,8 +55,8 @@ validar_comando(T, Res) :-
 % ---------------------------------------------------------------------------
 % Que comandos se pueden usar en cada fase (la fase se deriva en estado:fase/1).
 % ---------------------------------------------------------------------------
-permitidos(exploracion, [ayuda, mirar, ir, pelear, compania, inventario, explicar, salir]).
-permitidos(taberna,     [ayuda, mirar, ir, descansar, pagar, compania, inventario, explicar, salir]).
+permitidos(exploracion, [ayuda, mirar, ir, contratos, aceptar, pelear, compania, inventario, explicar, salir]).
+permitidos(taberna,     [ayuda, mirar, ir, contratos, aceptar, descansar, pagar, compania, inventario, explicar, salir]).
 permitidos(combate,     [ayuda, mirar, atacar, defender, compania, inventario, explicar, salir]).
 permitidos(fin,         [ayuda, explicar, salir]).
 
@@ -67,6 +70,7 @@ comandos_disponibles(Fase, Lista) :- permitidos(Fase, Lista).
 objetivo_de_accion(ir(Zona),  compania:puede_viajar(Zona)).
 objetivo_de_accion(descansar, economia:puede_descansar).
 objetivo_de_accion(pagar,     economia:puede_pagar_sueldos).
+objetivo_de_accion(aceptar(C), contratos:puede_aceptar(C)).
 % atacar(Objetivo) y atacar(Actor, Objetivo): el Objetivo puede ser un tipo (bandido_torpe) o una
 % instancia (e(bandido_torpe, 1)); el actor del primero es a quien le toca el turno.
 objetivo_de_accion(atacar(Actor, Objetivo), (combate:puede_atacar(Actor, B), combate:dano(Actor, B, _))) :-
@@ -163,7 +167,7 @@ ejecutar_en_fase(ir(Zona), _, Items) :-
     (   compania:puede_viajar(Zona)
     ->  once(explicar:solve(compania:puede_viajar(Zona), Prueba)),
         salir_de_taberna(I0),
-        etapa([guardar_prueba(ir(Zona), Prueba), viajar(Zona)], I1),
+        etapa([guardar_prueba(ir(Zona), Prueba), viajar(Zona), visitar(Zona)], I1),
         pasar_dia(I2),
         llegada(Zona, I3),
         comprobar_fin(I4),
@@ -212,6 +216,21 @@ ejecutar_en_fase(defender, _, Items) :-
         ;   Items = [error(no_puede_defender(Actor))]
         )
     ;   Items = [error(no_es_tu_turno)]
+    ).
+
+% contratos : el tablon. Cada contrato a la vista con su estado (disponible, bloqueado, lejos...).
+ejecutar_en_fase(contratos, _, [vista(contratos, Fichas)]) :-
+    findall(F, ( contratos:contrato(C, _, _, _, _), contratos:ficha(C, F) ), Fichas).
+
+% aceptar(Contrato) : se acepta si la regla puede_aceptar/1 lo permite. La prueba se guarda ANTES
+% de aplicar el efecto, para que explicar(aceptar(C)) pueda decir por que se pudo.
+ejecutar_en_fase(aceptar(C), _, Items) :-
+    (   \+ contratos:contrato(C, _, _, _, _)
+    ->  Items = [error(contrato_desconocido(C))]
+    ;   contratos:puede_aceptar(C)
+    ->  once(explicar:solve(contratos:puede_aceptar(C), Prueba)),
+        etapa([guardar_prueba(aceptar(C), Prueba), contrato_aceptar(C), mensaje(acepta, [C])], Items)
+    ;   Items = [error(no_puede_aceptar(C))]
     ).
 
 % pelear(Grupo) (PROVISIONAL): empieza un combate contra un tipo o una lista de tipos. Solo en

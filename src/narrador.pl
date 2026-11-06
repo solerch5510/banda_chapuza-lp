@@ -17,7 +17,7 @@
 % Texto provisional: el banco con todo el humor (docs/05-comedia-y-narracion.md) crece despues.
 
 :- module(narrador, [frase/3, texto/4, texto_error/2, ayuda_de/2,
-                     comentario/4, comentario_prueba/4, nombre_visible/2]).
+                     comentario/4, comentario_prueba/4, nombre_visible/2, texto_recompensa/2]).
 
 % La declaracion de modulo va primero; el archivo tiene tildes, asi que se declara UTF-8 justo despues.
 :- encoding(utf8).
@@ -68,6 +68,8 @@ frase(suceso(golpe(A, B, D)), ambos,
       '~w le suelta un golpe a ~w: ~w de vida menos. Ha sido casi técnico.'-[A, B, D]).
 frase(suceso(cae(B)), ambos,
       '~w cae redondo. Se levantará luego con 1 de vida y ninguna dignidad.'-[B]).
+frase(suceso(acepta(C)), ambos,
+      'Contrato aceptado: «~w». Todos asienten con convicción; nadie ha leído la letra pequeña.'-[C]).
 frase(suceso(aparece(T)), ambos,
       '~w se interpone en tu camino. Nadie ha preguntado si tenía permiso.'-[T]).
 frase(suceso(victoria), ambos,
@@ -124,6 +126,12 @@ nombre(castillo,    'el Castillo Camembert').
 nombre(cuevas,      'las Cuevas del Roquefort').
 nombre(cheddar,     'el cheddar').
 nombre(brie,        'el brie').
+nombre(ratas_del_granero, 'Ratas del Granero').
+nombre(gato_en_el_arbol,   'El Gato en el Árbol').
+nombre(gallina_noble,      'Lady Clotilde Plumífera').
+nombre(despensa_real,      'La Despensa Real').
+nombre(pocion,             'poción').
+nombre(venda_de_caballos,  'venda de caballos').
 nombre(rata_quesera,    'la Rata Quesera').
 nombre(bandido_torpe,   'el Bandido Torpe').
 nombre(moho_saltarin,   'el Moho Saltarín').
@@ -272,6 +280,18 @@ con_a(Nombre, ConA) :-
     ).
 
 % ---------------------------------------------------------------------------
+% texto_recompensa(+Premios, -Texto): "9 quesos, poción" a partir de [quesos(9), objeto(pocion)].
+texto_recompensa(Premios, Texto) :-
+    maplist(texto_premio, Premios, Textos),
+    atomic_list_concat(Textos, ', ', Texto).
+
+texto_premio(quesos(N), Texto) :-
+    format(atom(Texto), '~w quesos', [N]).
+texto_premio(queso(Tipo, _, N), Texto) :-
+    format(atom(Texto), '~w ~w', [N, Tipo]).
+texto_premio(objeto(Objeto), Texto) :-
+    nombre_visible(Objeto, Texto).
+
 % texto_error(+Motivo, -Texto): por que un comando no se pudo ejecutar.
 % (Aun fuera del banco: sus variantes llegan con el resto del humor.)
 % ---------------------------------------------------------------------------
@@ -299,6 +319,12 @@ texto_error(no_entiendo(Termino), Texto) :-
 texto_error(grupo_desconocido(Grupo), Texto) :-
     como_texto(Grupo, Dicho),
     format(atom(Texto), 'No conozco a esos enemigos: "~w". Prueba con pelear(rata_quesera).', [Dicho]).
+texto_error(contrato_desconocido(C), Texto) :-
+    como_texto(C, Dicho),
+    format(atom(Texto), 'No hay ningún contrato llamado "~w". Escribe contratos. para ver los que hay.', [Dicho]).
+texto_error(no_puede_aceptar(C), Texto) :-
+    nombre_visible(C, Nombre),
+    format(atom(Texto), 'El contrato «~w» os mira, mira a la Banda y decide que no. Ahora mismo no podéis aceptarlo.', [Nombre]).
 texto_error(no_es_tu_turno, 'Ahora no te toca a ti: espera a tu turno.').
 texto_error(no_puede_atacar(Actor, Objetivo), Texto) :-
     nombre_visible(Actor, A),
@@ -319,7 +345,7 @@ texto_error(no_hay_prueba(Accion), Texto) :-
     format(atom(Texto), 'Ahora mismo no se puede hacer ~w, así que no hay prueba que enseñar.', [Dicho]).
 texto_error(no_se_explica(Accion), Texto) :-
     como_texto(Accion, Dicho),
-    format(atom(Texto), 'No sé explicar "~w". Puedo explicar ir(Zona), descansar, pagar, atacar(Objetivo) y defender.', [Dicho]).
+    format(atom(Texto), 'No sé explicar "~w". Puedo explicar ir(Zona), descansar, pagar, aceptar(Contrato), atacar(Objetivo) y defender.', [Dicho]).
 texto_error(falta_argumento(Termino), Texto) :-
     functor(Termino, Nombre, _),
     format(atom(Texto), 'A ~w le falta decir a dónde o a qué; escribe el nombre completo, por ejemplo: ir(aldea).', [Nombre]).
@@ -345,6 +371,8 @@ ayuda_de(descansar, Texto) :-
     format(atom(Texto),
            'descansar.     solo en la taberna: cuesta ~w quesos, cura a todos y pasa un día', [Coste]).
 ayuda_de(pagar, 'pagar.         solo en la taberna: paga los sueldos pendientes con lo más rancio').
+ayuda_de(contratos, 'contratos.     el tablón: los contratos a la vista y si se pueden aceptar').
+ayuda_de(aceptar, 'aceptar(Contrato). acepta un contrato (en la taberna o donde lo ofrecen)').
 ayuda_de(pelear, 'pelear(Tipo). (provisional) empieza un combate de prueba, p. ej. pelear(rata_quesera)').
 ayuda_de(atacar, 'atacar(Objetivo). solo en combate: golpea a un enemigo (un tipo o e(Tipo, N))').
 ayuda_de(defender, 'defender.      solo en combate: sube tu defensa hasta tu próximo turno').

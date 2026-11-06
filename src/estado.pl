@@ -86,7 +86,7 @@ nueva_partida :-
     forall(mundo:inicio(D), cargar_inicio(D)),
     assertz(marca(sueldos_pagados)).      % al empezar no se debe nada
 
-cargar_inicio(zona(Z))        :- assertz(en_zona(Z)).
+cargar_inicio(zona(Z))        :- assertz(en_zona(Z)), assertz(visitada(Z)).      % donde empiezas, ya lo has visitado
 cargar_inicio(dia(N))         :- assertz(dia(N)).
 cargar_inicio(semilla(S))     :- assertz(semilla(S)).
 cargar_inicio(queso(T, E, C)) :- assertz(queso(T, E, C)).
@@ -224,6 +224,18 @@ aplicar_conocido(alterar(Id, Estado, Turnos)) :-
     assertz(alterado(Id, Estado, Turnos)).
 aplicar_conocido(quitar_alteracion(Id, Estado)) :-
     retractall(alterado(Id, Estado, _)).
+% Aceptar un contrato: queda activo. Aceptar dos veces el mismo, o uno ya resuelto, no vale.
+aplicar_conocido(contrato_aceptar(C)) :-
+    atom(C),
+    \+ contrato_activo(C),
+    \+ contrato_por_cobrar(C, _),
+    \+ ( contrato_cerrado(C, R), R \== fracaso ),
+    assertz(contrato_activo(C)).
+% Llegar a una zona la deja marcada como visitada (condicion de algunos contratos).
+aplicar_conocido(visitar(Z)) :-
+    atom(Z),
+    mundo:zona(Z, _),
+    (   visitada(Z) -> true ; assertz(visitada(Z)) ).
 aplicar_conocido(marcar(F)) :-
     (   marca(F) -> true ; assertz(marca(F)) ).
 aplicar_conocido(desmarcar(F)) :-
@@ -258,7 +270,7 @@ conocido(fin/1).          conocido(uso_frase/1).     conocido(guardar_prueba/2).
 conocido(ganar_objeto/3). conocido(gastar_objeto/3). conocido(equipar/2).
 conocido(iniciar_combate/1). conocido(siguiente_turno/0). conocido(siguiente_ronda/1).
 conocido(alterar/3).      conocido(quitar_alteracion/2).  conocido(terminar_combate/0).
-conocido(invocar/1).
+conocido(invocar/1).      conocido(contrato_aceptar/1).   conocido(visitar/1).
 
 nace_enemigo(E) :-
     E = e(Tipo, _),

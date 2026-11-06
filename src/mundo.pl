@@ -168,6 +168,7 @@ parametro(moral_hambre,      1).    % moral que pierde quien se queda sin comer 
 parametro(dano_hambre,       2).    % vida que pierde quien se queda sin comer; nunca baja de 1 (provisional)
 parametro(moral_rancio,      2).    % moral que pierde quien come queso rancio (lore 7.1)
 parametro(base_iniciativa,  10).    % la iniciativa es esta base + ataque - defensa + modificador de moral
+parametro(max_contratos,     3).    % contratos activos a la vez
 parametro(moral_victoria,    1).    % moral que gana cada miembro al ganar un combate (provisional)
 parametro(bono_defender,     2).    % defensa extra de quien esta defendiendo (provisional)
 parametro(dano_miedo,        2).    % dano extra que recibe quien teme a la clase del atacante (lore 7)

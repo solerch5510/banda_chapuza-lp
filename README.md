@@ -55,6 +55,8 @@ Se puede **recorrer el mapa, gestionar la compañía y pedir explicaciones**. Ca
 | `pagar.` | Solo en la taberna: paga los sueldos pendientes (5 quesos) empezando por los más rancios. Llegar a la taberna deja sueldos pendientes. |
 | `compania.` | Los miembros: vida, ataque, defensa, moral, fila, sueldo, rasgo y estado (en pie, huelga o caído). |
 | `inventario.` | La despensa lote a lote (con la edad y la categoría del queso) y los objetos. |
+| `contratos.` | El tablón: los contratos a la vista con su zona, dificultad, premio y estado (`disponible`, `bloqueado`, `lejos`, `activo` o `cumplido`). |
+| `aceptar(Contrato).` | Acepta un contrato (en la taberna o donde lo ofrecen). Hasta 3 a la vez. Si no se puede, el contrato "os mira y decide que no". `explicar(aceptar(Contrato)).` enseña la prueba de por qué se pudo. |
 | `pelear(Tipo).` | **Provisional.** Empieza un combate de prueba contra un tipo de enemigo (`rata_quesera`, `bandido_torpe`, `moho_saltarin`, `bandido_montado`, `gran_roquefort`) o una lista de ellos, p. ej. `pelear([rata_quesera, rata_quesera]).` Solo fuera de la taberna. Desaparecerá cuando los contratos empiecen los combates. |
 | `atacar(Objetivo).` | Solo en combate: golpea con el miembro al que le toca. El objetivo es un tipo (`bandido_torpe`) o una instancia (`e(bandido_torpe, 1)`). |
 | `defender.` | Solo en combate: sube la defensa del miembro al que le toca hasta su próximo turno. |
@@ -62,7 +64,7 @@ Se puede **recorrer el mapa, gestionar la compañía y pedir explicaciones**. Ca
 | `explicar(ir(aldea)).` | La prueba de esa acción: la guardada si es la última; si no, se resuelve ahora. |
 | `salir.` | Termina la partida. |
 
-Si la despensa se queda vacía, la partida termina por hambre. El combate ya se puede jugar (`pelear(rata_quesera).`, luego `atacar(...)` y `defender.` con cada miembro por turno, y `mirar.` para ver la ronda y a los enemigos): los enemigos actúan solos, al ganar hay botín y moral, los caídos se levantan con 1 de vida y al perder termina la partida. Cada enemigo elige su acción con reglas por prioridad y corte: la rata roba queso, el bandido montado embiste una vez, el Gran Roquefort invoca mohos y se cura con sus esporas, y el resto ataca al más débil que alcanza; `explicar.` tras su turno enseña por qué (con el corte). Contratos, habilidades y `por_que_no` aún no están implementados (ver `docs/03-funcionalidades-y-etapas.md`). Los acentos dependen de la consola de Windows (comprobación pendiente en la consola de la entrega).
+Si la despensa se queda vacía, la partida termina por hambre. El combate ya se puede jugar (`pelear(rata_quesera).`, luego `atacar(...)` y `defender.` con cada miembro por turno, y `mirar.` para ver la ronda y a los enemigos): los enemigos actúan solos, al ganar hay botín y moral, los caídos se levantan con 1 de vida y al perder termina la partida. Cada enemigo elige su acción con reglas por prioridad y corte: la rata roba queso, el bandido montado embiste una vez, el Gran Roquefort invoca mohos y se cura con sus esporas, y el resto ataca al más débil que alcanza; `explicar.` tras su turno enseña por qué (con el corte). Los contratos ya se ven y se aceptan, pero aún no se cumplen ni se cobran, y las habilidades y `por_que_no` no están implementados (ver `docs/03-funcionalidades-y-etapas.md`). Los acentos dependen de la consola de Windows (comprobación pendiente en la consola de la entrega).
 
 ## Pruebas
 
@@ -105,10 +107,14 @@ Las pruebas usan `plunit`. Desde la raíz del repositorio (PowerShell), con el e
 ```
 
 ```
+& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/contratos -g "run_tests,halt" -t "halt(1)"
+```
+
+```
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/spike_explicar -g "run_tests,halt" -t "halt(1)"
 ```
 
-Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (698 pruebas):
+Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (841 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -120,6 +126,7 @@ Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 
 | `tests/acciones.pl` (105) | Las acciones del jugador en combate: el efecto `alterar`, `efectos_accion/3`, el paso de los estados, los comandos `atacar` y `defender` (turno, objetivos, fases, errores sin efecto) y su prueba guardada para `explicar`. |
 | `tests/bucle.pl` (84) | El combate de principio a fin: fin de combate (victoria y derrota), `terminar_combate` (los caídos se levantan con 1), el turno enemigo provisional, el bucle de turnos y rondas, `pelear`, lo que ve el jugador y `explicar` tras un turno enemigo. |
 | `tests/ia.pl` (75) | La IA enemiga: las seis reglas por prioridad con corte (`curarse`, `invocar_moho`, `robar_queso`, `embestir`, `atacar`, `defender`), cada acción como efectos, su gemela sin corte (el oráculo) en 15 escenarios, la lección del corte rojo y la IA dentro del bucle de combate. |
+| `tests/contratos.pl` (143) | Los cuatro contratos de la versión mínima como datos, qué contratos se ven y cuáles se pueden aceptar (`puede_aceptar/1` y sus cinco condiciones), los efectos `contrato_aceptar` y `visitar`, los comandos `contratos` y `aceptar` y su prueba para `explicar`. |
 | `tests/narrador.pl` (44) | El narrador: el banco de frases, la clave más específica, la rotación de variantes, los niveles, los nombres con artículo, las frases genéricas y el comentario de `explicar`. |
 | `tests/spike_explicar.pl` (17) | El meta-intérprete de `src/explicar.pl`, con dos módulos de juguete (`tests/spike/`). |
 

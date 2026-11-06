@@ -79,6 +79,14 @@ mostrar_conocido(vista(inventario, Datos)) :-
     forall(member(lote(Tipo, Edad, Cant, Categoria), Lotes),
            format("  ~w x~w   edad ~w (~w)~n", [Tipo, Cant, Edad, Categoria])),
     escribir_objetos(Objetos).
+mostrar_conocido(vista(contratos, Fichas)) :-
+    format("El tablón de contratos:~n", []),
+    forall(member(contrato(Id, Zona, Dificultad, Recompensa, Estado), Fichas),
+           (   narrador:nombre_visible(Id, Nombre),
+               narrador:nombre_visible(Zona, NombreZona),
+               narrador:texto_recompensa(Recompensa, Premio),
+               format("  [~w] ~w (~w, dificultad ~w): ~w~n", [Estado, Nombre, NombreZona, Dificultad, Premio])
+           )).
 mostrar_conocido(vista(combate, combate(Ronda, Turno, Enemigos))) :-
     narrador:nombre_visible(Turno, QuienJuega),
     format("Combate · ronda ~w · turno de ~w~n", [Ronda, QuienJuega]),

@@ -5,7 +5,7 @@
 % regla (teme_caballos...) y el nivel de moral llegan con el combate.
 
 :- module(compania, [miembro/1, vivo/1, activo/1, en_pie/1, esta_en_huelga/1,
-                     teme/2, ignora_miedo/1, nivel_moral/2, modificador_moral/2,
+                     teme/2, ignora_miedo/1, nivel_moral/2, modificador_moral/2, moral_media/1,
                      sueldo_de/2, puede_viajar/1, informe/1]).
 :- use_module(mundo).
 :- use_module(estado).
@@ -27,6 +27,14 @@ esta_en_huelga(Id) :-
     estado:moral(Id, M),
     mundo:parametro(moral_huelga, Umbral),
     M =< Umbral.
+
+% moral_media(-M): la moral media de los miembros activos. Falla si no hay ninguno.
+moral_media(M) :-
+    findall(V, ( activo(Id), estado:moral(Id, V) ), Vs),
+    Vs = [_|_],
+    sumlist(Vs, Suma),
+    length(Vs, K),
+    M is Suma / K.
 
 % nivel_moral(+Id, -Nivel): alta (8-10), normal (4-7), baja (2-3) o critica (0-1). Cifras provisionales.
 nivel_moral(Id, Nivel) :-
