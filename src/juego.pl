@@ -170,8 +170,10 @@ ejecutar_en_fase(ir(Zona), _, Items) :-
         etapa([guardar_prueba(ir(Zona), Prueba), viajar(Zona), visitar(Zona)], I1),
         pasar_dia(I2),
         llegada(Zona, I3),
+        cobrar_contratos(Zona, I3b),
         comprobar_fin(I4),
-        append([I0, I1, I2, I3, I4], Items)
+        iniciar_objetivo(Zona, I5),
+        append([I0, I1, I2, I3, I3b, I4, I5], Items)
     ;   Items = [error(no_puede_viajar(Zona))]
     ).
 ejecutar_en_fase(descansar, _, Items) :-
@@ -296,7 +298,9 @@ avanzar_combate(Limite, Items) :-
     ->  Items = [error(interno(combate_sin_fin))]
     ;   combate:fin_combate(Resultado)
     ->  once(combate:efectos_fin(Resultado, Efectos)),
-        etapa(Efectos, Items)
+        etapa(Efectos, I1),
+        cerrar_contrato(Resultado, I2),
+        append(I1, I2, Items)
     ;   estado:cola_turnos([])
     ->  once(combate:efectos_ronda(Efectos)),         % nadie por actuar: empieza otra ronda
         etapa(Efectos, I1),
@@ -402,6 +406,39 @@ llegada(Zona, Items) :-
     (   Zona == taberna
     ->  etapa([desmarcar(sueldos_pagados), mensaje(llegada, [Zona])], Items)
     ;   etapa([mensaje(llegada, [Zona])], Items)
+    ).
+
+% Al llegar a la taberna se cobran solos los contratos resueltos (los sueldos no: eso es `pagar`).
+cobrar_contratos(Zona, Items) :-
+    (   Zona == taberna,
+        contratos:efectos_cobro(Efectos),
+        Efectos = [_|_]
+    ->  etapa(Efectos, Items)
+    ;   Items = []
+    ).
+
+% Al llegar a la zona de un contrato activo cuyo objetivo es un combate, el combate empieza.
+% (El primero del catalogo; el contrato queda marcado como dueno del combate.)
+iniciar_objetivo(Zona, Items) :-
+    (   \+ estado:fin_partida(_),
+        contratos:objetivo_pendiente(Zona, C, Grupo)
+    ->  contratos:efectos_inicio_objetivo(C, Efectos),
+        etapa(Efectos, I1),
+        comenzar_combate(Grupo, I2),
+        append(I1, I2, Items)
+    ;   Items = []
+    ).
+
+% Si el combate que acaba de ganarse era el objetivo de un contrato, se resuelve: el resultado sale
+% de resultado/3 (guardamos su prueba para explicar) y se aplican sus consecuencias inmediatas.
+cerrar_contrato(Resultado, Items) :-
+    (   Resultado == victoria,
+        estado:marca(combate_de(C))
+    ->  contratos:contexto(Ctx),
+        once(explicar:solve(contratos:resultado(C, Ctx, Res), Prueba)),
+        contratos:efectos_resolucion(C, Res, Efectos),
+        etapa([guardar_prueba(resultado(C), Prueba)|Efectos], Items)
+    ;   Items = []
     ).
 
 % Fin por hambre: sin queso y sin nada por cobrar no se puede alimentar a nadie manana.

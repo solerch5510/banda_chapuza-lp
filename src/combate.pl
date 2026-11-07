@@ -217,7 +217,7 @@ efectos_accion(E, curarse, [gastar_objeto(E, Objeto, 1), curar(E, Cura), mensaje
     mundo:curacion(Objeto, Cura).
 efectos_accion(E, invocar_moho, [invocar(moho_saltarin), mensaje(invoca_moho, [E])]) :-
     debe_invocar_moho(E).
-efectos_accion(E, robar_queso, [gastar_queso(Tipo, Edad, 1), mensaje(roba_queso, [E])]) :-
+efectos_accion(E, robar_queso, [gastar_queso(Tipo, Edad, 1), contar(quesos_robados, 1), mensaje(roba_queso, [E])]) :-
     puede_robar_queso(E),
     economia:despensa([q(Tipo, Edad, _)|_]).                 % lo primero que ve: lo mas fresco
 efectos_accion(E, embestir(B), Efectos) :-

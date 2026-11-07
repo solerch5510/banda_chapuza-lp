@@ -5,16 +5,21 @@
 % REGLAS puras que consultan el estado y nunca lo modifican. En esta etapa: el catalogo de la
 % version minima (cuatro contratos), saber cuales hay a la vista, cuales se pueden aceptar y por
 % que no (puede_aceptar/1 es la regla que explica el modo explicar).
-% El resultado (exito, a medias, fracaso) y el cobro llegan despues.
+% Y como acaban: el resultado (exito, a medias o fracaso) con resultado/3, sus consecuencias y el
+% cobro de la recompensa, que es automatico al llegar a la taberna.
 
 :- module(contratos, [contrato/5, oferente/3, aparece/2, enemigos_de/2, resolucion/3,
                       via_objetivo/2, expandir_grupo/2,
                       visible/1, disponible/1, puede_aceptar/1, condicion_cumple/1,
                       contrato_cumplido/1, contrato_exito/1, contratos_cumplidos/1,
-                      contratos_activos/1, estado_de_contrato/2, ficha/2]).
+                      contratos_activos/1, estado_de_contrato/2, ficha/2,
+                      consecuencia/3, contadores_de/2, contexto/1, resultado/3,
+                      objetivo_pendiente/3, efectos_inicio_objetivo/2,
+                      efectos_resolucion/3, efectos_cobro/1, efectos_cobro_de/3]).
 :- use_module(mundo).
 :- use_module(estado).
 :- use_module(compania).
+:- use_module(economia).
 
 % ---------------------------------------------------------------------------
 % El catalogo (docs/04 §3). contrato(Id, Zona, Objetivo, recompensa(Lista), Condiciones):
@@ -162,7 +167,8 @@ contratos_activos(N) :-
 % ---------------------------------------------------------------------------
 % Para el tablon (comando contratos): el estado de cada contrato a la vista.
 %   activo     ya lo tienes aceptado
-%   cumplido   ya lo resolviste (bien o a medias)
+%   por_cobrar resuelto, a la espera de cobrar al llegar a la taberna
+%   cumplido   ya lo resolviste y lo cobraste (bien o a medias)
 %   disponible se puede aceptar ahora
 %   lejos      habria que ir a donde esta quien lo ofrece
 %   bloqueado  alguna condicion o el limite lo impiden
@@ -170,6 +176,7 @@ contratos_activos(N) :-
 estado_de_contrato(C, Estado) :-
     visible(C),
     (   estado:contrato_activo(C)  ->  Estado = activo
+    ;   estado:contrato_por_cobrar(C, _) -> Estado = por_cobrar
     ;   contrato_cumplido(C)       ->  Estado = cumplido
     ;   puede_aceptar(C)           ->  Estado = disponible
     ;   \+ disponible(C)           ->  Estado = lejos
@@ -186,3 +193,156 @@ dificultad(ratas_del_granero, 1).
 dificultad(gato_en_el_arbol,  1).
 dificultad(gallina_noble,     3).
 dificultad(despensa_real,     5).
+
+
+% ---------------------------------------------------------------------------
+% Como acaba un contrato. Tres pasos:
+%   1. el objetivo EMPIEZA (al llegar a su zona con el contrato activo: un combate);
+%   2. se RESUELVE (resultado/3 decide exito, a medias o fracaso con los contadores y marcas);
+%      las consecuencias inmediatas (moral, marcas, quesos perdidos) se aplican en el acto;
+%   3. se COBRA al llegar a la taberna (la recompensa y los objetos que se equipan solos).
+% Todo son reglas puras: devuelven listas de efectos y no tocan el estado.
+% ---------------------------------------------------------------------------
+
+% consecuencia(Contrato, Resultado, Efectos04): que pasa con cada resultado (docs/04 §3).
+%   cobrar(todo|mitad|quesos(N)|objetos), moral(grupo|Id, N), marcar(F), perder_queso(N), equipar(Id, O)
+consecuencia(ratas_del_granero, exito,    [cobrar(todo), moral(grupo, 1)]).
+consecuencia(ratas_del_granero, a_medias, [cobrar(quesos(5)), cobrar(objetos)]).
+consecuencia(gato_en_el_arbol,  exito,    [cobrar(todo), moral(grupo, 1), equipar(baldomero, venda_de_caballos)]).
+consecuencia(gato_en_el_arbol,  a_medias, [cobrar(quesos(5)), cobrar(objetos), perder_queso(1),
+                                           equipar(baldomero, venda_de_caballos)]).
+consecuencia(gato_en_el_arbol,  fracaso,  [moral(grupo, -1)]).
+consecuencia(gallina_noble,     exito,    [cobrar(todo), moral(grupo, 1), marcar(recomendada_por_clotilde)]).
+consecuencia(gallina_noble,     a_medias, [cobrar(mitad), marcar(recomendada_por_clotilde)]).
+consecuencia(gallina_noble,     fracaso,  [perder_queso(3), moral(grupo, -2)]).
+consecuencia(despensa_real,     exito,    [cobrar(todo)]).
+
+% contadores_de(Contrato, Claves): los contadores que cuenta su objetivo (se ponen a cero al empezar).
+contadores_de(ratas_del_granero, [quesos_robados]).
+contadores_de(gallina_noble,     [golpes_a_clotilde]).
+
+% --- el resultado ---
+% contexto(-Ctx): lo registrado durante el contrato, como lista de contador(Clave, N) y marca(M).
+contexto(Ctx) :-
+    findall(contador(K, V), estado:contador(K, V), Contadores),
+    findall(marca(M), estado:marca(M), Marcas),
+    append(Contadores, Marcas, Ctx).
+
+% resultado(+C, +Ctx, -Res): el PRIMER resultado de resolucion/3 cuyas condiciones se cumplen. Regla
+% pura y sin corte: si el primero no se cumple, se mira el siguiente.
+resultado(C, Ctx, Res) :-
+    findall(R-Cs, resolucion(C, R, Cs), Lista),
+    primero_que_cumple(Lista, Ctx, Res).
+
+primero_que_cumple([R-Cs|_], Ctx, R) :-
+    cumple_resolucion(Cs, Ctx).
+primero_que_cumple([_-Cs|Resto], Ctx, R) :-
+    \+ cumple_resolucion(Cs, Ctx),
+    primero_que_cumple(Resto, Ctx, R).
+
+cumple_resolucion([], _).
+cumple_resolucion([Cond|Resto], Ctx) :-
+    condicion_resolucion(Cond, Ctx),
+    cumple_resolucion(Resto, Ctx).
+
+% contador_max(K, N): el contador K (0 si no consta) no pasa de N. marca(M): consta la marca M.
+condicion_resolucion(contador_max(K, N), Ctx) :-
+    valor_contador(K, Ctx, V),
+    V =< N.
+condicion_resolucion(marca(M), Ctx) :-
+    memberchk(marca(M), Ctx).
+
+valor_contador(K, Ctx, V) :-
+    (   memberchk(contador(K, V0), Ctx) -> V = V0 ; V = 0 ).
+
+% --- empezar el objetivo ---
+% objetivo_pendiente(+Zona, -C, -Grupo): un contrato activo cuyo objetivo es un combate en esta zona
+% y que aun no ha empezado. (Si hay varios, el primero del catalogo.)
+objetivo_pendiente(Zona, C, Grupo) :-
+    contrato(C, Zona, _, _, _),
+    estado:contrato_activo(C),
+    \+ estado:marca(combate_de(C)),
+    via_objetivo(C, combate(Grupo)).
+
+% efectos_inicio_objetivo(+C, -Efectos): marca el combate como suyo y pone a cero sus contadores.
+efectos_inicio_objetivo(C, Efectos) :-
+    (   contadores_de(C, Claves) -> true ; Claves = [] ),
+    findall(borrar_contador(K), member(K, Claves), Borrados),
+    append(Borrados, [marcar(combate_de(C)), mensaje(objetivo, [C])], Efectos).
+
+% --- resolver ---
+% efectos_resolucion(+C, +Res, -Efectos): el contrato deja de estar activo, se quita la marca de su
+% combate y se aplican ya las consecuencias que no son cobrar ni equipar.
+efectos_resolucion(C, Res, Efectos) :-
+    consecuencia(C, Res, Efectos04),
+    inmediatos(Efectos04, Inmediatos),
+    expandir_todos(C, Inmediatos, Traducidos),
+    append([[contrato_resolver(C, Res), desmarcar(combate_de(C)), mensaje(contrato_resuelto, [C, Res])],
+            Traducidos], Efectos).
+
+% --- cobrar ---
+% efectos_cobro(-Efectos): el cobro automatico de TODOS los contratos por cobrar, en orden de catalogo.
+efectos_cobro(Efectos) :-
+    findall(Efs,
+            (   contrato(C, _, _, _, _),
+                estado:contrato_por_cobrar(C, R),
+                efectos_cobro_de(C, R, Efs)
+            ),
+            Listas),
+    append(Listas, Efectos).
+
+% efectos_cobro_de(+C, +Res, -Efectos): la recompensa y lo que se equipa, mas pasarlo a cerrado.
+efectos_cobro_de(C, Res, Efectos) :-
+    consecuencia(C, Res, Efectos04),
+    diferidos(Efectos04, Diferidos),
+    expandir_todos(C, Diferidos, Traducidos),
+    append(Traducidos, [contrato_cobrar(C), mensaje(cobra, [C])], Efectos).
+
+% Lo que se cobra (cobrar/1) o se entrega (equipar/2) espera a la taberna; lo demas es inmediato.
+inmediatos([], []).
+inmediatos([E|Es], Is) :-
+    (   diferido(E) -> Is = Is1 ; Is = [E|Is1] ),
+    inmediatos(Es, Is1).
+
+diferidos([], []).
+diferidos([E|Es], Ds) :-
+    (   diferido(E) -> Ds = [E|Ds1] ; Ds = Ds1 ),
+    diferidos(Es, Ds1).
+
+diferido(cobrar(_)).
+diferido(equipar(_, _)).
+
+expandir_todos(_, [], []).
+expandir_todos(C, [E|Es], Efectos) :-
+    expandir(C, E, Efs1),
+    expandir_todos(C, Es, Efs2),
+    append(Efs1, Efs2, Efectos).
+
+% expandir(+C, +Efecto04, -Efectos): traduce un termino de docs/04 a efectos de estado.
+expandir(C, cobrar(todo),  Efs) :- premios_como_efectos(C, todo, Efs).
+expandir(C, cobrar(mitad), Efs) :- premios_como_efectos(C, mitad, Efs).
+expandir(_, cobrar(quesos(N)), [ganar_queso(cheddar, 0, N)]).
+expandir(C, cobrar(objetos), Efs) :-
+    contrato(C, _, _, recompensa(Premios), _),
+    findall(ganar_objeto(compania, O, 1), member(objeto(O), Premios), Efs).
+expandir(_, equipar(Id, O), [equipar(Id, O)]).
+expandir(_, moral(grupo, N), Efs) :-
+    findall(mod_moral(Id, N), compania:activo(Id), Efs).
+expandir(_, moral(Id, N), [mod_moral(Id, N)]) :-
+    Id \== grupo.
+expandir(_, marcar(F), [marcar(F)]).
+expandir(_, perder_queso(N), Efs) :-
+    economia:efectos_perdida(N, Efs).
+
+% premios_como_efectos(+C, +Modo, -Efectos): la recompensa entera (todo) o la mitad de los quesos (mitad).
+premios_como_efectos(C, Modo, Efectos) :-
+    contrato(C, _, _, recompensa(Premios), _),
+    findall(E, ( member(P, Premios), premio_efecto(Modo, P, E) ), Efectos).
+
+premio_efecto(todo, quesos(N), ganar_queso(cheddar, 0, N)).
+premio_efecto(todo, queso(T, E, N), ganar_queso(T, E, N)).
+premio_efecto(todo, objeto(O), ganar_objeto(compania, O, 1)).
+premio_efecto(mitad, quesos(N), ganar_queso(cheddar, 0, M)) :-
+    M is N // 2, M > 0.
+premio_efecto(mitad, queso(T, E, N), ganar_queso(T, E, M)) :-
+    M is N // 2, M > 0.

@@ -68,6 +68,16 @@ frase(suceso(golpe(A, B, D)), ambos,
       '~w le suelta un golpe a ~w: ~w de vida menos. Ha sido casi técnico.'-[A, B, D]).
 frase(suceso(cae(B)), ambos,
       '~w cae redondo. Se levantará luego con 1 de vida y ninguna dignidad.'-[B]).
+frase(suceso(objetivo(C)), ambos,
+      'Habéis llegado: «~w» os espera. Ahora toca ganarse el queso, que es lo que se espera de unos mercenarios.'-[C]).
+frase(suceso(contrato_resuelto(C, exito)), ambos,
+      'Contrato resuelto con éxito: «~w». La recompensa os espera en la taberna, en cuanto Doña Mantecosa deje de contarla.'-[C]).
+frase(suceso(contrato_resuelto(C, a_medias)), ambos,
+      'Contrato resuelto a medias: «~w». A medias es mejor que nada, y bastante peor que todo.'-[C]).
+frase(suceso(contrato_resuelto(C, fracaso)), ambos,
+      'Contrato fracasado: «~w». Se queda en el tablón, por si a alguien le queda dignidad para otro intento.'-[C]).
+frase(suceso(cobra(C)), ambos,
+      'Cobráis por «~w». Los quesos entran en la despensa y los sueldos, como siempre, esperan su turno.'-[C]).
 frase(suceso(acepta(C)), ambos,
       'Contrato aceptado: «~w». Todos asienten con convicción; nadie ha leído la letra pequeña.'-[C]).
 frase(suceso(aparece(T)), ambos,

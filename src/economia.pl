@@ -9,7 +9,8 @@
 :- module(economia, [categoria_queso/2, queso_total/1, hay_queso_para/1, despensa/1,
                      valor_queso/3, valor_despensa/1, inventario/1,
                      puede_descansar/0, efectos_racion/1, efectos_descanso/1,
-                     total_sueldos/1, puede_pagar_sueldos/0, efectos_sueldos/1]).
+                     total_sueldos/1, puede_pagar_sueldos/0, efectos_sueldos/1,
+                     efectos_perdida/2]).
 :- use_module(mundo).
 :- use_module(estado).
 :- use_module(compania).
@@ -200,6 +201,13 @@ efectos_sueldos([marcar(sueldos_pagados), mensaje(pago, [Total])|Gastos]) :-
     total_sueldos(Total),
     despensa_para_pago(Despensa),
     tomar(Despensa, Total, Gastos).
+
+% efectos_perdida(+N, -Efectos): se pierden N quesos (los mas rancios primero) o todos si hay menos.
+efectos_perdida(N, Efectos) :-
+    queso_total(Total),
+    Real is min(N, Total),
+    despensa_para_pago(Despensa),
+    tomar(Despensa, Real, Efectos).
 
 % despensa_para_pago(-Lotes): la despensa con el lote mas viejo primero.
 despensa_para_pago(Lista) :-

@@ -231,6 +231,27 @@ aplicar_conocido(contrato_aceptar(C)) :-
     \+ contrato_por_cobrar(C, _),
     \+ ( contrato_cerrado(C, R), R \== fracaso ),
     assertz(contrato_activo(C)).
+% Resolver un contrato activo: con exito o a medias queda POR COBRAR (se cobra al llegar a la
+% taberna); un fracaso no tiene nada que cobrar y queda cerrado (se puede volver a intentar).
+aplicar_conocido(contrato_resolver(C, R)) :-
+    memberchk(R, [exito, a_medias, fracaso]),
+    retract(contrato_activo(C)),
+    (   R == fracaso
+    ->  assertz(contrato_cerrado(C, fracaso))
+    ;   assertz(contrato_por_cobrar(C, R))
+    ).
+% Cobrar: el contrato pasa de por cobrar a cerrado (los quesos y objetos son otros efectos).
+aplicar_conocido(contrato_cobrar(C)) :-
+    retract(contrato_por_cobrar(C, R)),
+    assertz(contrato_cerrado(C, R)).
+% Contadores de un contrato (quesos_robados, golpes_a_clotilde...): suben o se borran.
+aplicar_conocido(contar(Clave, N)) :-
+    atom(Clave), integer(N), N > 0,
+    (   retract(contador(Clave, V0)) -> V is V0 + N ; V = N ),
+    assertz(contador(Clave, V)).
+aplicar_conocido(borrar_contador(Clave)) :-
+    atom(Clave),
+    retractall(contador(Clave, _)).
 % Llegar a una zona la deja marcada como visitada (condicion de algunos contratos).
 aplicar_conocido(visitar(Z)) :-
     atom(Z),
@@ -271,6 +292,7 @@ conocido(ganar_objeto/3). conocido(gastar_objeto/3). conocido(equipar/2).
 conocido(iniciar_combate/1). conocido(siguiente_turno/0). conocido(siguiente_ronda/1).
 conocido(alterar/3).      conocido(quitar_alteracion/2).  conocido(terminar_combate/0).
 conocido(invocar/1).      conocido(contrato_aceptar/1).   conocido(visitar/1).
+conocido(contrato_resolver/2). conocido(contrato_cobrar/1). conocido(contar/2). conocido(borrar_contador/1).
 
 nace_enemigo(E) :-
     E = e(Tipo, _),

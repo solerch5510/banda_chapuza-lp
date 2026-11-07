@@ -313,7 +313,7 @@ test(robar_se_lleva_el_queso_mas_fresco, [nondet]) :-
     montado([rata_quesera]),
     aplicar_efecto(ganar_queso(brie, 5, 2)),           % un lote curado: el cheddar fresco va antes
     combate:efectos_accion(e(rata_quesera, 1), robar_queso, Efs),
-    Efs == [gastar_queso(cheddar, 0, 1), mensaje(roba_queso, [e(rata_quesera, 1)])].
+    Efs == [gastar_queso(cheddar, 0, 1), contar(quesos_robados, 1), mensaje(roba_queso, [e(rata_quesera, 1)])].
 
 test(robar_baja_la_despensa_en_uno, [nondet]) :-
     montado([rata_quesera]),
