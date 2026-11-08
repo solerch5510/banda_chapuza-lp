@@ -5,18 +5,19 @@
 % los aplica estado.pl). Por ahora, lo que hace falta para los rasgos del heroe:
 %   - puede_atacar/2: la regla de la primera demostracion de explicar (el miedo de Baldomero);
 %   - en_fila_alcanzable/2: las reglas de fila de las que depende;
-%   - puede_habilidad/2: el rasgo hechizos_de_cocina de Pimentina.
+%   - puede_habilidad/2 y /3: las habilidades (una por personaje) y el rasgo hechizos_de_cocina de Pimentina.
 % Y el orden de los turnos:
 %   - iniciativa/2 y orden_turnos/1: quien actua primero en cada ronda;
 %   - efectos_inicio/2 y efectos_ronda/1: los efectos que abren el combate y cada ronda.
 % Y el dano:
 %   - dano/3 con sus modificadores (moral, miedo, venda, defender);
 %   - efectos_golpe/3: un golpe convertido en efectos.
-% Y las acciones del jugador: efectos_accion/3 (atacar, defender).
+% Y las acciones del jugador: efectos_accion/3 (atacar, defender, habilidad).
 % El resto del combate (bucle, IA) llega en las tareas siguientes.
 
 :- module(combate, [puede_atacar/2, en_fila_alcanzable/2, aturdido/1,
-                    puede_habilidad/2, tipo_de/2, clase_de/2,
+                    puede_habilidad/2, puede_habilidad/3, efecto_habilidad/2, objetivo_de_habilidad/2,
+                    efectos_habilidad/4, tipo_de/2, clase_de/2,
                     ataque_base/2, defensa_base/2, puede_actuar/1,
                     iniciativa/2, orden_turnos/1,
                     ataque/2, defensa/2, modificador/3, dano/3, efectos_golpe/3,
@@ -207,11 +208,15 @@ efectos_caida(B, D, Efectos) :-
 % accion no es legal; no modifica el estado.
 %   atacar(B)  : un golpe (efectos_golpe/3)
 %   defender   : durante una ronda la defensa sube (estado defendiendo, 1 turno)
+%   habilidad(B): la habilidad del actor (efectos_habilidad/4); B es el enemigo o ninguno
 % ---------------------------------------------------------------------------
 efectos_accion(A, atacar(B), Efectos) :-
     efectos_golpe(A, B, Efectos).
 efectos_accion(A, defender, [alterar(A, defendiendo, 1), mensaje(defiende, [A])]) :-
     puede_defender(A).
+efectos_accion(A, habilidad(B), Efectos) :-
+    mundo:habilidad_de(A, Habilidad),
+    efectos_habilidad(A, Habilidad, B, Efectos).
 efectos_accion(E, curarse, [gastar_objeto(E, Objeto, 1), curar(E, Cura), mensaje(se_cura, [E, Cura])]) :-
     curativos_de(E, [Objeto|_]),
     mundo:curacion(Objeto, Cura).
@@ -379,14 +384,88 @@ efectos_ronda([siguiente_ronda(Orden)]) :-
     orden_turnos(Orden).
 
 % ---------------------------------------------------------------------------
-% Rasgo hechizos_de_cocina (Pimentina): "toda magia necesita queso". Cada hechizo gasta
-% quesos de la despensa; sin queso suficiente no se puede lanzar.
-% puede_habilidad(+Id, +Habilidad)
+% Habilidades: una por personaje (mundo:habilidad_de/2). Lo que hace cada una es una tabla de
+% DATOS (efecto_habilidad/2) y cuenta con una regla que dice si se puede usar:
+%   puede_habilidad(+Id, +Hab)       el personaje puede usarla (en pie, sin aturdir y, si es magia
+%                                    de cocina, con queso); no mira el objetivo;
+%   puede_habilidad(+Id, +Hab, +O)   ademas el objetivo vale: un enemigo al que alcanza, o ninguno.
+% Rasgo hechizos_de_cocina (Pimentina): "toda magia necesita queso"; cada hechizo gasta quesos
+% de la despensa (los mas rancios primero) y sin queso suficiente no se puede lanzar.
 % ---------------------------------------------------------------------------
+efecto_habilidad(carga_heroica,      golpe_extra(4)).         % el golpe de siempre, mas 4
+efecto_habilidad(fondue_flamigera,   dano_fijo(8)).           % 8 de dano, ignora la defensa
+efecto_habilidad(balada_inspiradora, moral_grupo(1)).         % +1 de moral a toda la compania
+efecto_habilidad(rebuscar_bolsillos, queso_del_bolsillo(1)).  % 1 queso si el enemigo lo lleva
+
+objetivo_de_habilidad(carga_heroica,      enemigo).
+objetivo_de_habilidad(fondue_flamigera,   enemigo).
+objetivo_de_habilidad(balada_inspiradora, ninguno).
+objetivo_de_habilidad(rebuscar_bolsillos, enemigo).
+
 puede_habilidad(Id, Habilidad) :-
-    mundo:rasgo(Id, hechizos_de_cocina),
     mundo:habilidad_de(Id, Habilidad),
-    compania:vivo(Id),
+    puede_actuar(Id),
     \+ aturdido(Id),
-    mundo:coste_queso(Habilidad, Coste),
-    economia:hay_queso_para(Coste).
+    puede_pagar(Id, Habilidad).
+
+% Solo la magia de cocina cuesta queso; las demas habilidades son gratis.
+puede_pagar(Id, Habilidad) :-
+    (   mundo:rasgo(Id, hechizos_de_cocina)
+    ->  mundo:coste_queso(Habilidad, Coste),
+        economia:hay_queso_para(Coste)
+    ;   true
+    ).
+
+puede_habilidad(Id, Habilidad, Objetivo) :-
+    puede_habilidad(Id, Habilidad),
+    objetivo_valido(Id, Habilidad, Objetivo).
+
+objetivo_valido(Id, Habilidad, Objetivo) :-
+    (   Objetivo == ninguno
+    ->  objetivo_de_habilidad(Habilidad, ninguno)
+    ;   objetivo_de_habilidad(Habilidad, enemigo),
+        puede_atacar(Id, Objetivo),
+        \+ ya_hecho(Habilidad, Objetivo)
+    ).
+
+% A cada enemigo se le rebuscan los bolsillos una sola vez por combate.
+ya_hecho(rebuscar_bolsillos, B) :-
+    estado:alterado(B, rebuscado, _).
+
+% efectos_habilidad(+Id, +Hab, +Objetivo, -Efectos): falla si no se puede. No modifica el estado.
+efectos_habilidad(Id, Habilidad, Objetivo, Efectos) :-
+    puede_habilidad(Id, Habilidad, Objetivo),
+    efecto_habilidad(Habilidad, Datos),
+    efectos_de(Datos, Id, Habilidad, Objetivo, Propios),
+    gasto_habilidad(Id, Habilidad, Gasto),
+    append(Gasto, Propios, Efectos).
+
+gasto_habilidad(Id, Habilidad, Gasto) :-
+    (   mundo:rasgo(Id, hechizos_de_cocina), mundo:coste_queso(Habilidad, Coste)
+    ->  economia:efectos_perdida(Coste, Gasto)
+    ;   Gasto = []
+    ).
+
+efectos_de(golpe_extra(Extra), A, Habilidad, B, Efectos) :-
+    dano(A, B, D0),
+    D is D0 + Extra,
+    aviso_de(Habilidad, B, Aviso),
+    efectos_caida(B, D, Caida),
+    append([Aviso, dano(B, D), mensaje(golpe, [A, B, D])], Caida, Efectos).
+efectos_de(dano_fijo(D), A, Habilidad, B, Efectos) :-
+    aviso_de(Habilidad, B, Aviso),
+    efectos_caida(B, D, Caida),
+    append([Aviso, dano(B, D), mensaje(golpe, [A, B, D])], Caida, Efectos).
+efectos_de(moral_grupo(N), _, Habilidad, B, [Aviso|Moral]) :-
+    aviso_de(Habilidad, B, Aviso),
+    findall(mod_moral(Id, N), compania:miembro(Id), Moral).
+efectos_de(queso_del_bolsillo(N), _, _, B, Efectos) :-
+    tipo_de(B, Tipo),
+    (   mundo:lleva_queso(Tipo)
+    ->  Efectos = [alterar(B, rebuscado, fijo), ganar_queso(cheddar, 0, N), mensaje(rebuscar, [B, ok])]
+    ;   Efectos = [alterar(B, rebuscado, fijo), mensaje(rebuscar, [B, nada])]
+    ).
+
+aviso_de(carga_heroica,      B, mensaje(carga_heroica, [B])).
+aviso_de(fondue_flamigera,   B, mensaje(fondue, [B])).
+aviso_de(balada_inspiradora, _, mensaje(balada, [])).

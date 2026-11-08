@@ -591,7 +591,7 @@ test(se_ve_el_objetivo_desconocido, [nondet]) :-
 
 test(se_ve_fuera_de_fase, [setup(nueva_partida), nondet]) :-
     pantalla(atacar(rata_quesera), Texto),
-    sub_atom(Texto, _, _, _, 'Solo se puede atacar o defender en pleno combate.').
+    sub_atom(Texto, _, _, _, 'Solo se puede atacar, defender o usar una habilidad en pleno combate.').
 
 test(ningun_error_de_combate_ensena_terminos_crudos) :-
     combate_listo([bandido_montado]),

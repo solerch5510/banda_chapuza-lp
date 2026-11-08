@@ -36,6 +36,8 @@ comando(explicar,   0).
 comando(explicar,   1).
 comando(atacar,     1).
 comando(defender,   0).
+comando(habilidad,  0).
+comando(habilidad,  1).
 comando(contratos,  0).
 comando(aceptar,    1).
 comando(elegir,     1).
@@ -58,7 +60,7 @@ validar_comando(T, Res) :-
 % ---------------------------------------------------------------------------
 permitidos(exploracion, [ayuda, mirar, ir, contratos, aceptar, elegir, compania, inventario, explicar, salir]).
 permitidos(taberna,     [ayuda, mirar, ir, contratos, aceptar, elegir, descansar, pagar, compania, inventario, explicar, salir]).
-permitidos(combate,     [ayuda, mirar, atacar, defender, compania, inventario, explicar, salir]).
+permitidos(combate,     [ayuda, mirar, atacar, defender, habilidad, compania, inventario, explicar, salir]).
 permitidos(fin,         [ayuda, explicar, salir]).
 
 permitido(Fase, Nombre) :-
@@ -85,6 +87,14 @@ objetivo_de_accion(atacar(Objetivo), Meta) :-
     objetivo_de_accion(atacar(Actor, Objetivo), Meta).
 objetivo_de_accion(defender, combate:puede_defender(Actor)) :-
     actor_del_turno(Actor).
+% habilidad (sin objetivo, la de Rufino) y habilidad(Objetivo): la del miembro al que le toca.
+objetivo_de_accion(habilidad, combate:puede_habilidad(Actor, Habilidad, ninguno)) :-
+    actor_del_turno(Actor),
+    mundo:habilidad_de(Actor, Habilidad).
+objetivo_de_accion(habilidad(Objetivo), combate:puede_habilidad(Actor, Habilidad, B)) :-
+    actor_del_turno(Actor),
+    mundo:habilidad_de(Actor, Habilidad),
+    resolver_objetivo(Objetivo, B).
 
 % actor_del_turno(-Id): el miembro al que le toca (la cabeza de la cola de turnos).
 actor_del_turno(Actor) :-
@@ -113,6 +123,9 @@ misma_accion(atacar(Objetivo), atacar(_, B)) :-
 misma_accion(atacar(Actor, Objetivo), atacar(Actor, B)) :-
     atomo_o_instancia(Objetivo, B).
 misma_accion(defender, defender(_)).
+misma_accion(habilidad, habilidad(_, ninguno)).
+misma_accion(habilidad(Objetivo), habilidad(_, B)) :-
+    atomo_o_instancia(Objetivo, B).
 
 atomo_o_instancia(Objetivo, B) :-
     (   Objetivo == B -> true ; B = e(Objetivo, _) ).
@@ -228,6 +241,17 @@ ejecutar_en_fase(defender, _, Items) :-
     ;   Items = [error(no_es_tu_turno)]
     ).
 
+% habilidad y habilidad(Objetivo): la habilidad del miembro al que le toca el turno. Las hay con
+% enemigo (carga, fondue, rebuscar) y sin el (la balada); la prueba se guarda ANTES de aplicar los efectos.
+ejecutar_en_fase(habilidad, _, Items) :-
+    usar_habilidad(ninguno, Items).
+ejecutar_en_fase(habilidad(Objetivo), _, Items) :-
+    (   actor_del_turno(Actor), mundo:habilidad_de(Actor, Habilidad),
+        combate:objetivo_de_habilidad(Habilidad, ninguno)
+    ->  usar_habilidad(ninguno, Items)               % la balada no necesita a quien apuntar
+    ;   usar_habilidad(Objetivo, Items)
+    ).
+
 % contratos : el tablon. Cada contrato a la vista con su estado (disponible, bloqueado, lejos...).
 ejecutar_en_fase(contratos, _, [vista(contratos, Fichas)]) :-
     findall(F, ( contratos:contrato(C, _, _, _, _), contratos:ficha(C, F) ), Fichas).
@@ -289,6 +313,28 @@ accion_de_turno(Clave, Actor, Accion, Meta, Items) :-
     etapa(Todos, I1),
     avanzar_combate(I2),
     append(I1, I2, Items).
+
+% usar_habilidad(+Objetivo, -Items): Objetivo es ninguno, un tipo o una instancia.
+usar_habilidad(Objetivo, Items) :-
+    (   actor_del_turno(Actor)
+    ->  mundo:habilidad_de(Actor, Habilidad),
+        (   Objetivo == ninguno
+        ->  B = ninguno
+        ;   resolver_objetivo(Objetivo, B)
+        ->  true
+        ;   B = desconocido
+        ),
+        (   B == desconocido
+        ->  Items = [error(objetivo_desconocido(Objetivo))]
+        ;   combate:puede_habilidad(Actor, Habilidad, B)
+        ->  accion_de_turno(habilidad(Actor, B), Actor, habilidad(B),
+                            combate:puede_habilidad(Actor, Habilidad, B), Items)
+        ;   Objetivo == ninguno, \+ combate:objetivo_de_habilidad(Habilidad, ninguno)
+        ->  Items = [error(habilidad_pide_objetivo(Habilidad))]
+        ;   Items = [error(no_puede_habilidad(Actor, Habilidad))]
+        )
+    ;   Items = [error(no_es_tu_turno)]
+    ).
 
 % ---------------------------------------------------------------------------
 % El combate por turnos. comenzar_combate/2 lo abre y avanzar_combate/1 lo lleva hasta que le

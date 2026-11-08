@@ -122,6 +122,16 @@ frase(suceso(roba_queso(E)), ambos,
       '~w se lleva un queso de la despensa mientras todos miran el combate. Roba con una técnica impecable.'-[E]).
 frase(suceso(embiste(E, B, D)), ambos,
       '~w embiste a ~w con todo el peso del caballo y le quita ~w de vida. El jinete se lleva el mérito.'-[E, B, D]).
+frase(suceso(carga_heroica(B)), ambos,
+      'Sir Baldomero grita «¡Por mi honor!» y carga contra ~w. Hay más honor que puntería, pero llega.'-[B]).
+frase(suceso(fondue(B)), ambos,
+      'Madame Pimentina lanza una Fondue Flamígera contra ~w. Huele a cena y a problemas para el enemigo.'-[B]).
+frase(suceso(balada), ambos,
+      'Rufino entona la Balada Inspiradora. La moral sube; los oídos se despiden.').
+frase(suceso(rebuscar(E, ok)), ambos,
+      'Tuerca rebusca en los bolsillos de ~w y encuentra un queso. «Lo tomo prestado», dice.'-[E]).
+frase(suceso(rebuscar(E, nada)), ambos,
+      'Tuerca rebusca en ~w y no halla nada. Se queda con la dignidad, que no cotiza.'-[E]).
 frase(suceso(defiende(A)), ambos,
       '~w se pone a la defensiva: escudo arriba, ojos cerrados y una plegaria a medias.'-[A]).
 
@@ -183,6 +193,10 @@ nombre(gato_en_el_arbol,   'El Gato en el Árbol').
 nombre(gallina_noble,      'Lady Clotilde Plumífera').
 nombre(despensa_real,      'La Despensa Real').
 nombre(pocion,             'poción').
+nombre(carga_heroica,      'la Carga Heroica').
+nombre(fondue_flamigera,   'la Fondue Flamígera').
+nombre(balada_inspiradora, 'la Balada Inspiradora').
+nombre(rebuscar_bolsillos, 'Rebuscar Bolsillos').
 nombre(venda_de_caballos,  'venda de caballos').
 nombre(rata_quesera,    'la Rata Quesera').
 nombre(bandido_torpe,   'el Bandido Torpe').
@@ -441,8 +455,8 @@ texto_error(fuera_de_fase(Cmd, Fase), Texto) :-
     ->  Texto = 'La partida ha terminado.'
     ;   functor(Cmd, descansar, _)
     ->  Texto = 'Solo se puede descansar en la taberna.'
-    ;   ( functor(Cmd, atacar, _) ; functor(Cmd, defender, _) )
-    ->  Texto = 'Solo se puede atacar o defender en pleno combate.'
+    ;   ( functor(Cmd, atacar, _) ; functor(Cmd, defender, _) ; functor(Cmd, habilidad, _) )
+    ->  Texto = 'Solo se puede atacar, defender o usar una habilidad en pleno combate.'
     ;   format(atom(Texto), 'Ahora mismo no puedes hacer eso (fase: ~w).', [Fase])
     ).
 texto_error(no_entiendo(Termino), Texto) :-
@@ -466,6 +480,13 @@ texto_error(no_puede_atacar(Actor, Objetivo), Texto) :-
     nombre_visible(Objetivo, B),
     con_a(B, ConA),
     format(atom(Texto), '~w no puede atacar ~w ahora mismo.', [A, ConA]).
+texto_error(no_puede_habilidad(Actor, Habilidad), Texto) :-
+    nombre_visible(Actor, A),
+    nombre_visible(Habilidad, H),
+    format(atom(Texto), '~w no puede usar ~w ahora mismo: falta lo que necesita, o el objetivo no está a su alcance.', [A, H]).
+texto_error(habilidad_pide_objetivo(Habilidad), Texto) :-
+    nombre_visible(Habilidad, H),
+    format(atom(Texto), '~w necesita un enemigo: escribe habilidad(Objetivo).', [H]).
 texto_error(no_puede_defender(Actor), Texto) :-
     nombre_visible(Actor, A),
     format(atom(Texto), '~w no puede defenderse ahora mismo.', [A]).
@@ -480,7 +501,7 @@ texto_error(no_hay_prueba(Accion), Texto) :-
     format(atom(Texto), 'Ahora mismo no se puede hacer ~w, así que no hay prueba que enseñar.', [Dicho]).
 texto_error(no_se_explica(Accion), Texto) :-
     como_texto(Accion, Dicho),
-    format(atom(Texto), 'No sé explicar "~w". Puedo explicar ir(Zona), descansar, pagar, aceptar(Contrato), atacar(Objetivo) y defender.', [Dicho]).
+    format(atom(Texto), 'No sé explicar "~w". Puedo explicar ir(Zona), descansar, pagar, aceptar(Contrato), atacar(Objetivo), defender y habilidad.', [Dicho]).
 texto_error(falta_argumento(Termino), Texto) :-
     functor(Termino, Nombre, _),
     format(atom(Texto), 'A ~w le falta decir a dónde o a qué; escribe el nombre completo, por ejemplo: ir(aldea).', [Nombre]).
@@ -511,6 +532,7 @@ ayuda_de(contratos, 'contratos.     el tablón: los contratos a la vista y si se
 ayuda_de(aceptar, 'aceptar(Contrato). acepta un contrato (en la taberna o donde lo ofrecen)').
 ayuda_de(atacar, 'atacar(Objetivo). solo en combate: golpea a un enemigo (un tipo o e(Tipo, N))').
 ayuda_de(defender, 'defender.      solo en combate: sube tu defensa hasta tu próximo turno').
+ayuda_de(habilidad, 'habilidad(Objetivo). solo en combate: usa la habilidad de tu personaje; la balada de Rufino se escribe habilidad.').
 ayuda_de(compania,'compania.      muestra a los miembros, su vida, su moral y su estado').
 ayuda_de(inventario, 'inventario.    muestra la despensa (con la edad del queso) y los objetos').
 ayuda_de(explicar, 'explicar.      la prueba de lo último que hiciste; explicar(Accion). la de esa acción').

@@ -60,7 +60,8 @@ Se puede **recorrer el mapa, gestionar la compañía y pedir explicaciones**. Ca
 | `elegir(Opcion).` | Elige una opción del evento abierto, por su número o por su nombre (p. ej. `elegir(trepar).` o `elegir(1).`). `mirar.` vuelve a enseñar las opciones. Un evento se abre al aceptar su contrato en su zona o al llegar a ella con el contrato activo. |
 | `atacar(Objetivo).` | Solo en combate: golpea con el miembro al que le toca. El objetivo es un tipo (`bandido_torpe`) o una instancia (`e(bandido_torpe, 1)`). |
 | `defender.` | Solo en combate: sube la defensa del miembro al que le toca hasta su próximo turno. |
-| `explicar.` | La prueba lógica, en árbol, de lo último que se hizo (`ir`, `descansar`, `pagar`, `atacar`, `defender` o la decisión de un enemigo). |
+| `habilidad(Objetivo).` / `habilidad.` | Solo en combate: la habilidad del miembro al que le toca. Baldomero: **Carga Heroica** (el golpe + 4). Pimentina: **Fondue Flamígera** (8 de daño que ignora la defensa; gasta 1 queso, el más rancio). Tuerca: **Rebuscar Bolsillos** (1 queso si el enemigo lo lleva; una vez por enemigo). Rufino: **Balada Inspiradora** (+1 de moral a toda la compañía; se escribe `habilidad.`, sin objetivo). |
+| `explicar.` | La prueba lógica, en árbol, de lo último que se hizo (`ir`, `descansar`, `pagar`, `atacar`, `defender`, `habilidad` o la decisión de un enemigo). |
 | `explicar(ir(aldea)).` | La prueba de esa acción: la guardada si es la última; si no, se resuelve ahora. |
 | `salir.` | Termina la partida. |
 
@@ -79,7 +80,7 @@ ir(castillo).  aceptar(despensa_real).
 ir(camino_real).  ir(cuevas). % el Gran Roquefort
 ```
 
-En combate manda cada miembro en su turno (`mirar.` dice de quién es y cuánta vida tiene cada enemigo); los enemigos actúan solos, al ganar hay botín y moral, y los caídos se levantan con 1 de vida. `explicar.` justifica lo último que pasó, también las decisiones de los enemigos. Todavía no están implementados `habilidad`, la escolta de Clotilde con sus golpes, `por_que_no`, el narrador completo ni los finales de nivel Objetivo.
+En combate manda cada miembro en su turno (`mirar.` dice de quién es y cuánta vida tiene cada enemigo); los enemigos actúan solos, al ganar hay botín y moral, y los caídos se levantan con 1 de vida. `explicar.` justifica lo último que pasó, también las decisiones de los enemigos. Todavía no están implementados la escolta de Clotilde con sus golpes, `por_que_no`, el narrador completo ni los finales de nivel Objetivo.
 
 ## Pruebas
 
@@ -142,10 +143,14 @@ Las pruebas usan `plunit`. Desde la raíz del repositorio (PowerShell), con el e
 ```
 
 ```
+& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/habilidades -g "run_tests,halt" -t "halt(1)"
+```
+
+```
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/spike_explicar -g "run_tests,halt" -t "halt(1)"
 ```
 
-Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (1144 pruebas):
+Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (1226 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -161,6 +166,7 @@ Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 
 | `tests/cierre.pl` (102) | Cómo acaba un contrato: `resultado/3` (éxito, a medias o fracaso según contadores y marcas), sus consecuencias, el cobro automático al llegar a la taberna, el combate que empieza al llegar a la zona de un contrato activo, y partidas completas de aceptar a cobrar. |
 | `tests/eventos.pl` (110) | El motor mínimo de eventos y el comando `elegir`: cuándo se abre el evento del gato, sus opciones y cuáles están disponibles, los intentos, qué pasa al elegir cada una, cómo se resuelve el contrato con las marcas que dejan y la cadena gato → venda → gallina. |
 | `tests/campana.pl` (39) | La partida mínima de principio a fin: los finales (`chapuza`, `derrota_combate`, `derrota_hambre`), la fase final, partidas completas escritas como una lista de comandos (se gana en 7 días y es reproducible) y que `pelear` ya no existe. |
+| `tests/habilidades.pl` (82) | Las habilidades: la tabla de datos `efecto_habilidad/2`, las reglas `puede_habilidad/2` y `/3`, los efectos de la carga, la fondue, la balada y rebuscar, el comando `habilidad` (errores sin efecto, prueba guardada, `explicar`), las pantallas y combates enteros jugados con habilidades. |
 | `tests/diagnosticos.pl` (63) | Del diagnóstico de `por_que_no` a la frase: `claves_de_diag/2` y `comentario_diag/4` con diagnósticos escritos a mano (`neg_viola`, `fallo`, `tras`, `ninguna`, `sin_clausula`, `builtin_falso`, `limite`), las claves del núcleo (huelga, aturdido, fila, hechizo, viaje, descanso, contrato, miedo a los caballos) y las frases de reserva. |
 | `tests/narrador.pl` (44) | El narrador: el banco de frases, la clave más específica, la rotación de variantes, los niveles, los nombres con artículo, las frases genéricas y el comentario de `explicar`. |
 | `tests/spike_explicar.pl` (17) | El meta-intérprete de `src/explicar.pl`, con dos módulos de juguete (`tests/spike/`). |

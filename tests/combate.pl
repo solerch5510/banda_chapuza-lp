@@ -205,8 +205,13 @@ test(sirve_cualquier_tipo_de_queso, [setup(nueva_partida)]) :-
     aplicar_efecto(ganar_queso(brie, 12, 1)),          % un brie rancio tambien alimenta la magia
     combate:puede_habilidad(pimentina, fondue_flamigera).
 
-test(solo_pimentina_tiene_este_rasgo, [setup(nueva_partida), fail]) :-
-    combate:puede_habilidad(baldomero, carga_heroica).
+test(solo_pimentina_gasta_queso_en_sus_habilidades, [setup(nueva_partida)]) :-
+    aplicar_efecto(gastar_queso(cheddar, 0, 12)),
+    economia:queso_total(0),
+    combate:puede_habilidad(baldomero, carga_heroica),        % las demas no cuestan nada
+    combate:puede_habilidad(rufino, balada_inspiradora),
+    combate:puede_habilidad(tuerca, rebuscar_bolsillos),
+    \+ combate:puede_habilidad(pimentina, fondue_flamigera).
 
 test(pimentina_no_lanza_la_habilidad_de_otro, [setup(nueva_partida), fail]) :-
     combate:puede_habilidad(pimentina, balada_inspiradora).
