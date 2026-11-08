@@ -17,7 +17,8 @@
 % Texto provisional: el banco con todo el humor (docs/05-comedia-y-narracion.md) crece despues.
 
 :- module(narrador, [frase/3, texto/4, texto_error/2, ayuda_de/2,
-                     comentario/4, comentario_prueba/4, nombre_visible/2, texto_recompensa/2]).
+                     comentario/4, comentario_prueba/4, nombre_visible/2, texto_recompensa/2,
+                     descripcion_evento/2, descripcion_opcion/3]).
 
 % La declaracion de modulo va primero; el archivo tiene tildes, asi que se declara UTF-8 justo despues.
 :- encoding(utf8).
@@ -68,6 +69,22 @@ frase(suceso(golpe(A, B, D)), ambos,
       '~w le suelta un golpe a ~w: ~w de vida menos. Ha sido casi técnico.'-[A, B, D]).
 frase(suceso(cae(B)), ambos,
       '~w cae redondo. Se levantará luego con 1 de vida y ninguna dignidad.'-[B]).
+frase(suceso(evento_abre(rescate_gato)), ambos,
+      'Su Excelencia Bigotes lleva tres días en lo alto del árbol y dice que desde allí se juzga mejor. Tenéis tres intentos y ninguna idea.').
+frase(suceso(evento_elige(rescate_gato, trepar)), ambos,
+      'Tuerca trepa sin ruido, saluda al gato con una reverencia y baja con él bajo el brazo. Las alturas le sientan bien.').
+frase(suceso(evento_elige(rescate_gato, hechizo_de_raclette)), ambos,
+      'Madame Pimentina enciende un hechizo de raclette y el gato baja solo, atraído por el olor y por la dignidad perdida. Cuesta un queso.').
+frase(suceso(evento_elige(rescate_gato, sacudir_arbol)), ambos,
+      'Sir Baldomero sacude el árbol por su honor. El gato cae, el árbol también y el pozo de la alcaldesa recibe a los dos.').
+frase(suceso(evento_elige(rescate_gato, cantar)), ambos,
+      'Rufino canta una balada. El gato la escucha entera y sube más alto, por prudencia.').
+frase(suceso(intento_fallido(E, 0)), ambos,
+      'Se acabaron los intentos en «~w». El gato se muda a otro árbol y la alcaldesa suspira con experiencia.'-[E]).
+frase(suceso(intento_fallido(_, 1)), ambos,
+      'Os queda un intento. Uno solo. El gato lo sabe.').
+frase(suceso(intento_fallido(_, N)), ambos,
+      'Os quedan ~w intentos.'-[N]).
 frase(suceso(objetivo(C)), ambos,
       'Habéis llegado: «~w» os espera. Ahora toca ganarse el queso, que es lo que se espera de unos mercenarios.'-[C]).
 frase(suceso(contrato_resuelto(C, exito)), ambos,
@@ -137,6 +154,7 @@ nombre(cuevas,      'las Cuevas del Roquefort').
 nombre(cheddar,     'el cheddar').
 nombre(brie,        'el brie').
 nombre(ratas_del_granero, 'Ratas del Granero').
+nombre(rescate_gato,       'el rescate del gato').
 nombre(gato_en_el_arbol,   'El Gato en el Árbol').
 nombre(gallina_noble,      'Lady Clotilde Plumífera').
 nombre(despensa_real,      'La Despensa Real').
@@ -290,6 +308,13 @@ con_a(Nombre, ConA) :-
     ).
 
 % ---------------------------------------------------------------------------
+% descripcion_evento(+E, -Texto) y descripcion_opcion(+E, +Opcion, -Texto): lo que enseña el evento.
+descripcion_evento(rescate_gato, 'El Gato en el Árbol: Su Excelencia Bigotes no piensa bajar solo.').
+descripcion_opcion(rescate_gato, trepar,              'Tuerca trepa a por él').
+descripcion_opcion(rescate_gato, hechizo_de_raclette, 'Madame Pimentina lo atrae con un hechizo de raclette (cuesta 1 queso)').
+descripcion_opcion(rescate_gato, sacudir_arbol,       'Sir Baldomero sacude el árbol con todo su honor').
+descripcion_opcion(rescate_gato, cantar,              'Rufino le canta una balada (gasta un intento)').
+
 % texto_recompensa(+Premios, -Texto): "9 quesos, poción" a partir de [quesos(9), objeto(pocion)].
 texto_recompensa(Premios, Texto) :-
     maplist(texto_premio, Premios, Textos),
@@ -335,6 +360,12 @@ texto_error(contrato_desconocido(C), Texto) :-
 texto_error(no_puede_aceptar(C), Texto) :-
     nombre_visible(C, Nombre),
     format(atom(Texto), 'El contrato «~w» os mira, mira a la Banda y decide que no. Ahora mismo no podéis aceptarlo.', [Nombre]).
+texto_error(no_hay_evento, 'No hay ningún evento abierto: no hay nada que elegir.').
+texto_error(opcion_desconocida(X), Texto) :-
+    como_texto(X, Dicho),
+    format(atom(Texto), 'No existe la opción "~w". Escribe mirar. para ver las que hay.', [Dicho]).
+texto_error(opcion_no_disponible(Op), Texto) :-
+    format(atom(Texto), 'La opción «~w» no está disponible ahora mismo: falta quien la haga o lo que necesita.', [Op]).
 texto_error(no_es_tu_turno, 'Ahora no te toca a ti: espera a tu turno.').
 texto_error(no_puede_atacar(Actor, Objetivo), Texto) :-
     nombre_visible(Actor, A),
@@ -381,6 +412,7 @@ ayuda_de(descansar, Texto) :-
     format(atom(Texto),
            'descansar.     solo en la taberna: cuesta ~w quesos, cura a todos y pasa un día', [Coste]).
 ayuda_de(pagar, 'pagar.         solo en la taberna: paga los sueldos pendientes con lo más rancio').
+ayuda_de(elegir, 'elegir(Opcion). elige una opción del evento abierto (su número o su nombre)').
 ayuda_de(contratos, 'contratos.     el tablón: los contratos a la vista y si se pueden aceptar').
 ayuda_de(aceptar, 'aceptar(Contrato). acepta un contrato (en la taberna o donde lo ofrecen)').
 ayuda_de(pelear, 'pelear(Tipo). (provisional) empieza un combate de prueba, p. ej. pelear(rata_quesera)').

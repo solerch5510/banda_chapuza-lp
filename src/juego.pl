@@ -19,6 +19,7 @@
 :- use_module(economia).
 :- use_module(combate).
 :- use_module(contratos).
+:- use_module(eventos).
 :- use_module(explicar).
 
 % ---------------------------------------------------------------------------
@@ -37,6 +38,7 @@ comando(atacar,     1).
 comando(defender,   0).
 comando(contratos,  0).
 comando(aceptar,    1).
+comando(elegir,     1).
 comando(pelear,     1).          % PROVISIONAL: empieza un combate de prueba hasta que lleguen los contratos
 comando(salir,      0).
 
@@ -55,8 +57,8 @@ validar_comando(T, Res) :-
 % ---------------------------------------------------------------------------
 % Que comandos se pueden usar en cada fase (la fase se deriva en estado:fase/1).
 % ---------------------------------------------------------------------------
-permitidos(exploracion, [ayuda, mirar, ir, contratos, aceptar, pelear, compania, inventario, explicar, salir]).
-permitidos(taberna,     [ayuda, mirar, ir, contratos, aceptar, descansar, pagar, compania, inventario, explicar, salir]).
+permitidos(exploracion, [ayuda, mirar, ir, contratos, aceptar, elegir, pelear, compania, inventario, explicar, salir]).
+permitidos(taberna,     [ayuda, mirar, ir, contratos, aceptar, elegir, descansar, pagar, compania, inventario, explicar, salir]).
 permitidos(combate,     [ayuda, mirar, atacar, defender, compania, inventario, explicar, salir]).
 permitidos(fin,         [ayuda, explicar, salir]).
 
@@ -71,6 +73,10 @@ objetivo_de_accion(ir(Zona),  compania:puede_viajar(Zona)).
 objetivo_de_accion(descansar, economia:puede_descansar).
 objetivo_de_accion(pagar,     economia:puede_pagar_sueldos).
 objetivo_de_accion(aceptar(C), contratos:puede_aceptar(C)).
+% elegir(Opcion): el numero de la opcion o su nombre; el evento es el que esta abierto.
+objetivo_de_accion(elegir(Escrito), eventos:puede_elegir(E, Opcion)) :-
+    eventos:evento_abierto(E),
+    eventos:resolver_opcion(E, Escrito, Opcion).
 % atacar(Objetivo) y atacar(Actor, Objetivo): el Objetivo puede ser un tipo (bandido_torpe) o una
 % instancia (e(bandido_torpe, 1)); el actor del primero es a quien le toca el turno.
 objetivo_de_accion(atacar(Actor, Objetivo), (combate:puede_atacar(Actor, B), combate:dano(Actor, B, _))) :-
@@ -156,6 +162,9 @@ ejecutar_en_fase(mirar, Fase, Items) :-
     (   Fase == combate
     ->  datos_de_combate(Combate),
         Items = [vista(zona, Datos), vista(combate, Combate)]
+    ;   eventos:evento_abierto(E)
+    ->  mostrar_evento(E, Evento),
+        Items = [vista(zona, Datos)|Evento]
     ;   Items = [vista(zona, Datos)]
     ).
 ejecutar_en_fase(compania, _, [vista(compania, Filas)]) :-
@@ -231,8 +240,27 @@ ejecutar_en_fase(aceptar(C), _, Items) :-
     ->  Items = [error(contrato_desconocido(C))]
     ;   contratos:puede_aceptar(C)
     ->  once(explicar:solve(contratos:puede_aceptar(C), Prueba)),
-        etapa([guardar_prueba(aceptar(C), Prueba), contrato_aceptar(C), mensaje(acepta, [C])], Items)
+        etapa([guardar_prueba(aceptar(C), Prueba), contrato_aceptar(C), mensaje(acepta, [C])], I1),
+        siguiente_objetivo(I2),
+        append(I1, I2, Items)
     ;   Items = [error(no_puede_aceptar(C))]
+    ).
+
+% elegir(Opcion) : una opcion del evento abierto (por su numero o su nombre). Se comprueba con la regla
+% eventos:puede_elegir/2, cuya prueba se guarda ANTES de aplicar los efectos. Si la opcion acaba el
+% evento, el contrato se resuelve con las marcas que dejo.
+ejecutar_en_fase(elegir(Escrito), _, Items) :-
+    (   \+ eventos:evento_abierto(_)
+    ->  Items = [error(no_hay_evento)]
+    ;   once(eventos:evento_abierto(E)),
+        (   \+ eventos:resolver_opcion(E, Escrito, _)
+        ->  Items = [error(opcion_desconocida(Escrito))]
+        ;   eventos:resolver_opcion(E, Escrito, Opcion),
+            \+ eventos:puede_elegir(E, Opcion)
+        ->  Items = [error(opcion_no_disponible(Opcion))]
+        ;   eventos:resolver_opcion(E, Escrito, Opcion),
+            elegir_opcion(E, Opcion, Items)
+        )
     ).
 
 % pelear(Grupo) (PROVISIONAL): empieza un combate contra un tipo o una lista de tipos. Solo en
@@ -417,29 +445,70 @@ cobrar_contratos(Zona, Items) :-
     ;   Items = []
     ).
 
-% Al llegar a la zona de un contrato activo cuyo objetivo es un combate, el combate empieza.
-% (El primero del catalogo; el contrato queda marcado como dueno del combate.)
+% Al llegar a la zona de un contrato activo (o al aceptarlo estando ya en ella) empieza su objetivo:
+% un combate (queda marcado como suyo) o un evento con opciones. Primero los combates, en orden de
+% catalogo. Si no hay nada nuevo pero hay un evento abierto, se vuelven a enseñar sus opciones.
 iniciar_objetivo(Zona, Items) :-
-    (   \+ estado:fin_partida(_),
-        contratos:objetivo_pendiente(Zona, C, Grupo)
+    (   estado:fin_partida(_)
+    ->  Items = []
+    ;   contratos:objetivo_pendiente(Zona, C, Grupo)
     ->  contratos:efectos_inicio_objetivo(C, Efectos),
         etapa(Efectos, I1),
         comenzar_combate(Grupo, I2),
         append(I1, I2, Items)
+    ;   eventos:evento_pendiente(Zona, _, E)
+    ->  eventos:efectos_apertura(E, Efectos),
+        etapa(Efectos, I1),
+        mostrar_evento(E, I2),
+        append(I1, I2, Items)
+    ;   eventos:evento_abierto(E)
+    ->  mostrar_evento(E, Items)
     ;   Items = []
     ).
+
+% siguiente_objetivo(-Items): mira si en la zona donde estas queda algun objetivo por empezar.
+siguiente_objetivo(Items) :-
+    (   estado:en_zona(Zona)
+    ->  iniciar_objetivo(Zona, Items)
+    ;   Items = []
+    ).
+
+% mostrar_evento(+E, -Items): la vista del evento con sus opciones y los intentos que quedan.
+mostrar_evento(E, [vista(evento, E, Quedan, Opciones)]) :-
+    eventos:intentos_restantes(E, Quedan),
+    eventos:opciones_de(E, Opciones).
+
+elegir_opcion(E, Opcion, Items) :-
+    once(explicar:solve(eventos:puede_elegir(E, Opcion), Prueba)),
+    once(eventos:efectos_eleccion(E, Opcion, Efectos)),
+    (   eventos:termina_con(E, Opcion, _) -> Cierra = si ; Cierra = no ),
+    etapa([guardar_prueba(elegir(Opcion), Prueba)|Efectos], I1),
+    (   Cierra == si
+    ->  once(eventos:evento_de_contrato(C, E, _)),
+        resolver_contrato(C, I2)
+    ;   mostrar_evento(E, I2)
+    ),
+    append(I1, I2, Items).
 
 % Si el combate que acaba de ganarse era el objetivo de un contrato, se resuelve: el resultado sale
 % de resultado/3 (guardamos su prueba para explicar) y se aplican sus consecuencias inmediatas.
 cerrar_contrato(Resultado, Items) :-
     (   Resultado == victoria,
         estado:marca(combate_de(C))
-    ->  contratos:contexto(Ctx),
-        once(explicar:solve(contratos:resultado(C, Ctx, Res), Prueba)),
-        contratos:efectos_resolucion(C, Res, Efectos),
-        etapa([guardar_prueba(resultado(C), Prueba)|Efectos], Items)
+    ->  resolver_contrato(C, Items)
     ;   Items = []
     ).
+
+% resolver_contrato(+C, -Items): el resultado sale de resultado/3 con lo registrado durante el contrato
+% (su prueba se guarda para explicar), se aplican las consecuencias inmediatas y se mira si en esta
+% zona queda otro objetivo por empezar.
+resolver_contrato(C, Items) :-
+    contratos:contexto(Ctx),
+    once(explicar:solve(contratos:resultado(C, Ctx, Res), Prueba)),
+    contratos:efectos_resolucion(C, Res, Efectos),
+    etapa([guardar_prueba(resultado(C), Prueba)|Efectos], I1),
+    siguiente_objetivo(I2),
+    append(I1, I2, Items).
 
 % Fin por hambre: sin queso y sin nada por cobrar no se puede alimentar a nadie manana.
 comprobar_fin(Items) :-

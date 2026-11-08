@@ -628,7 +628,8 @@ test(se_acepta_desde_la_aldea_lo_de_la_aldea) :-
     nueva_partida,
     ordena(ir(aldea), _),
     ordena(aceptar(gato_en_el_arbol), Items),
-    Items == [msg(acepta, [gato_en_el_arbol], 0)].
+    Items = [msg(acepta, [gato_en_el_arbol], 0)|Resto],           % y, como el evento esta aqui, se abre
+    memberchk(msg(evento_abre, [rescate_gato], _), Resto).
 
 test(desde_la_aldea_no_se_acepta_lo_del_camino_real) :-
     nueva_partida,
@@ -642,7 +643,8 @@ test(en_el_camino_real_se_acepta_la_gallina_con_venda) :-
     aplicar_efecto(equipar(baldomero, venda_de_caballos)),
     ordena(ir(camino_real), _),
     ordena(aceptar(gallina_noble), Items),
-    Items == [msg(acepta, [gallina_noble], 0)].
+    Items = [msg(acepta, [gallina_noble], 0)|Resto],              % y el combate de la escolta empieza ya
+    memberchk(msg(objetivo, [gallina_noble], _), Resto).
 
 test(el_limite_de_tres_se_aplica_al_aceptar) :-
     nueva_partida,

@@ -79,6 +79,16 @@ mostrar_conocido(vista(inventario, Datos)) :-
     forall(member(lote(Tipo, Edad, Cant, Categoria), Lotes),
            format("  ~w x~w   edad ~w (~w)~n", [Tipo, Cant, Edad, Categoria])),
     escribir_objetos(Objetos).
+mostrar_conocido(vista(evento, E, Quedan, Opciones)) :-
+    narrador:descripcion_evento(E, Descripcion),
+    format("~w~n", [Descripcion]),
+    forall(member(opcion(N, Opcion, Quien, Disponible), Opciones),
+           (   narrador:descripcion_opcion(E, Opcion, Texto),
+               narrador:nombre_visible(Quien, NombreQuien),
+               (   Disponible == si -> Marca = '' ; Marca = ' [no disponible]' ),
+               format("  ~w. ~w: ~w (~w)~w~n", [N, Opcion, Texto, NombreQuien, Marca])
+           )),
+    format("Intentos que quedan: ~w. Elige con elegir(Opcion). (el número o el nombre).~n", [Quedan]).
 mostrar_conocido(vista(contratos, Fichas)) :-
     format("El tablón de contratos:~n", []),
     forall(member(contrato(Id, Zona, Dificultad, Recompensa, Estado), Fichas),
