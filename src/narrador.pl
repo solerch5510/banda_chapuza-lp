@@ -18,7 +18,8 @@
 
 :- module(narrador, [frase/3, texto/4, texto_error/2, ayuda_de/2,
                      comentario/4, comentario_prueba/4, nombre_visible/2, texto_recompensa/2,
-                     descripcion_evento/2, descripcion_opcion/3]).
+                     descripcion_evento/2, descripcion_opcion/3,
+                     claves_de_diag/2, clave_de_diag/2, comentario_diag/4]).
 
 % La declaracion de modulo va primero; el archivo tiene tildes, asi que se declara UTF-8 justo despues.
 :- encoding(utf8).
@@ -131,6 +132,27 @@ frase(puede_descansar, ambos,
       'Las camas del Cuajo Torcido aceptan clientes. Han visto cosas y siguen aceptando.').
 frase(puede_pagar_sueldos, ambos,
       'Hay queso para todos los sueldos. Que conste en acta, por si alguien lo duda dentro de una semana.').
+
+% --- por_que_no: por que NO se puede (F01a a F10b de docs/05). Las claves son impide(Hecho) cuando
+% algo lo prohibe (una negacion que se cumplio) y falla(Meta) cuando una regla no se cumple. ---
+frase(impide(teme(baldomero, caballo)), ambos,
+      'Sir Baldomero ve el caballo, recuerda su infancia, y decide revisar sus calcetines.').
+frase(impide(esta_en_huelga(P)), ambos,
+      'Con la moral por los suelos nadie combate, y la de ~w anda en el sótano. Ley de la Huelga Sagrada.'-[P]).
+frase(impide(aturdido(P)), ambos,
+      'A ~w le dan vueltas la sala, el reglamento y el desayuno. Que ataque otro día.'-[P]).
+frase(falla(en_fila_alcanzable(A, B)), ambos,
+      'La retaguardia queda tras el frente: ~w no llega hasta ~w mientras alguien siga delante.'-[A, B]).
+frase(falla(puede_habilidad(pimentina, _)), ambos,
+      'Sin queso no hay hechizo. Madame Pimentina agita el cucharón y la despensa vacía le devuelve el eco.').
+frase(falla(puede_viajar(Z)), ambos,
+      'No hay camino de aquí a ~w. Hay un campo, un arroyo y una filosofía, pero camino, no.'-[Z]).
+frase(falla(puede_descansar), ambos,
+      'Aquí fuera no hay camas, solo suelo con ganas de serlo. Descansar se hace en la taberna.').
+frase(falla(puede_aceptar(_)), ambos,
+      'Este contrato no se puede aceptar todavía. Los requisitos están a la vista, como una factura.').
+frase(impide(rasgo(baldomero, teme_caballos)), ambos,
+      'Lady Clotilde exige escolta sin miedo a los caballos. Sir Baldomero levanta la mano, muy despacio, por honestidad.').
 
 % --- frases genericas de reserva (G01 a G08): neutras y cortas; si salen mucho, falta cobertura ---
 frase(generica(exito),      ambos,     'Todo conforme al reglamento. En esta compañía, eso es una noticia.').
@@ -285,6 +307,79 @@ meta_en(der(P), M)  :- meta_en(P, M).
 meta_en((A, B), M)  :- ( meta_en(A, M) ; meta_en(B, M) ).
 meta_en(si(PC, PT), M) :- ( meta_en(PC, M) ; meta_en(PT, M) ).
 meta_en(sino(PE), M)   :- meta_en(PE, M).
+
+% ---------------------------------------------------------------------------
+% Del diagnostico de por_que_no a una frase (docs/05 7.4).
+%
+% El diagnostico (explicar, docs/02 6.9) dice DONDE falla algo; aqui se traduce a una lista de
+% claves candidatas, de la causa mas profunda a la raiz, y se usa la primera que tenga frase:
+%   neg_viola(X, Prueba)  impide(H) por cada meta de la prueba de X, en preorden
+%   fallo(G, [cl(_,_,punto(F,D))|_])  las de D, luego falla(F) (si F no es una negacion), luego falla(G)
+%   tras(_, D)            las de D (el fallo esta en el segundo conjuntivo)
+%   ninguna(DA, DB)       las de DA y luego las de DB (una disyuncion que falla por los dos lados)
+%   sin_clausula(G)       falla(G)
+%   builtin_falso, limite ninguna (se salta a la clave falla(...) de la regla padre)
+% Una condicion de contrato llega envuelta en condicion_cumple(C): se prueba falla(condicion_cumple(C))
+% y luego falla(C). Los objetivos pueden llegar con modulo (strip_module los pela).
+% ---------------------------------------------------------------------------
+
+% claves_de_diag(+Diag, -Claves): siempre tiene exito; una forma desconocida da [].
+claves_de_diag(Diag, Claves) :-
+    (   nonvar(Diag), claves_diag(Diag, Cs)
+    ->  Claves = Cs
+    ;   Claves = []
+    ).
+
+claves_diag(neg_viola(_, Prueba), Claves) :-
+    findall(impide(H),
+            ( meta_en(Prueba, H0), strip_module(H0, _, H) ),
+            Claves).
+claves_diag(tras(_, D), Claves) :-
+    claves_de_diag(D, Claves).
+claves_diag(ninguna(DA, DB), Claves) :-
+    claves_de_diag(DA, As),
+    claves_de_diag(DB, Bs),
+    append(As, Bs, Claves).
+claves_diag(sin_clausula(G0), Claves) :-
+    strip_module(G0, _, G),
+    claves_falla(G, Claves).
+claves_diag(builtin_falso(_), []).
+claves_diag(limite(_), []).
+claves_diag(fallo(G0, Cands), Claves) :-
+    strip_module(G0, _, G),
+    (   Cands = [cl(_, _, punto(F0, D))|_]
+    ->  claves_de_diag(D, Hondas),
+        strip_module(F0, _, F),
+        (   F = (\+ _) -> Propias = [] ; claves_falla(F, Propias) )
+    ;   Hondas = [], Propias = []
+    ),
+    append([Hondas, Propias, [falla(G)]], Claves).
+
+claves_falla(Meta, Claves) :-
+    (   Meta = condicion_cumple(C)
+    ->  Claves = [falla(condicion_cumple(C)), falla(C)]
+    ;   Claves = [falla(Meta)]
+    ).
+
+% tiene_frase(+Clave): hay alguna frase en el banco para esa clave (a cualquier nivel).
+tiene_frase(Clave) :-
+    \+ \+ ( frase(K, _, _), casa(K, Clave) ).
+
+% clave_de_diag(+Diag, -Clave): la primera clave candidata con frase; si ninguna la tiene,
+% generica(impide) cuando algo lo prohibia (hubo neg_viola) y generica(fallo) en otro caso.
+clave_de_diag(Diag, Clave) :-
+    claves_de_diag(Diag, Claves),
+    (   member(C, Claves), tiene_frase(C)
+    ->  Clave = C
+    ;   member(impide(_), Claves)
+    ->  Clave = generica(impide)
+    ;   Clave = generica(fallo)
+    ).
+
+% comentario_diag(+Diag, +Nivel, +Uso, -Texto): la frase de por_que_no. Siempre hay texto.
+comentario_diag(Diag, Nivel, Uso, Texto) :-
+    clave_de_diag(Diag, Clave),
+    comentario(Clave, Nivel, Uso, Texto).
 
 % como_texto(+Termino, -Texto): para repetirle al jugador lo que escribio. Una lista de
 % codigos (lo que Prolog 5.10.4 hace con "aldea" entre comillas dobles) se muestra como
