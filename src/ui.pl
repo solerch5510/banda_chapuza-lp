@@ -112,9 +112,11 @@ mostrar_conocido(vista(prueba, accion_enemigo(E), Prueba)) :-
     explicar:prueba_a_lineas(Prueba, Lineas),
     format("Por qué ~w hizo eso:~n", [Nombre]),
     (   predicate_property(combate:accion_enemigo(_, _), number_of_clauses(Total))
-    ->  (   Prueba = regla(_, Prioridad, _)
+    ->  (   Prueba = regla(accion_enemigo(_, _), Prioridad, _)
         ->  format("Eligió la regla de prioridad ~w de ~w (el corte descartó las demás).~n", [Prioridad, Total])
-        ;   Prueba = hecho(_)
+        ;   Prueba = regla(golpea_a_clotilde(_), _, _)
+        ->  format("Lady Clotilde va escoltada: el primero en actuar de cada ronda se ceba con ella.~n", [])
+        ;   Prueba = hecho(accion_enemigo(_, _))
         ->  format("Eligió la última regla (prioridad ~w de ~w): el comodín, cuando no hay nada mejor.~n", [Total, Total])
         ;   true
         )

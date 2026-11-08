@@ -80,7 +80,7 @@ ir(castillo).  aceptar(despensa_real).
 ir(camino_real).  ir(cuevas). % el Gran Roquefort
 ```
 
-En combate manda cada miembro en su turno (`mirar.` dice de quién es y cuánta vida tiene cada enemigo); los enemigos actúan solos, al ganar hay botín y moral, y los caídos se levantan con 1 de vida. `explicar.` justifica lo último que pasó, también las decisiones de los enemigos. Todavía no están implementados la escolta de Clotilde con sus golpes, `por_que_no`, el narrador completo ni los finales de nivel Objetivo.
+En combate manda cada miembro en su turno (`mirar.` dice de quién es y cuánta vida tiene cada enemigo); los enemigos actúan solos, al ganar hay botín y moral, y los caídos se levantan con 1 de vida. `explicar.` justifica lo último que pasó, también las decisiones de los enemigos. **La escolta de Lady Clotilde:** al aceptar `gallina_noble` en el Camino Real, en cada ronda del combate el primer enemigo que actúa se ceba con ella (anota un golpe y no ataca a la Banda). Con 2 golpes o menos, éxito (14 quesos y un brie); con 3 o 4, a medias (la mitad); con 5 o más, fracaso (−3 quesos y −2 de moral; se puede reintentar). Cuanto antes acabes el combate, menos plumas pierde. Todavía no están implementados `por_que_no`, el narrador completo ni los finales de nivel Objetivo.
 
 ## Pruebas
 
@@ -147,10 +147,14 @@ Las pruebas usan `plunit`. Desde la raíz del repositorio (PowerShell), con el e
 ```
 
 ```
+& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/escolta -g "run_tests,halt" -t "halt(1)"
+```
+
+```
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/spike_explicar -g "run_tests,halt" -t "halt(1)"
 ```
 
-Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (1226 pruebas):
+Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (1267 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -166,6 +170,7 @@ Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 
 | `tests/cierre.pl` (102) | Cómo acaba un contrato: `resultado/3` (éxito, a medias o fracaso según contadores y marcas), sus consecuencias, el cobro automático al llegar a la taberna, el combate que empieza al llegar a la zona de un contrato activo, y partidas completas de aceptar a cobrar. |
 | `tests/eventos.pl` (110) | El motor mínimo de eventos y el comando `elegir`: cuándo se abre el evento del gato, sus opciones y cuáles están disponibles, los intentos, qué pasa al elegir cada una, cómo se resuelve el contrato con las marcas que dejan y la cadena gato → venda → gallina. |
 | `tests/campana.pl` (39) | La partida mínima de principio a fin: los finales (`chapuza`, `derrota_combate`, `derrota_hambre`), la fase final, partidas completas escritas como una lista de comandos (se gana en 7 días y es reproducible) y que `pelear` ya no existe. |
+| `tests/escolta.pl` (41) | La escolta de Clotilde: la regla (un golpe por ronda al primer enemigo que actúa), el aviso, el turno enemigo con su prueba guardada y el `explicar` de la escolta, el resultado por umbrales (2 / 4 / 5), el fracaso con reintento y que los demás combates no cuentan golpes. |
 | `tests/habilidades.pl` (82) | Las habilidades: la tabla de datos `efecto_habilidad/2`, las reglas `puede_habilidad/2` y `/3`, los efectos de la carga, la fondue, la balada y rebuscar, el comando `habilidad` (errores sin efecto, prueba guardada, `explicar`), las pantallas y combates enteros jugados con habilidades. |
 | `tests/diagnosticos.pl` (63) | Del diagnóstico de `por_que_no` a la frase: `claves_de_diag/2` y `comentario_diag/4` con diagnósticos escritos a mano (`neg_viola`, `fallo`, `tras`, `ninguna`, `sin_clausula`, `builtin_falso`, `limite`), las claves del núcleo (huelga, aturdido, fila, hechizo, viaje, descanso, contrato, miedo a los caballos) y las frases de reserva. |
 | `tests/narrador.pl` (44) | El narrador: el banco de frases, la clave más específica, la rotación de variantes, los niveles, los nombres con artículo, las frases genéricas y el comentario de `explicar`. |

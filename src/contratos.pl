@@ -16,6 +16,7 @@
                       consecuencia/3, contadores_de/2, contexto/1, resultado/3,
                       objetivo_pendiente/3, efectos_inicio_objetivo/2,
                       efectos_resolucion/3, efectos_cobro/1, efectos_cobro_de/3,
+                      escolta_en_curso/0, golpes_dados/1, golpea_a_clotilde/1, efectos_golpe_a_clotilde/2,
                       orden_finales/1, final/2, final_de_la_partida/1]).
 :- use_module(mundo).
 :- use_module(estado).
@@ -289,6 +290,32 @@ efectos_inicio_objetivo(C, Efectos) :-
     (   contadores_de(C, Claves) -> true ; Claves = [] ),
     findall(borrar_contador(K), member(K, Claves), Borrados),
     append(Borrados, [marcar(combate_de(C)), mensaje(objetivo, [C])], Efectos).
+
+% --- la escolta de Clotilde (D-33) ---
+% Clotilde no es una combatiente: es un contador. En cada ronda del combate de la escolta el primer
+% enemigo que actua se ceba con ella: anota un golpe en vez de atacar a la compania. Como hay un
+% golpe por ronda, el contador va un paso por detras del numero de ronda hasta que le toca dar el
+% de la ronda: se golpea a Clotilde mientras los golpes dados sean MENOS que la ronda actual.
+escolta_en_curso :-
+    estado:marca(combate_de(C)),
+    contrato(C, _, escoltar(_, _), _, _).
+
+% golpes_dados(-N): los golpes que lleva Clotilde en esta escolta (0 si aun no consta ninguno).
+golpes_dados(N) :-
+    (   estado:contador(golpes_a_clotilde, V) -> N = V ; N = 0 ).
+
+golpea_a_clotilde(E) :-
+    escolta_en_curso,
+    estado:combatiente(E, enemigo),
+    golpes_dados(N),
+    estado:en_combate(Ronda),
+    N < Ronda.
+
+% efectos_golpe_a_clotilde(+E, -Efectos): falla si E no debe golpearla. Nadie sufre dano.
+efectos_golpe_a_clotilde(E, [contar(golpes_a_clotilde, 1), mensaje(golpea_a_clotilde, [E, Golpe])]) :-
+    golpea_a_clotilde(E),
+    golpes_dados(N),
+    Golpe is N + 1.
 
 % --- resolver ---
 % efectos_resolucion(+C, +Res, -Efectos): el contrato deja de estar activo, se quita la marca de su

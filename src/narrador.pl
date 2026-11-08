@@ -132,6 +132,8 @@ frase(suceso(rebuscar(E, ok)), ambos,
       'Tuerca rebusca en los bolsillos de ~w y encuentra un queso. «Lo tomo prestado», dice.'-[E]).
 frase(suceso(rebuscar(E, nada)), ambos,
       'Tuerca rebusca en ~w y no halla nada. Se queda con la dignidad, que no cotiza.'-[E]).
+frase(suceso(golpea_a_clotilde(E, N)), ambos,
+      '~w se abalanza sobre Lady Clotilde y le arranca una pluma (golpe ~w). Ella lo anota para la factura.'-[E, N]).
 frase(suceso(defiende(A)), ambos,
       '~w se pone a la defensiva: escudo arriba, ojos cerrados y una plegaria a medias.'-[A]).
 

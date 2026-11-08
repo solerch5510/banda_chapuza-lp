@@ -213,7 +213,7 @@ test(las_ratas_y_el_gato_se_cobran_en_la_taberna_y_los_ultimos_quedan_por_cobrar
     campana,
     estado:contrato_cerrado(ratas_del_granero, _),
     estado:contrato_cerrado(gato_en_el_arbol, _),
-    estado:contrato_por_cobrar(gallina_noble, _),       % se resolvio despues de volver de la taberna
+    estado:contrato_por_cobrar(gallina_noble, exito),   % la escolta salio con exito (dos golpes a Clotilde); se resolvio despues de volver de la taberna
     estado:contrato_por_cobrar(despensa_real, exito).
 
 test(la_venda_se_gana_por_el_camino, [nondet]) :-
