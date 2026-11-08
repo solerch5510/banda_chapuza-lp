@@ -15,7 +15,8 @@
                       contratos_activos/1, estado_de_contrato/2, ficha/2,
                       consecuencia/3, contadores_de/2, contexto/1, resultado/3,
                       objetivo_pendiente/3, efectos_inicio_objetivo/2,
-                      efectos_resolucion/3, efectos_cobro/1, efectos_cobro_de/3]).
+                      efectos_resolucion/3, efectos_cobro/1, efectos_cobro_de/3,
+                      orden_finales/1, final/2, final_de_la_partida/1]).
 :- use_module(mundo).
 :- use_module(estado).
 :- use_module(compania).
@@ -215,7 +216,26 @@ consecuencia(gato_en_el_arbol,  fracaso,  [moral(grupo, -1)]).
 consecuencia(gallina_noble,     exito,    [cobrar(todo), moral(grupo, 1), marcar(recomendada_por_clotilde)]).
 consecuencia(gallina_noble,     a_medias, [cobrar(mitad), marcar(recomendada_por_clotilde)]).
 consecuencia(gallina_noble,     fracaso,  [perder_queso(3), moral(grupo, -2)]).
-consecuencia(despensa_real,     exito,    [cobrar(todo)]).
+consecuencia(despensa_real,     exito,    [cobrar(todo), victoria]).    % ganar el jefe es ganar la partida
+
+% --- los finales de victoria (docs/04 §8.4) ---
+% orden_finales(Ids): se evaluan en este orden y gana el primero cuyas condiciones se cumplen.
+% La version minima solo tiene chapuza, el final por defecto (sin condiciones).
+orden_finales([chapuza]).
+final(chapuza, []).
+
+% final_de_la_partida(-Id): el final que toca con el estado de ahora.
+final_de_la_partida(Id) :-
+    orden_finales(Ids),
+    primer_final(Ids, Id).
+
+primer_final([Id|_], Id) :-
+    final(Id, Condiciones),
+    cumple_todas(Condiciones).
+primer_final([Id|Resto], Final) :-
+    final(Id, Condiciones),
+    \+ cumple_todas(Condiciones),
+    primer_final(Resto, Final).
 
 % contadores_de(Contrato, Claves): los contadores que cuenta su objetivo (se ponen a cero al empezar).
 contadores_de(ratas_del_granero, [quesos_robados]).
@@ -331,6 +351,9 @@ expandir(_, moral(grupo, N), Efs) :-
 expandir(_, moral(Id, N), [mod_moral(Id, N)]) :-
     Id \== grupo.
 expandir(_, marcar(F), [marcar(F)]).
+% victoria: la partida se gana con el final que corresponda al estado de ahora.
+expandir(_, victoria, [fin(victoria(Final)), mensaje(final, [Final])]) :-
+    final_de_la_partida(Final).
 expandir(_, perder_queso(N), Efs) :-
     economia:efectos_perdida(N, Efs).
 

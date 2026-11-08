@@ -574,7 +574,7 @@ test(el_tablon_funciona_tambien_fuera_de_la_taberna) :-
 test(el_tablon_no_vale_en_combate) :-
     nueva_partida,
     ordena(ir(aldea), _),
-    ordena(pelear(rata_quesera), _),
+    comenzar_combate([rata_quesera], _),
     ordena(contratos, Items),
     Items = [error(fuera_de_fase(contratos, combate))].
 
@@ -677,7 +677,7 @@ test(contratos_con_argumento_no_es_comando, [setup(nueva_partida)]) :-
 test(en_combate_no_se_acepta) :-
     nueva_partida,
     ordena(ir(aldea), _),
-    ordena(pelear(rata_quesera), _),
+    comenzar_combate([rata_quesera], _),
     ordena(aceptar(ratas_del_granero), Items),
     Items = [error(fuera_de_fase(aceptar(ratas_del_granero), combate))].
 

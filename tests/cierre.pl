@@ -264,7 +264,7 @@ test(solo_hay_consecuencias_de_resultados_posibles) :-
 test(los_terminos_de_las_consecuencias_son_del_vocabulario) :-
     forall(( contratos:consecuencia(_, _, Efs), member(E, Efs) ),
            memberchk(E, [cobrar(todo), cobrar(mitad), cobrar(quesos(_)), cobrar(objetos), moral(_, _),
-                         marcar(_), perder_queso(_), equipar(_, _)])).
+                         marcar(_), perder_queso(_), equipar(_, _), victoria])).
 
 test(un_fracaso_nunca_cobra) :-
     forall(( contratos:consecuencia(_, fracaso, Efs), member(E, Efs) ), \+ E = cobrar(_)).

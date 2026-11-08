@@ -60,7 +60,9 @@ frase(suceso(pago(T)), ambos,
 frase(suceso(impago), ambos,
       'Sales de la taberna sin pagar los sueldos y la compañía no lo olvida: baja la moral.').
 frase(suceso(fin_hambre), ambos,
-      'La despensa está vacía y nadie quiere pelear con el estómago vacío: la Banda Chapuza se disuelve. Fin de la partida.').
+      'Sin ración. No quedan quesos, ni ánimo, ni puntos de apoyo: la Banda se disuelve entre bostezos.\nNarrador: «Un mercenario sin queso es un caballero sin caballo. Con la salvedad de que Baldomero lo prefiere.»\nFin de la partida.').
+frase(suceso(final(chapuza)), ambos,
+      'Chapuza de toda la vida. Ganáis. Más o menos. El Gran Roquefort cae, el moho retrocede y el rey os paga... en dos plazos: el primero, hoy; el segundo, «cuando la despensa se recupere», que es una forma de decir «nunca».\nEl Registro os sube al puesto 31, con una nota a lápiz: «a confirmar». Baldomero jura que lo planeó todo y Pimentina ha probado el moho y opina que le falta fondo.\nNarrador: «Un éxito rotundo, en el sentido de que rodó escaleras abajo y llegó.»\nFin de la partida.').
 
 % --- combate: un golpe, una caida y ponerse a la defensiva (X08 a X10 de docs/05, version corta) ---
 frase(suceso(golpe(A, B, D)), ambos,
@@ -106,7 +108,7 @@ frase(suceso(botin(1)), ambos,
 frase(suceso(botin(N)), ambos,
       'Botín: ~w quesos frescos. Los guardaban «para emergencias». Esto lo era.'-[N]).
 frase(suceso(derrota_combate), ambos,
-      'La Banda Chapuza cae entera. Los bardos del futuro lo cantarán mal. Fin de la partida.').
+      'Cuajados. El moho avanza. Una a una, las cuatro botas se quedan pegadas al suelo de la cueva y Doña Mantecosa añade vuestro nombre al tablón de incobrables.\nNarrador: «Intentadlo de nuevo, esta vez con más queso y menos honor.»\nFin de la partida.').
 frase(suceso(aturdido(A)), ambos,
       '~w pierde el turno, aturdido de pies a cabeza. Mira las estrellas, que hoy están muy cerca.'-[A]).
 frase(suceso(pasa(E)), ambos,
@@ -351,9 +353,6 @@ texto_error(fuera_de_fase(Cmd, Fase), Texto) :-
 texto_error(no_entiendo(Termino), Texto) :-
     como_texto(Termino, Dicho),
     format(atom(Texto), 'No entiendo "~w". Escribe ayuda. para ver los comandos.', [Dicho]).
-texto_error(grupo_desconocido(Grupo), Texto) :-
-    como_texto(Grupo, Dicho),
-    format(atom(Texto), 'No conozco a esos enemigos: "~w". Prueba con pelear(rata_quesera).', [Dicho]).
 texto_error(contrato_desconocido(C), Texto) :-
     como_texto(C, Dicho),
     format(atom(Texto), 'No hay ningún contrato llamado "~w". Escribe contratos. para ver los que hay.', [Dicho]).
@@ -415,7 +414,6 @@ ayuda_de(pagar, 'pagar.         solo en la taberna: paga los sueldos pendientes 
 ayuda_de(elegir, 'elegir(Opcion). elige una opción del evento abierto (su número o su nombre)').
 ayuda_de(contratos, 'contratos.     el tablón: los contratos a la vista y si se pueden aceptar').
 ayuda_de(aceptar, 'aceptar(Contrato). acepta un contrato (en la taberna o donde lo ofrecen)').
-ayuda_de(pelear, 'pelear(Tipo). (provisional) empieza un combate de prueba, p. ej. pelear(rata_quesera)').
 ayuda_de(atacar, 'atacar(Objetivo). solo en combate: golpea a un enemigo (un tipo o e(Tipo, N))').
 ayuda_de(defender, 'defender.      solo en combate: sube tu defensa hasta tu próximo turno').
 ayuda_de(compania,'compania.      muestra a los miembros, su vida, su moral y su estado').

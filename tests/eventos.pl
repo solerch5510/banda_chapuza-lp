@@ -548,7 +548,7 @@ test(las_entradas_raras_nunca_fallan_ni_lanzan, [nondet]) :-
 test(en_combate_no_se_elige) :-
     nueva_partida,
     ordena(ir(aldea), _),
-    ordena(pelear(rata_quesera), _),
+    comenzar_combate([rata_quesera], _),
     ordena(elegir(trepar), Items),
     Items = [error(fuera_de_fase(elegir(trepar), combate))].
 

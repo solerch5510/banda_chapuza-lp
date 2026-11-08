@@ -600,7 +600,8 @@ test(explicar_tras_robar_la_rata_dice_prioridad_3, [nondet]) :-
 test(las_pantallas_de_la_ia_no_ensenan_terminos_crudos, [nondet]) :-
     nueva_partida,
     ordena(ir(aldea), _),
-    forall(member(Cmd, [pelear([rata_quesera, bandido_montado, bandido_torpe]), defender, defender, defender,
+    comenzar_combate([rata_quesera, bandido_montado, bandido_torpe], _),
+    forall(member(Cmd, [defender, defender, defender,
                         defender, defender, defender, defender, mirar, explicar]),
            (   pantalla(Cmd, Texto),
                \+ sub_atom(Texto, _, _, _, 'msg('),

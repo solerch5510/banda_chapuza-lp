@@ -1,7 +1,7 @@
 % bucle.pl (pruebas)
 % T-23: el combate de principio a fin. Fin de combate (victoria y derrota), terminar_combate
 % (los caidos se levantan con 1 de vida), el turno enemigo provisional, el bucle de juego
-% (comenzar_combate/2 y avanzar_combate/1), el comando provisional pelear(Grupo) y lo que
+% (comenzar_combate/2 y avanzar_combate/1), y lo que
 % ve el jugador (mirar en combate, mensajes, explicar tras un turno enemigo).
 %
 % Ejecucion (desde la raiz del repositorio, sin extension en la ruta):
@@ -445,7 +445,7 @@ test(el_caido_tambien_celebra_la_victoria, [nondet]) :-
 test(tras_ganar_la_fase_vuelve_a_la_zona) :-
     nueva_partida,
     ordena(ir(aldea), _),
-    ordena(pelear(rata_quesera), _),
+    comenzar_combate([rata_quesera], _),
     ordena(atacar(rata_quesera), _),
     once(estado:fase(F)),
     F == exploracion.
@@ -513,80 +513,6 @@ jugar_hasta_el_final(Pasos, Final) :-
 
 :- end_tests(ganar_y_perder).
 
-:- begin_tests(comando_pelear).
-
-test(pelear_empieza_un_combate_en_exploracion) :-
-    nueva_partida,
-    ordena(ir(aldea), _),
-    ordena(pelear(bandido_torpe), Items),
-    memberchk(msg(aparece, [bandido_torpe], _), Items),
-    once(estado:fase(F)),
-    F == combate.
-
-test(pelear_acepta_una_lista, [nondet]) :-
-    nueva_partida,
-    ordena(ir(aldea), _),
-    ordena(pelear([rata_quesera, rata_quesera]), _),
-    estado:instancia(e(rata_quesera, 2), rata_quesera).
-
-test(en_la_taberna_no_se_pelea, [setup(nueva_partida)]) :-
-    ordena(pelear(rata_quesera), Items),
-    Items == [error(fuera_de_fase(pelear(rata_quesera), taberna))].
-
-test(dentro_de_un_combate_no_se_empieza_otro) :-
-    nueva_partida,
-    ordena(ir(aldea), _),
-    ordena(pelear(rata_quesera), _),
-    ordena(pelear(bandido_torpe), Items),
-    Items == [error(fuera_de_fase(pelear(bandido_torpe), combate))].
-
-test(un_enemigo_desconocido_es_un_error) :-
-    nueva_partida,
-    ordena(ir(aldea), _),
-    foto_estado(Antes),
-    ordena(pelear(dragon), Items),
-    foto_estado(Despues),
-    Items == [error(grupo_desconocido(dragon))],
-    Antes =@= Despues.
-
-test(una_lista_con_un_desconocido_no_empieza_nada) :-
-    nueva_partida,
-    ordena(ir(aldea), _),
-    foto_estado(Antes),
-    ordena(pelear([rata_quesera, dragon]), Items),
-    foto_estado(Despues),
-    Items == [error(grupo_desconocido([rata_quesera, dragon]))],
-    Antes =@= Despues.
-
-test(una_lista_vacia_no_es_un_combate) :-
-    nueva_partida,
-    ordena(ir(aldea), _),
-    ordena(pelear([]), Items),
-    Items == [error(grupo_desconocido([]))].
-
-test(un_miembro_no_es_un_enemigo) :-
-    nueva_partida,
-    ordena(ir(aldea), _),
-    ordena(pelear(baldomero), Items),
-    Items == [error(grupo_desconocido(baldomero))].
-
-test(pelear_con_variable_falta_argumento) :-
-    nueva_partida,
-    ordena(ir(aldea), _),
-    ordena(pelear(_), Items),
-    Items = [error(falta_argumento(_))].
-
-test(la_ayuda_de_exploracion_incluye_pelear_y_la_de_taberna_no, [nondet]) :-
-    comandos_disponibles(exploracion, E),
-    comandos_disponibles(taberna, T),
-    memberchk(pelear, E),
-    \+ memberchk(pelear, T).
-
-test(pelear_tiene_ayuda, [nondet]) :-
-    narrador:ayuda_de(pelear, _).
-
-:- end_tests(comando_pelear).
-
 :- begin_tests(ver_el_combate).
 
 test(mirar_en_combate_ensena_el_combate, [nondet]) :-
@@ -604,7 +530,7 @@ test(mirar_fuera_de_combate_no_cambia, [setup(nueva_partida)]) :-
 test(mirar_tras_ganar_ya_no_ensena_combate, [nondet]) :-
     nueva_partida,
     ordena(ir(aldea), _),
-    ordena(pelear(rata_quesera), _),
+    comenzar_combate([rata_quesera], _),
     ordena(atacar(rata_quesera), _),
     ordena(mirar, Items),
     Items = [vista(zona, _)].
@@ -612,7 +538,7 @@ test(mirar_tras_ganar_ya_no_ensena_combate, [nondet]) :-
 test(se_ve_el_estado_de_los_enemigos, [nondet]) :-
     nueva_partida,
     ordena(ir(aldea), _),
-    ordena(pelear([bandido_torpe, rata_quesera]), _),
+    comenzar_combate([bandido_torpe, rata_quesera], _),
     pantalla(mirar, Texto),
     sub_atom(Texto, _, _, _, 'Combate · ronda 1 · turno de Sir Baldomero'),
     sub_atom(Texto, _, _, _, 'el Bandido Torpe: vida 12/12 (frente)'),
@@ -627,7 +553,8 @@ test(un_enemigo_caido_se_ve_como_caido, [nondet]) :-
 test(se_cuenta_el_combate_entero_sin_terminos_crudos) :-
     nueva_partida,
     ordena(ir(aldea), _),
-    forall(member(Cmd, [pelear([bandido_torpe, bandido_torpe]), mirar, atacar(bandido_torpe), defender,
+    comenzar_combate([bandido_torpe, bandido_torpe], _),
+    forall(member(Cmd, [mirar, atacar(bandido_torpe), defender,
                         atacar(bandido_torpe), atacar(bandido_torpe), mirar, atacar(bandido_torpe),
                         atacar(bandido_torpe), atacar(bandido_torpe), compania, inventario, explicar]),
            (   pantalla(Cmd, Texto),
@@ -640,7 +567,7 @@ test(se_cuenta_el_combate_entero_sin_terminos_crudos) :-
 test(se_narra_el_botin_la_victoria_y_la_derrota, [nondet]) :-
     nueva_partida,
     ordena(ir(aldea), _),
-    ordena(pelear(bandido_torpe), _),
+    comenzar_combate([bandido_torpe], _),
     ordena(atacar(bandido_torpe), _),
     pantalla(atacar(bandido_torpe), Texto),
     sub_atom(Texto, _, _, _, 'Victoria.'),

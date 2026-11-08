@@ -39,7 +39,6 @@ comando(defender,   0).
 comando(contratos,  0).
 comando(aceptar,    1).
 comando(elegir,     1).
-comando(pelear,     1).          % PROVISIONAL: empieza un combate de prueba hasta que lleguen los contratos
 comando(salir,      0).
 
 validar_comando(T, Res) :-
@@ -57,7 +56,7 @@ validar_comando(T, Res) :-
 % ---------------------------------------------------------------------------
 % Que comandos se pueden usar en cada fase (la fase se deriva en estado:fase/1).
 % ---------------------------------------------------------------------------
-permitidos(exploracion, [ayuda, mirar, ir, contratos, aceptar, elegir, pelear, compania, inventario, explicar, salir]).
+permitidos(exploracion, [ayuda, mirar, ir, contratos, aceptar, elegir, compania, inventario, explicar, salir]).
 permitidos(taberna,     [ayuda, mirar, ir, contratos, aceptar, elegir, descansar, pagar, compania, inventario, explicar, salir]).
 permitidos(combate,     [ayuda, mirar, atacar, defender, compania, inventario, explicar, salir]).
 permitidos(fin,         [ayuda, explicar, salir]).
@@ -263,15 +262,6 @@ ejecutar_en_fase(elegir(Escrito), _, Items) :-
         )
     ).
 
-% pelear(Grupo) (PROVISIONAL): empieza un combate contra un tipo o una lista de tipos. Solo en
-% exploracion (en la taberna no se pelea). Desaparecera cuando los contratos y los eventos
-% empiecen los combates por su cuenta.
-ejecutar_en_fase(pelear(Grupo), _, Items) :-
-    (   grupo_de_tipos(Grupo, Tipos)
-    ->  comenzar_combate(Tipos, Items)
-    ;   Items = [error(grupo_desconocido(Grupo))]
-    ).
-
 % explicar. : la prueba de lo ultimo que se hizo. explicar(Accion). : la de esa accion;
 % si es la ultima, la guardada (el estado ya cambio); si no, se resuelve ahora, en hipotetico.
 ejecutar_en_fase(explicar, _, Items) :-
@@ -336,10 +326,6 @@ avanzar_combate(Limite, Items) :-
     ;   estado:cola_turnos([Actor|_])
     ->  turno_de(Actor, Limite, Items)
     ).
-
-grupo_de_tipos(Grupo, Tipos) :-
-    (   is_list(Grupo) -> Tipos = Grupo ; atom(Grupo) -> Tipos = [Grupo] ),
-    combate:efectos_inicio(Tipos, _).
 
 % turno_de(+Actor, +Limite, -Items): quien ya no puede actuar pierde el turno sin ruido; un
 % aturdido lo pierde con aviso; a un miembro se le espera; un enemigo actua.
