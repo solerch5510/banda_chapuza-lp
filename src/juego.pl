@@ -34,6 +34,7 @@ comando(compania,   0).
 comando(inventario, 0).
 comando(explicar,   0).
 comando(explicar,   1).
+comando(por_que_no, 1).
 comando(atacar,     1).
 comando(defender,   0).
 comando(habilidad,  0).
@@ -58,10 +59,10 @@ validar_comando(T, Res) :-
 % ---------------------------------------------------------------------------
 % Que comandos se pueden usar en cada fase (la fase se deriva en estado:fase/1).
 % ---------------------------------------------------------------------------
-permitidos(exploracion, [ayuda, mirar, ir, contratos, aceptar, elegir, compania, inventario, explicar, salir]).
-permitidos(taberna,     [ayuda, mirar, ir, contratos, aceptar, elegir, descansar, pagar, compania, inventario, explicar, salir]).
-permitidos(combate,     [ayuda, mirar, atacar, defender, habilidad, compania, inventario, explicar, salir]).
-permitidos(fin,         [ayuda, explicar, salir]).
+permitidos(exploracion, [ayuda, mirar, ir, contratos, aceptar, elegir, compania, inventario, explicar, por_que_no, salir]).
+permitidos(taberna,     [ayuda, mirar, ir, contratos, aceptar, elegir, descansar, pagar, compania, inventario, explicar, por_que_no, salir]).
+permitidos(combate,     [ayuda, mirar, atacar, defender, habilidad, compania, inventario, explicar, por_que_no, salir]).
+permitidos(fin,         [ayuda, explicar, por_que_no, salir]).
 
 permitido(Fase, Nombre) :-
     permitidos(Fase, Lista),
@@ -300,6 +301,18 @@ ejecutar_en_fase(explicar(Accion), _, Items) :-
     ->  (   once(explicar:solve(Meta, Prueba))
         ->  Items = [vista(prueba, Accion, Prueba)]
         ;   Items = [error(no_hay_prueba(Accion))]
+        )
+    ;   Items = [error(no_se_explica(Accion))]
+    ).
+
+% por_que_no(Accion) : por que la accion NO se puede. Es la misma regla que explica `explicar`, pero
+% con el segundo meta-interprete: da el diagnostico (el primer subobjetivo que falla y, si es una
+% negacion, lo que la impide). Si la accion si se puede, lo dice. No modifica el estado.
+ejecutar_en_fase(por_que_no(Accion), _, Items) :-
+    (   once(objetivo_de_accion(Accion, Meta))
+    ->  (   once(explicar:por_que_no(Meta, Diag))
+        ->  Items = [vista(diag, Accion, Diag)]
+        ;   Items = [error(sin_fallo(Accion))]
         )
     ;   Items = [error(no_se_explica(Accion))]
     ).

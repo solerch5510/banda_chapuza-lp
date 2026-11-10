@@ -3,10 +3,13 @@
 %
 % solve/2,3 (docs/02-arquitectura-codigo.md, 6.4 y 6.5) construye la prueba de un objetivo
 % y trata el corte de forma real; prueba_a_lineas/2 (6.11) la convierte en un arbol de texto
-% ASCII que ui escribe. por_que_no y los niveles resumido/detallado llegan mas adelante.
+% ASCII que ui escribe. por_que_no/2 (6.9) es el segundo meta-interprete: explica por que una meta
+% NO tiene solucion, y diag_a_lineas/2 convierte ese diagnostico en texto. Los niveles
+% resumido/detallado llegan mas adelante.
 
-:- module(explicar, [solve/2, solve/3, prueba_a_lineas/2, meta_de_prueba/2]).
-:- meta_predicate solve(0, -), solve(0, -, +).
+:- module(explicar, [solve/2, solve/3, prueba_a_lineas/2, meta_de_prueba/2,
+                     por_que_no/2, diag_a_lineas/2]).
+:- meta_predicate solve(0, -), solve(0, -, +), por_que_no(0, -).
 
 % Modulos por cuyas clausulas SI se desciende; todo lo demas es hoja.
 % Es multifile para que las pruebas puedan registrar modulos de juguete.
@@ -213,6 +216,13 @@ t(G, Texto) :-
     ;   nonvar(G), G = (X, Y)
     ->  t(X, TX), t(Y, TY),
         format(atom(Texto), '~w, ~w', [TX, TY])
+    ;   nonvar(G), G = (X ; Y)
+    ->  (   nonvar(X), X = (C -> T)
+        ->  t(C, TC), t(T, TT), t(Y, TY),
+            format(atom(Texto), '(~w -> ~w ; ~w)', [TC, TT, TY])
+        ;   t(X, TX), t(Y, TY),
+            format(atom(Texto), '(~w ; ~w)', [TX, TY])
+        )
     ;   format(atom(Texto), '~W', [G, [numbervars(true), quoted(false), spacing(next_argument)]])
     ).
 
@@ -262,3 +272,184 @@ hijos(agregado(_, _, M), Hs) :- findall(H, ( member(X, M), aplanar_y(X, L), memb
 hijos(todos(_, Cs), Hs) :- findall(H, ( member(PC-PA, Cs), member(H, [PC, PA]) ), Hs).
 hijos(si(_, PT), [PT]).
 hijos(sino(PE), [PE]).
+
+% ===========================================================================
+% por_que_no: por que una meta NO tiene solucion (docs/02 6.9)
+%
+% Es un segundo meta-interprete. Recorre las clausulas del predicado y busca el primer
+% subobjetivo que falla; si es una negacion (\+ X) da la prueba de X, que es la razon de que
+% la negacion falle. El diagnostico es un termino:
+%   sin_clausula(G)         ningun hecho ni clausula unifica con G (mundo cerrado)
+%   fallo(G, Candidatas)    hay clausulas y todas fallan; la mas cercana primero
+%   builtin_falso(G)        un predefinido instanciado resulto falso (3 > 5)
+%   neg_viola(X, Prueba)    \+ X falla porque X SI se demuestra (se da su prueba)
+%   tras(PruebaDeA, DiagB)  (A, B): A tiene solucion pero B falla con ella
+%   ninguna(DiagA, DiagB)   (A ; B): las dos ramas fallan
+%   limite(G)               se agoto la profundidad de diagnostico
+% Candidatas = [cl(I, PruebasPrevias, punto(SubobjetivoFallido, DiagDeEse)), ...]
+% Solo lee: nunca modifica el estado.
+% ===========================================================================
+
+% por_que_no(:Meta, -Diag): falla si la Meta SI se puede demostrar.
+por_que_no(Meta, Diag) :-
+    strip_module(Meta, M, G),
+    \+ s(G, M, 400, _),
+    diag(G, M, 40, Diag).
+
+% Las pruebas de los subobjetivos que SI se cumplen usan siempre el limite normal.
+prueba_de(G, M, P) :- s(G, M, 400, P).
+
+diag(G, M, N, Diag) :-
+    (   N =< 0
+    ->  Diag = limite(G)
+    ;   clasifica(G, T),
+        diag_(T, G, M, N, Diag)
+    ).
+
+% (A, B): si A tiene solucion, falla B con ella; si no, falla A.
+diag_(conj, (A, B), M, N, Diag) :-
+    (   prueba_de(A, M, PA)
+    ->  diag(B, M, N, DB),
+        Diag = tras(PA, DB)
+    ;   diag(A, M, N, Diag)
+    ).
+% \+ X solo falla si X se demuestra: esa prueba es la razon.
+diag_(neg, (\+ X), M, _, neg_viola(X, P)) :-
+    prueba_de(X, M, P).
+diag_(hoja, G, _, _, builtin_falso(G)).
+diag_(findall, G, _, _, builtin_falso(G)).
+diag_(forall, G, _, _, builtin_falso(G)).
+diag_(calificada, (M2 : G), _, N, Diag) :-
+    diag(G, M2, N, Diag).
+% (C -> T ; E): si la condicion se cumple falla T; si no, falla E. (A ; B) sin condicion: fallan las dos.
+diag_(disy, (A ; B), M, N, Diag) :-
+    (   nonvar(A), A = (C -> T)
+    ->  (   prueba_de(C, M, PC)
+        ->  diag(T, M, N, DT),
+            Diag = tras(PC, DT)
+        ;   diag(B, M, N, Diag)
+        )
+    ;   diag(A, M, N, DA),
+        diag(B, M, N, DB),
+        Diag = ninguna(DA, DB)
+    ).
+diag_(si_solo, (C -> T), M, N, Diag) :-
+    (   prueba_de(C, M, PC)
+    ->  diag(T, M, N, DT),
+        Diag = tras(PC, DT)
+    ;   diag(C, M, N, Diag)
+    ).
+diag_(pred, G, M, N, Diag) :-
+    modulo_definicion(M, G, D),
+    (   modulo_juego(D), definido(D, G)
+    ->  findall(cl(I, Pre, Punto), candidata(D, G, N, I, Pre, Punto), C0),
+        (   C0 == []
+        ->  Diag = sin_clausula(G)
+        ;   ordenar_por_cercania(C0, C),
+            Diag = fallo(G, C)
+        )
+    ;   Diag = builtin_falso(G)
+    ).
+
+% candidata(+D, +G, +N, -I, -Pre, -Punto): la clausula I de G (en el modulo D) hasta donde llega
+% su cuerpo: Pre son las pruebas de los subobjetivos que se cumplen y Punto el primero que falla.
+candidata(D, G, N, I, Pre, punto(Fallido, DiagSub)) :-
+    clause(D:G, Cuerpo, Ref),
+    nth_clause(_, I, Ref),
+    conj_lista(Cuerpo, Metas),
+    N1 is N - 1,
+    prefijo_y_fallo(Metas, D, N1, Pre, Fallido, DiagSub).
+
+% Los cortes se ignoran: si uno hubiera cortado antes, la meta tendria solucion y no estariamos aqui.
+prefijo_y_fallo([Meta|Resto], D, N, Pre, Fallido, DiagSub) :-
+    (   Meta == !
+    ->  prefijo_y_fallo(Resto, D, N, Pre, Fallido, DiagSub)
+    ;   prueba_de(Meta, D, P)
+    ->  Pre = [P|Pre1],
+        prefijo_y_fallo(Resto, D, N, Pre1, Fallido, DiagSub)
+    ;   Pre = [],
+        Fallido = Meta,
+        diag(Meta, D, N, DiagSub)
+    ).
+
+% La clausula mas cercana es la que cumplio mas subobjetivos antes de fallar (la primera si empatan).
+ordenar_por_cercania(C0, C) :-
+    findall(K-I-Cl, ( nth1(I, C0, Cl), Cl = cl(_, Pre, _), length(Pre, L), K is -L ), Ks),
+    msort(Ks, S),
+    findall(Cl, member(_-_-Cl, S), C).
+
+% ---------------------------------------------------------------------------
+% El diagnostico como arbol de texto ASCII (funciones puras, como prueba_a_lineas/2).
+% ---------------------------------------------------------------------------
+diag_a_lineas(Diag, Lineas) :-
+    cabecera(Diag, Cab),
+    detalle(Diag, '  ', Resto),
+    append(Cab, Resto, Lineas).
+
+cabecera(fallo(G, [cl(I, _, _)|_]), [L]) :-
+    txt(G, T),
+    format(atom(L), '[no] ~w   [clausula ~w]', [T, I]).
+cabecera(sin_clausula(G), [L]) :-
+    txt(G, T),
+    format(atom(L), '[no] ~w   [no hay ningun hecho ni clausula]', [T]).
+cabecera(builtin_falso(G), [L]) :-
+    txt(G, T),
+    format(atom(L), '[no] ~w   [falso]', [T]).
+cabecera(neg_viola(X, _), [L]) :-
+    txt(\+ X, T),
+    format(atom(L), '[no] ~w', [T]).
+cabecera(tras(_, D), Ls) :-
+    cabecera(D, Ls).
+cabecera(ninguna(_, _), ['[no] ninguna de las dos ramas se cumple']).
+cabecera(limite(G), [L]) :-
+    txt(G, T),
+    format(atom(L), '[no] ~w   [se agoto la profundidad del diagnostico]', [T]).
+
+detalle(fallo(_, [cl(_, Pre, punto(F, D))|_]), S, Ls) :-
+    findall(L,
+            (   member(P, Pre),
+                meta_de_prueba(P, PG),
+                txt(PG, PT),
+                format(atom(L), '~w|- [ok] ~w', [S, PT])
+            ),
+            Oks),
+    txt(F, TF),
+    format(atom(LF), '~w\\- [no] ~w', [S, TF]),
+    atom_concat(S, '      ', S2),
+    detalle(D, S2, Sub),
+    append([Oks, [LF], Sub], Ls).
+detalle(tras(_, D), S, Ls) :-
+    detalle(D, S, Ls).
+detalle(neg_viola(_, P), S, [L]) :-
+    aplanar_y(P, Ps),
+    findall(T, ( member(Q, Ps), meta_de_prueba(Q, QG), txt(QG, T) ), Ts),
+    unir_y(Ts, Y),
+    (   Ts = [_] -> Verbo = 'es cierto' ; Verbo = 'son ciertos' ),
+    format(atom(L), '~wporque ~w ~w.', [S, Y, Verbo]).
+detalle(sin_clausula(G), S, [L]) :-
+    txt(G, T),
+    format(atom(L), '~wno hay ningun hecho ni clausula para ~w', [S, T]).
+detalle(builtin_falso(G), S, [L]) :-
+    txt(G, T),
+    format(atom(L), '~w~w es falso', [S, T]).
+detalle(ninguna(DA, DB), S, Ls) :-
+    ramas([DA, DB], S, Ls).
+detalle(limite(_), S, [L]) :-
+    format(atom(L), '~wno sigo: demasiado profundo', [S]).
+
+ramas([], _, []).
+ramas([D|Ds], S, Ls) :-
+    cabecera(D, Cab),
+    atom_concat(S, '   ', S2),
+    detalle(D, S2, Det),
+    findall(L, ( member(C, Cab), format(atom(L), '~w\\- ~w', [S, C]) ), CabS),
+    ramas(Ds, S, Resto),
+    append([CabS, Det, Resto], Ls).
+
+% unir_y(+Textos, -Atomo): "a", "a y b", "a, b y c".
+unir_y([X], X).
+unir_y([X, Y], R) :-
+    format(atom(R), '~w y ~w', [X, Y]).
+unir_y([X, Y, Z|T], R) :-
+    unir_y([Y, Z|T], R1),
+    format(atom(R), '~w, ~w', [X, R1]).

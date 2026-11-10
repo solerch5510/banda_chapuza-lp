@@ -131,6 +131,12 @@ mostrar_conocido(vista(prueba, Accion, Prueba)) :-
     escribir_lineas(Lineas),
     narrador:comentario_prueba(Prueba, ambos, 0, Comentario),
     format("Narrador: ~w~n", [Comentario]).
+mostrar_conocido(vista(diag, Accion, Diag)) :-
+    explicar:diag_a_lineas(Diag, Lineas),
+    format("Por qué no se puede ~w:~n", [Accion]),
+    escribir_lineas(Lineas),
+    narrador:comentario_diag(Diag, ambos, 0, Comentario),
+    format("Narrador: ~w~n", [Comentario]).
 mostrar_conocido(salir) :-
     format("Hasta la próxima, Banda Chapuza.~n", []).
 mostrar_conocido(fase(_)).

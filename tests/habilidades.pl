@@ -318,7 +318,7 @@ test(solo_se_permite_en_combate) :-
 test(los_comandos_del_combate_son_estos_y_no_otros) :-
     comandos_disponibles(combate, Cs),
     msort(Cs, Ordenados),
-    msort([ayuda, mirar, atacar, defender, habilidad, compania, inventario, explicar, salir], Ordenados).
+    msort([ayuda, mirar, atacar, defender, habilidad, compania, inventario, explicar, por_que_no, salir], Ordenados).
 
 test(en_combate_no_se_descansa) :-
     \+ permitido(combate, descansar),

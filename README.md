@@ -63,6 +63,7 @@ Se puede **recorrer el mapa, gestionar la compañía y pedir explicaciones**. Ca
 | `habilidad(Objetivo).` / `habilidad.` | Solo en combate: la habilidad del miembro al que le toca. Baldomero: **Carga Heroica** (el golpe + 4). Pimentina: **Fondue Flamígera** (8 de daño que ignora la defensa; gasta 1 queso, el más rancio). Tuerca: **Rebuscar Bolsillos** (1 queso si el enemigo lo lleva; una vez por enemigo). Rufino: **Balada Inspiradora** (+1 de moral a toda la compañía; se escribe `habilidad.`, sin objetivo). |
 | `explicar.` | La prueba lógica, en árbol, de lo último que se hizo (`ir`, `descansar`, `pagar`, `atacar`, `defender`, `habilidad` o la decisión de un enemigo). |
 | `explicar(ir(aldea)).` | La prueba de esa acción: la guardada si es la última; si no, se resuelve ahora. |
+| `por_que_no(Accion).` | **Por qué NO se puede** una acción: la regla que falla, lo que sí se cumplía antes y, si falla una negación (`\+`), el hecho que la impide. Ejemplos: `por_que_no(aceptar(gallina_noble)).` (el miedo de Baldomero a los caballos), `por_que_no(atacar(bandido_montado)).` en combate, `por_que_no(ir(castillo)).`, `por_que_no(descansar).` Si la acción sí se puede, lo dice. No cambia nada. |
 | `salir.` | Termina la partida. |
 
 **La partida mínima ya se puede jugar de principio a fin.** Si la despensa se queda vacía y no hay nada por cobrar, la partida termina por hambre; si caen los cuatro miembros en un combate, termina en derrota; y si se derrota al Gran Roquefort, se gana con el final `chapuza`.
@@ -80,7 +81,7 @@ ir(castillo).  aceptar(despensa_real).
 ir(camino_real).  ir(cuevas). % el Gran Roquefort
 ```
 
-En combate manda cada miembro en su turno (`mirar.` dice de quién es y cuánta vida tiene cada enemigo); los enemigos actúan solos, al ganar hay botín y moral, y los caídos se levantan con 1 de vida. `explicar.` justifica lo último que pasó, también las decisiones de los enemigos. **La escolta de Lady Clotilde:** al aceptar `gallina_noble` en el Camino Real, en cada ronda del combate el primer enemigo que actúa se ceba con ella (anota un golpe y no ataca a la Banda). Con 2 golpes o menos, éxito (14 quesos y un brie); con 3 o 4, a medias (la mitad); con 5 o más, fracaso (−3 quesos y −2 de moral; se puede reintentar). Cuanto antes acabes el combate, menos plumas pierde. Todavía no están implementados `por_que_no`, el narrador completo ni los finales de nivel Objetivo.
+En combate manda cada miembro en su turno (`mirar.` dice de quién es y cuánta vida tiene cada enemigo); los enemigos actúan solos, al ganar hay botín y moral, y los caídos se levantan con 1 de vida. `explicar.` justifica lo último que pasó, también las decisiones de los enemigos. **La escolta de Lady Clotilde:** al aceptar `gallina_noble` en el Camino Real, en cada ronda del combate el primer enemigo que actúa se ceba con ella (anota un golpe y no ataca a la Banda). Con 2 golpes o menos, éxito (14 quesos y un brie); con 3 o 4, a medias (la mitad); con 5 o más, fracaso (−3 quesos y −2 de moral; se puede reintentar). Cuanto antes acabes el combate, menos plumas pierde. Todavía no están implementados el narrador completo ni los finales de nivel Objetivo.
 
 ## Pruebas
 
@@ -151,10 +152,14 @@ Las pruebas usan `plunit`. Desde la raíz del repositorio (PowerShell), con el e
 ```
 
 ```
+& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/por_que_no -g "run_tests,halt" -t "halt(1)"
+```
+
+```
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/spike_explicar -g "run_tests,halt" -t "halt(1)"
 ```
 
-Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (1267 pruebas):
+Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (1348 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -170,6 +175,7 @@ Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 
 | `tests/cierre.pl` (102) | Cómo acaba un contrato: `resultado/3` (éxito, a medias o fracaso según contadores y marcas), sus consecuencias, el cobro automático al llegar a la taberna, el combate que empieza al llegar a la zona de un contrato activo, y partidas completas de aceptar a cobrar. |
 | `tests/eventos.pl` (110) | El motor mínimo de eventos y el comando `elegir`: cuándo se abre el evento del gato, sus opciones y cuáles están disponibles, los intentos, qué pasa al elegir cada una, cómo se resuelve el contrato con las marcas que dejan y la cadena gato → venda → gallina. |
 | `tests/campana.pl` (39) | La partida mínima de principio a fin: los finales (`chapuza`, `derrota_combate`, `derrota_hambre`), la fase final, partidas completas escritas como una lista de comandos (se gana en 7 días y es reproducible) y que `pelear` ya no existe. |
+| `tests/por_que_no.pl` (81) | `por_que_no`, el segundo meta-intérprete: cada forma de diagnóstico con un módulo de juguete (`tests/spike/toy_diag.pl`), las dos demostraciones centrales (el miedo de Baldomero y la gallina noble), otras reglas del juego (viajar, descansar, pagar, huelga, aturdimiento, fila, hechizo), que las claves del narrador salgan igual que con los diagnósticos a mano, y el comando y su pantalla. |
 | `tests/escolta.pl` (41) | La escolta de Clotilde: la regla (un golpe por ronda al primer enemigo que actúa), el aviso, el turno enemigo con su prueba guardada y el `explicar` de la escolta, el resultado por umbrales (2 / 4 / 5), el fracaso con reintento y que los demás combates no cuentan golpes. |
 | `tests/habilidades.pl` (82) | Las habilidades: la tabla de datos `efecto_habilidad/2`, las reglas `puede_habilidad/2` y `/3`, los efectos de la carga, la fondue, la balada y rebuscar, el comando `habilidad` (errores sin efecto, prueba guardada, `explicar`), las pantallas y combates enteros jugados con habilidades. |
 | `tests/diagnosticos.pl` (63) | Del diagnóstico de `por_que_no` a la frase: `claves_de_diag/2` y `comentario_diag/4` con diagnósticos escritos a mano (`neg_viola`, `fallo`, `tras`, `ninguna`, `sin_clausula`, `builtin_falso`, `limite`), las claves del núcleo (huelga, aturdido, fila, hechizo, viaje, descanso, contrato, miedo a los caballos) y las frases de reserva. |

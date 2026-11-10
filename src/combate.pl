@@ -53,6 +53,7 @@ aturdido(Id) :-
 % ---------------------------------------------------------------------------
 puede_atacar(A, B) :-
     compania:vivo(A),
+    \+ compania:esta_en_huelga(A),             % quien esta en huelga no combate
     compania:vivo(B),
     en_fila_alcanzable(A, B),
     \+ aturdido(A),

@@ -233,7 +233,7 @@ test(un_comando_con_variable_sin_ligar_pide_el_argumento) :-
 test(cada_fase_permite_sus_comandos) :-
     comandos_disponibles(exploracion, E), \+ memberchk(descansar, E), memberchk(ir, E),
     comandos_disponibles(taberna, T),     memberchk(descansar, T),    memberchk(ir, T),
-    comandos_disponibles(fin, F),         F == [ayuda, explicar, salir].
+    comandos_disponibles(fin, F),         F == [ayuda, explicar, por_que_no, salir].
 
 :- end_tests(juego_validar).
 

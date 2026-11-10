@@ -500,10 +500,14 @@ texto_error(no_puede_pagar, 'Los sueldos no se pueden pagar a medias y la despen
 texto_error(nada_que_explicar, 'Todavía no has hecho nada que explicar. Prueba con explicar(ir(aldea)).').
 texto_error(no_hay_prueba(Accion), Texto) :-
     como_texto(Accion, Dicho),
-    format(atom(Texto), 'Ahora mismo no se puede hacer ~w, así que no hay prueba que enseñar.', [Dicho]).
+    format(atom(Texto), 'Ahora mismo no se puede hacer ~w, así que no hay prueba que enseñar. Prueba con por_que_no(~w) para ver qué falla.', [Dicho, Dicho]).
+texto_error(sin_fallo(Accion), Texto) :-
+    como_texto(Accion, Dicho),
+    comentario(generica(sin_fallo), ambos, 0, Frase),
+    format(atom(Texto), '~w (~w)', [Frase, Dicho]).
 texto_error(no_se_explica(Accion), Texto) :-
     como_texto(Accion, Dicho),
-    format(atom(Texto), 'No sé explicar "~w". Puedo explicar ir(Zona), descansar, pagar, aceptar(Contrato), atacar(Objetivo), defender y habilidad.', [Dicho]).
+    format(atom(Texto), 'No sé explicar "~w". Puedo explicar ir(Zona), descansar, pagar, aceptar(Contrato), elegir(Opcion), atacar(Objetivo), defender y habilidad.', [Dicho]).
 texto_error(falta_argumento(Termino), Texto) :-
     functor(Termino, Nombre, _),
     format(atom(Texto), 'A ~w le falta decir a dónde o a qué; escribe el nombre completo, por ejemplo: ir(aldea).', [Nombre]).
@@ -535,6 +539,7 @@ ayuda_de(aceptar, 'aceptar(Contrato). acepta un contrato (en la taberna o donde 
 ayuda_de(atacar, 'atacar(Objetivo). solo en combate: golpea a un enemigo (un tipo o e(Tipo, N))').
 ayuda_de(defender, 'defender.      solo en combate: sube tu defensa hasta tu próximo turno').
 ayuda_de(habilidad, 'habilidad(Objetivo). solo en combate: usa la habilidad de tu personaje; la balada de Rufino se escribe habilidad.').
+ayuda_de(por_que_no, 'por_que_no(Accion). por qué NO se puede una acción: qué regla falla y por qué (p. ej. por_que_no(aceptar(gallina_noble)).)').
 ayuda_de(compania,'compania.      muestra a los miembros, su vida, su moral y su estado').
 ayuda_de(inventario, 'inventario.    muestra la despensa (con la edad del queso) y los objetos').
 ayuda_de(explicar, 'explicar.      la prueba de lo último que hiciste; explicar(Accion). la de esa acción').
