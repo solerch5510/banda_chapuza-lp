@@ -587,7 +587,7 @@ test(la_pantalla_explica_el_comodin_como_la_ultima_regla, [nondet]) :-
     retractall(estado:combatiente(_, jugador)),
     solve(combate:accion_enemigo(e(bandido_torpe, 1), _), Prueba),
     with_output_to(atom(Texto),
-                   ui:mostrar(resultado([vista(prueba, accion_enemigo(e(bandido_torpe, 1)), Prueba)]))),
+                   ui:mostrar(resultado([vista(decision, e(bandido_torpe, 1), Prueba, [])]))),
     sub_atom(Texto, _, _, _, 'Eligió la última regla (prioridad 6 de 6)').
 
 test(explicar_tras_robar_la_rata_dice_prioridad_3, [nondet]) :-

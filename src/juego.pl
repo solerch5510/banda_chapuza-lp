@@ -290,7 +290,10 @@ ejecutar_en_fase(elegir(Escrito), _, Items) :-
 % explicar. : la prueba de lo ultimo que se hizo. explicar(Accion). : la de esa accion;
 % si es la ultima, la guardada (el estado ya cambio); si no, se resuelve ahora, en hipotetico.
 ejecutar_en_fase(explicar, _, Items) :-
-    (   estado:ultima_prueba(Accion, Prueba)
+    (   estado:ultima_prueba(accion_enemigo(E), Prueba)
+    ->  (   estado:ultimos_descartes(E, Descartes) -> true ; Descartes = [] ),
+        Items = [vista(decision, E, Prueba, Descartes)]            % el turno de un enemigo y por que no hizo otra cosa
+    ;   estado:ultima_prueba(Accion, Prueba)
     ->  Items = [vista(prueba, Accion, Prueba)]
     ;   Items = [error(nada_que_explicar)]
     ).
@@ -417,15 +420,41 @@ seguir_combate(Previos, Limite, Items) :-
 turno_enemigo(E, Items) :-
     (   contratos:golpea_a_clotilde(E)                  % en la escolta, el primero de la ronda se ceba con Clotilde
     ->  once(explicar:solve(contratos:golpea_a_clotilde(E), Prueba)),
-        once(contratos:efectos_golpe_a_clotilde(E, Efectos))
+        once(contratos:efectos_golpe_a_clotilde(E, Efectos)),
+        Descartes = []
     ;   once(explicar:solve(combate:accion_enemigo(E, Accion), Prueba)),
         (   once(combate:efectos_accion(E, Accion, Efectos0))
         ->  Efectos = Efectos0
         ;   Efectos = [mensaje(pasa, [E])]              % el comodin (defender) no siempre se puede: pasa
-        )
+        ),
+        descartes_de(E, Prueba, Descartes)
     ),
-    append([guardar_prueba(accion_enemigo(E), Prueba)|Efectos], [siguiente_turno], Todos),
+    append([guardar_prueba(accion_enemigo(E), Prueba), guardar_descartes(E, Descartes)|Efectos],
+           [siguiente_turno], Todos),
     etapa(Todos, Items).
+
+% descartes_de(+E, +Prueba, -Descartes): por que NO se aplico ninguna regla de mayor prioridad que la que
+% decidio. Se calcula en el momento de la decision (despues la vida y la fila ya habrian cambiado) con el
+% segundo meta-interprete sobre la gemela de datos regla_ia/3, cuyas condiciones son las mismas.
+% Descartes = [descarte(Prioridad, NombreDeLaAccion, Diag), ...] de la mas prioritaria a la mas cercana.
+descartes_de(E, Prueba, Descartes) :-
+    (   prioridad_decidida(Prueba, N)
+    ->  findall(descarte(J, Nombre, Diag),
+                (   between(1, N, J), J < N,
+                    descarte(E, J, Nombre, Diag)
+                ),
+                Descartes)
+    ;   Descartes = []
+    ).
+
+prioridad_decidida(regla(accion_enemigo(_, _), N, _), N).
+prioridad_decidida(hecho(accion_enemigo(_, _)), N) :-    % el comodin: la ultima clausula
+    predicate_property(combate:accion_enemigo(_, _), number_of_clauses(N)).
+
+descarte(E, J, Nombre, Diag) :-
+    clause(combate:regla_ia(J, _, Plantilla), _),         % lo que esa prioridad habria elegido
+    functor(Plantilla, Nombre, _),
+    once(explicar:por_que_no(combate:regla_ia(J, E, _), Diag)).
 
 % datos_de_combate(-Datos): lo que enseña mirar durante un combate.
 datos_de_combate(combate(Ronda, Turno, Enemigos)) :-

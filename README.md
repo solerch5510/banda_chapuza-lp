@@ -61,7 +61,7 @@ Se puede **recorrer el mapa, gestionar la compañía y pedir explicaciones**. Ca
 | `atacar(Objetivo).` | Solo en combate: golpea con el miembro al que le toca. El objetivo es un tipo (`bandido_torpe`) o una instancia (`e(bandido_torpe, 1)`). |
 | `defender.` | Solo en combate: sube la defensa del miembro al que le toca hasta su próximo turno. |
 | `habilidad(Objetivo).` / `habilidad.` | Solo en combate: la habilidad del miembro al que le toca. Baldomero: **Carga Heroica** (el golpe + 4). Pimentina: **Fondue Flamígera** (8 de daño que ignora la defensa; gasta 1 queso, el más rancio). Tuerca: **Rebuscar Bolsillos** (1 queso si el enemigo lo lleva; una vez por enemigo). Rufino: **Balada Inspiradora** (+1 de moral a toda la compañía; se escribe `habilidad.`, sin objetivo). |
-| `explicar.` | La prueba lógica, en árbol, de lo último que se hizo (`ir`, `descansar`, `pagar`, `atacar`, `defender`, `habilidad` o la decisión de un enemigo). |
+| `explicar.` | La prueba lógica, en árbol, de lo último que se hizo (`ir`, `descansar`, `pagar`, `atacar`, `defender`, `habilidad` o la decisión de un enemigo). Tras el turno de un enemigo cuenta **por qué hizo eso** (la regla de su IA que ganó, con su corte) y **por qué no hizo otra cosa** (por qué no se aplicó ninguna regla de mayor prioridad). |
 | `explicar(ir(aldea)).` | La prueba de esa acción: la guardada si es la última; si no, se resuelve ahora. |
 | `por_que_no(Accion).` | **Por qué NO se puede** una acción: la regla que falla, lo que sí se cumplía antes y, si falla una negación (`\+`), el hecho que la impide. Ejemplos: `por_que_no(aceptar(gallina_noble)).` (el miedo de Baldomero a los caballos), `por_que_no(atacar(bandido_montado)).` en combate, `por_que_no(ir(castillo)).`, `por_que_no(descansar).` Si la acción sí se puede, lo dice. No cambia nada. |
 | `salir.` | Termina la partida. |
@@ -156,10 +156,14 @@ Las pruebas usan `plunit`. Desde la raíz del repositorio (PowerShell), con el e
 ```
 
 ```
+& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/turno_enemigo -g "run_tests,halt" -t "halt(1)"
+```
+
+```
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/spike_explicar -g "run_tests,halt" -t "halt(1)"
 ```
 
-Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (1348 pruebas):
+Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (1403 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -175,6 +179,7 @@ Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 
 | `tests/cierre.pl` (102) | Cómo acaba un contrato: `resultado/3` (éxito, a medias o fracaso según contadores y marcas), sus consecuencias, el cobro automático al llegar a la taberna, el combate que empieza al llegar a la zona de un contrato activo, y partidas completas de aceptar a cobrar. |
 | `tests/eventos.pl` (110) | El motor mínimo de eventos y el comando `elegir`: cuándo se abre el evento del gato, sus opciones y cuáles están disponibles, los intentos, qué pasa al elegir cada una, cómo se resuelve el contrato con las marcas que dejan y la cadena gato → venda → gallina. |
 | `tests/campana.pl` (39) | La partida mínima de principio a fin: los finales (`chapuza`, `derrota_combate`, `derrota_hambre`), la fase final, partidas completas escritas como una lista de comandos (se gana en 7 días y es reproducible) y que `pelear` ya no existe. |
+| `tests/turno_enemigo.pl` (55) | `explicar` tras el turno de un enemigo (demostración central 3): plegar el árbol a lo esencial, las reglas de mayor prioridad que no se aplicaron (calculadas al decidir con `por_que_no`) para cada una de las seis reglas de la IA, la pantalla, las frases del narrador y combates enteros explicados turno a turno. |
 | `tests/por_que_no.pl` (81) | `por_que_no`, el segundo meta-intérprete: cada forma de diagnóstico con un módulo de juguete (`tests/spike/toy_diag.pl`), las dos demostraciones centrales (el miedo de Baldomero y la gallina noble), otras reglas del juego (viajar, descansar, pagar, huelga, aturdimiento, fila, hechizo), que las claves del narrador salgan igual que con los diagnósticos a mano, y el comando y su pantalla. |
 | `tests/escolta.pl` (41) | La escolta de Clotilde: la regla (un golpe por ronda al primer enemigo que actúa), el aviso, el turno enemigo con su prueba guardada y el `explicar` de la escolta, el resultado por umbrales (2 / 4 / 5), el fracaso con reintento y que los demás combates no cuentan golpes. |
 | `tests/habilidades.pl` (82) | Las habilidades: la tabla de datos `efecto_habilidad/2`, las reglas `puede_habilidad/2` y `/3`, los efectos de la carga, la fondue, la balada y rebuscar, el comando `habilidad` (errores sin efecto, prueba guardada, `explicar`), las pantallas y combates enteros jugados con habilidades. |

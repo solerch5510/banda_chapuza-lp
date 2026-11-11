@@ -34,6 +34,17 @@ leer_termino(Termino, Nombres) :-
 escribir_lineas(Lineas) :-
     forall(member(L, Lineas), format("~w~n", [L])).
 
+% escribir_descartes(+Descartes): las reglas de mayor prioridad que no se aplicaron y por que.
+escribir_descartes([]).
+escribir_descartes(Descartes) :-
+    Descartes = [_|_],
+    format("Las reglas de más prioridad no se aplicaron:~n", []),
+    forall(member(descarte(Prioridad, Nombre, Diag), Descartes),
+           (   format("  prioridad ~w (~w):~n", [Prioridad, Nombre]),
+               explicar:diag_detalle_a_lineas(Diag, Lineas),
+               forall(member(L, Lineas), format("  ~w~n", [L]))
+           )).
+
 % mostrar(+Resultado): imprime cada item del resultado. Nunca falla: si un item no se
 % conoce, lo muestra tal cual para que el fallo se vea y no se pierda.
 mostrar(resultado(Items)) :-
@@ -107,9 +118,12 @@ mostrar_conocido(vista(combate, combate(Ronda, Turno, Enemigos))) :-
                ;   format("  ~w: vida ~w/~w (~w)~n", [Nombre, Vida, Max, Fila])
                )
            )).
-mostrar_conocido(vista(prueba, accion_enemigo(E), Prueba)) :-
+% La decision de un enemigo (explicar tras su turno): la prueba de la regla que gano, plegada a lo
+% esencial, y por que no gano ninguna de mayor prioridad (Descartes, calculado al decidir).
+mostrar_conocido(vista(decision, E, Prueba, Descartes)) :-
     narrador:nombre_visible(E, Nombre),
-    explicar:prueba_a_lineas(Prueba, Lineas),
+    explicar:prueba_a_lineas(Prueba, Completas),
+    explicar:plegar_lineas(Completas, 1, Lineas),
     format("Por qué ~w hizo eso:~n", [Nombre]),
     (   predicate_property(combate:accion_enemigo(_, _), number_of_clauses(Total))
     ->  (   Prueba = regla(accion_enemigo(_, _), Prioridad, _)
@@ -123,6 +137,7 @@ mostrar_conocido(vista(prueba, accion_enemigo(E), Prueba)) :-
     ;   true
     ),
     escribir_lineas(Lineas),
+    escribir_descartes(Descartes),
     narrador:comentario_prueba(Prueba, ambos, 0, Comentario),
     format("Narrador: ~w~n", [Comentario]).
 mostrar_conocido(vista(prueba, Accion, Prueba)) :-

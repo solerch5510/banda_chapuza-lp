@@ -586,20 +586,20 @@ test(se_narra_el_aviso_de_aturdido, [nondet]) :-
 test(explicar_tras_un_turno_enemigo_da_su_decision, [nondet]) :-
     empieza([bandido_torpe]),
     ordena(defender, _), ordena(defender, _), ordena(defender, _),
-    ordena(explicar, [vista(prueba, Accion, _)]),
-    Accion == accion_enemigo(e(bandido_torpe, 1)).
+    ordena(explicar, [vista(decision, E, _, _)]),
+    E == e(bandido_torpe, 1).
 
 test(la_prueba_de_la_decision_nombra_la_accion_elegida, [nondet]) :-
     empieza([bandido_torpe]),
     ordena(defender, _), ordena(defender, _), ordena(defender, _),
-    ordena(explicar, [vista(prueba, _, Prueba)]),
+    ordena(explicar, [vista(decision, _, Prueba, _)]),
     explicar:prueba_a_lineas(Prueba, Lineas),
     memberchk('[ok] accion_enemigo(e(bandido_torpe, 1), atacar(tuerca))   [clausula 5 + corte]', Lineas).
 
 test(la_prueba_ensena_el_objetivo_mas_debil, [nondet]) :-
     empieza([bandido_torpe]),
     ordena(defender, _), ordena(defender, _), ordena(defender, _),
-    ordena(explicar, [vista(prueba, _, Prueba)]),
+    ordena(explicar, [vista(decision, _, Prueba, _)]),
     explicar:prueba_a_lineas(Prueba, Lineas),
     once(( member(L, Lineas), sub_atom(L, _, _, _, 'objetivo_mas_debil(e(bandido_torpe, 1), tuerca)') )).
 
@@ -612,7 +612,7 @@ test(la_pantalla_dice_quien_decidio, [nondet]) :-
 test(la_prueba_es_la_de_antes_del_golpe, [nondet]) :-
     empieza([bandido_torpe]),
     ordena(defender, _), ordena(defender, _), ordena(defender, _),
-    ordena(explicar, [vista(prueba, _, Prueba)]),
+    ordena(explicar, [vista(decision, _, Prueba, _)]),
     explicar:prueba_a_lineas(Prueba, Lineas),
     once(( member(L, Lineas), sub_atom(L, _, _, _, 'vida(tuerca, 22)') )).
 

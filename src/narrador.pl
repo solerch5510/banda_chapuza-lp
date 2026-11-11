@@ -145,6 +145,22 @@ frase(puede_descansar, ambos,
 frase(puede_pagar_sueldos, ambos,
       'Hay queso para todos los sueldos. Que conste en acta, por si alguien lo duda dentro de una semana.').
 
+% --- explicar el turno de un enemigo (X20 de docs/05): la clave es la decision que tomo la IA ---
+frase(accion_enemigo(rata_quesera, robar_queso), ambos,
+      'La Rata Quesera roba queso: la prioridad tres de su lista y, de hecho, la que le toca.').
+frase(accion_enemigo(bandido_torpe, atacar(_)), ambos,
+      'El Bandido Torpe elige al más débil. Torpe, sí; tonto, solo a ratos.').
+frase(accion_enemigo(bandido_montado, embestir(_)), ambos,
+      'El caballo embiste primero. El bandido le sigue, por cortesía.').
+frase(accion_enemigo(gran_roquefort, invocar_moho), ambos,
+      'El Gran Roquefort llama a su moho sin prisa. Lleva cuarenta años practicando la calma.').
+frase(accion_enemigo(_, curarse), ambos,
+      'El primer caso de la lista que aplica es curarse, y la regla no mira más. Eso se llama prioridad.').
+frase(accion_enemigo(_, _), detallado,
+      'Decide el primer caso que aplica; los demás esperan turno, como en la cola de Doña Mantecosa.').
+frase(golpea_a_clotilde(_), ambos,
+      'El primero de cada ronda va a por Lady Clotilde. Es la regla de la escolta, no una opinión sobre las plumas.').
+
 % --- por_que_no: por que NO se puede (F01a a F10b de docs/05). Las claves son impide(Hecho) cuando
 % algo lo prohibe (una negacion que se cumplio) y falla(Meta) cuando una regla no se cumple. ---
 frase(impide(teme(baldomero, caballo)), ambos,

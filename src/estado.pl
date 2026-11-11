@@ -13,7 +13,7 @@
         contrato_activo/1, contrato_por_cobrar/2, contrato_cerrado/2,
         evento_visto/2, semilla/1, usos_frase/2, ajuste/2, fin_partida/1,
         en_combate/1, combatiente/2, instancia/2, fila/2, cola_turnos/1,
-        alterado/3, zona_previa/1, ultima_prueba/2,
+        alterado/3, zona_previa/1, ultima_prueba/2, ultimos_descartes/2,
         % operaciones
         nueva_partida/0, reiniciar_estado/0,
         aplicar_efectos/1, aplicar_efecto/1, con_transaccion/1,
@@ -56,6 +56,7 @@
 :- dynamic alterado/3.            % alterado(Id, Estado, TurnosRestantes)
 :- dynamic zona_previa/1.         % zona_previa(Zona)
 :- dynamic ultima_prueba/2.       % ultima_prueba(Accion, Prueba)
+:- dynamic ultimos_descartes/2.   % ultimos_descartes(Enemigo, [descarte(Prioridad, Accion, Diag)...])
 
 % ---------------------------------------------------------------------------
 % Inicializacion y reinicio
@@ -73,7 +74,7 @@ persistente(ajuste/2).       persistente(fin_partida/1).
 
 transitorio(en_combate/1).   transitorio(combatiente/2).       transitorio(instancia/2).
 transitorio(fila/2).         transitorio(cola_turnos/1).       transitorio(alterado/3).
-transitorio(zona_previa/1).  transitorio(ultima_prueba/2).
+transitorio(zona_previa/1).  transitorio(ultima_prueba/2).  transitorio(ultimos_descartes/2).
 
 todo(N/A) :- persistente(N/A).
 todo(N/A) :- transitorio(N/A).
@@ -278,6 +279,11 @@ aplicar_conocido(fin(Motivo)) :-         % fin(victoria) o fin(derrota(Motivo));
 aplicar_conocido(guardar_prueba(Accion, Prueba)) :-   % la ultima prueba, para explicar lo que acaba de pasar
     retractall(ultima_prueba(_, _)),
     assertz(ultima_prueba(Accion, Prueba)).
+% Las reglas de mayor prioridad que NO se aplicaron en el ultimo turno enemigo (para explicar el corte).
+aplicar_conocido(guardar_descartes(Enemigo, Descartes)) :-
+    is_list(Descartes),
+    retractall(ultimos_descartes(_, _)),
+    assertz(ultimos_descartes(Enemigo, Descartes)).
 aplicar_conocido(uso_frase(Grupo)) :-    % cuantas veces se ha usado un grupo de frases (rotacion del narrador)
     (   retract(usos_frase(Grupo, U0)) -> U1 is U0 + 1 ; U1 = 1 ),
     assertz(usos_frase(Grupo, U1)).
@@ -287,7 +293,7 @@ conocido(mensaje/2).      conocido(dano/2).          conocido(curar/2).
 conocido(mod_moral/2).    conocido(ganar_queso/3).   conocido(gastar_queso/3).
 conocido(envejecer_quesos/0). conocido(marcar/1).    conocido(desmarcar/1).
 conocido(avanzar_dia/0).  conocido(viajar/1).        conocido(fijar_semilla/1).
-conocido(fin/1).          conocido(uso_frase/1).     conocido(guardar_prueba/2).
+conocido(fin/1).          conocido(uso_frase/1).     conocido(guardar_prueba/2). conocido(guardar_descartes/2).
 conocido(ganar_objeto/3). conocido(gastar_objeto/3). conocido(equipar/2).
 conocido(iniciar_combate/1). conocido(siguiente_turno/0). conocido(siguiente_ronda/1).
 conocido(alterar/3).      conocido(quitar_alteracion/2).  conocido(terminar_combate/0).

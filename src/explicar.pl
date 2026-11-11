@@ -8,7 +8,7 @@
 % resumido/detallado llegan mas adelante.
 
 :- module(explicar, [solve/2, solve/3, prueba_a_lineas/2, meta_de_prueba/2,
-                     por_que_no/2, diag_a_lineas/2]).
+                     por_que_no/2, diag_a_lineas/2, diag_detalle_a_lineas/2, plegar_lineas/3]).
 :- meta_predicate solve(0, -), solve(0, -, +), por_que_no(0, -).
 
 % Modulos por cuyas clausulas SI se desciende; todo lo demas es hoja.
@@ -386,6 +386,11 @@ diag_a_lineas(Diag, Lineas) :-
     detalle(Diag, '  ', Resto),
     append(Cab, Resto, Lineas).
 
+% diag_detalle_a_lineas(+Diag, -Lineas): solo el detalle (lo que se cumplia y lo que falla), sin la
+% cabecera con la meta: para cuando quien lo muestra ya ha dicho de que va.
+diag_detalle_a_lineas(Diag, Lineas) :-
+    detalle(Diag, '  ', Lineas).
+
 cabecera(fallo(G, [cl(I, _, _)|_]), [L]) :-
     txt(G, T),
     format(atom(L), '[no] ~w   [clausula ~w]', [T, I]).
@@ -453,3 +458,49 @@ unir_y([X, Y], R) :-
 unir_y([X, Y, Z|T], R) :-
     unir_y([Y, Z|T], R1),
     format(atom(R), '~w, ~w', [X, R1]).
+
+% ---------------------------------------------------------------------------
+% Plegar un arbol de texto: se conservan las lineas hasta una profundidad y las de debajo se
+% sustituyen por "[+N nodos]" en el nodo que las contenia. Funcion pura sobre las lineas que
+% devuelve prueba_a_lineas/2 (una linea por nodo, tres espacios de sangria por nivel).
+%   Prof = 0 deja solo las raices; Prof grande no pliega nada.
+% ---------------------------------------------------------------------------
+plegar_lineas([], _, []).
+plegar_lineas([L|Ls], Prof, [Salida|Resto]) :-
+    profundidad_de_linea(L, D),
+    (   D >= Prof
+    ->  hijas_mas_hondas(Ls, Prof, N, Siguientes),
+        (   N =:= 0
+        ->  Salida = L
+        ;   N =:= 1
+        ->  format(atom(Salida), '~w   [+1 nodo]', [L])
+        ;   format(atom(Salida), '~w   [+~w nodos]', [L, N])
+        ),
+        plegar_lineas(Siguientes, Prof, Resto)
+    ;   Salida = L,
+        plegar_lineas(Ls, Prof, Resto)
+    ).
+
+% hijas_mas_hondas(+Lineas, +Prof, -N, -Resto): las primeras lineas MAS hondas que Prof y cuantas son.
+hijas_mas_hondas([], _, 0, []).
+hijas_mas_hondas([L|Ls], Prof, N, Resto) :-
+    profundidad_de_linea(L, D),
+    (   D > Prof
+    ->  hijas_mas_hondas(Ls, Prof, N0, Resto),
+        N is N0 + 1
+    ;   N = 0,
+        Resto = [L|Ls]
+    ).
+
+% profundidad_de_linea(+Linea, -D): los espacios iniciales entre tres.
+profundidad_de_linea(L, D) :-
+    atom_codes(L, Cs),
+    espacios_iniciales(Cs, 0, E),
+    D is E // 3.
+
+espacios_iniciales(Cs, N0, N) :-
+    (   Cs = [0' |Resto]
+    ->  N1 is N0 + 1,
+        espacios_iniciales(Resto, N1, N)
+    ;   N = N0
+    ).
