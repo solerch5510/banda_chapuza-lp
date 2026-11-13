@@ -51,11 +51,13 @@ archivo_con(Texto, Archivo) :-
     format(S, "~w", [Texto]),
     close(S).
 
-% Juega una sesion guionizada por la entrada y devuelve todo lo impreso.
+% Juega una sesion guionizada por la entrada y devuelve todo lo impreso. Cada guion acaba en `salir.` o en
+% el fin del archivo, asi que main termina solo. (Antes llevaba un call_with_time_limit/2 de seguridad, pero
+% en SWI-Prolog 5.10.4 para Windows el temporizador provocaba un fallo de segmentacion de vez en cuando.)
 jugar(Guion, Salida) :-
     archivo_con(Guion, Archivo),
     see(Archivo),
-    call_with_time_limit(15, with_output_to(atom(Salida), main:main)),
+    with_output_to(atom(Salida), main:main),
     seen.
 
 % ===========================================================================
@@ -233,7 +235,7 @@ test(un_comando_con_variable_sin_ligar_pide_el_argumento) :-
 test(cada_fase_permite_sus_comandos) :-
     comandos_disponibles(exploracion, E), \+ memberchk(descansar, E), memberchk(ir, E),
     comandos_disponibles(taberna, T),     memberchk(descansar, T),    memberchk(ir, T),
-    comandos_disponibles(fin, F),         F == [ayuda, explicar, por_que_no, salir].
+    comandos_disponibles(fin, F),         F == [ayuda, explicar, por_que_no, nivel, salir].
 
 :- end_tests(juego_validar).
 

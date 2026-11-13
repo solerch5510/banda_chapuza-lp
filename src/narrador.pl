@@ -134,6 +134,10 @@ frase(suceso(rebuscar(E, nada)), ambos,
       'Tuerca rebusca en ~w y no halla nada. Se queda con la dignidad, que no cotiza.'-[E]).
 frase(suceso(golpea_a_clotilde(E, N)), ambos,
       '~w se abalanza sobre Lady Clotilde y le arranca una pluma (golpe ~w). Ella lo anota para la factura.'-[E, N]).
+frase(suceso(nivel(resumido)), ambos,
+      'Nivel resumido: las explicaciones salen plegadas a lo esencial. Para ver todo, nivel(detallado).').
+frase(suceso(nivel(detallado)), ambos,
+      'Nivel detallado: las explicaciones salen enteras, con todas las cláusulas y todas las pruebas. Para acortarlas, nivel(resumido).').
 frase(suceso(defiende(A)), ambos,
       '~w se pone a la defensiva: escudo arriba, ojos cerrados y una plegaria a medias.'-[A]).
 
@@ -366,6 +370,8 @@ claves_diag(neg_viola(_, Prueba), Claves) :-
     findall(impide(H),
             ( meta_en(Prueba, H0), strip_module(H0, _, H) ),
             Claves).
+claves_diag(neg_doble(_, D), Claves) :-
+    claves_de_diag(D, Claves).
 claves_diag(tras(_, D), Claves) :-
     claves_de_diag(D, Claves).
 claves_diag(ninguna(DA, DB), Claves) :-
@@ -411,7 +417,10 @@ clave_de_diag(Diag, Clave) :-
 % comentario_diag(+Diag, +Nivel, +Uso, -Texto): la frase de por_que_no. Siempre hay texto.
 comentario_diag(Diag, Nivel, Uso, Texto) :-
     clave_de_diag(Diag, Clave),
-    comentario(Clave, Nivel, Uso, Texto).
+    (   comentario(Clave, Nivel, Uso, T)
+    ->  Texto = T
+    ;   comentario(generica(fallo), Nivel, Uso, Texto)    % una frase solo de nivel detallado no sale en el resumido
+    ).
 
 % como_texto(+Termino, -Texto): para repetirle al jugador lo que escribio. Una lista de
 % codigos (lo que Prolog 5.10.4 hace con "aldea" entre comillas dobles) se muestra como
@@ -517,6 +526,9 @@ texto_error(nada_que_explicar, 'Todavía no has hecho nada que explicar. Prueba 
 texto_error(no_hay_prueba(Accion), Texto) :-
     como_texto(Accion, Dicho),
     format(atom(Texto), 'Ahora mismo no se puede hacer ~w, así que no hay prueba que enseñar. Prueba con por_que_no(~w) para ver qué falla.', [Dicho, Dicho]).
+texto_error(nivel_desconocido(Nivel), Texto) :-
+    como_texto(Nivel, Dicho),
+    format(atom(Texto), 'No existe el nivel "~w": usa nivel(resumido). o nivel(detallado).', [Dicho]).
 texto_error(sin_fallo(Accion), Texto) :-
     como_texto(Accion, Dicho),
     comentario(generica(sin_fallo), ambos, 0, Frase),
@@ -556,6 +568,7 @@ ayuda_de(atacar, 'atacar(Objetivo). solo en combate: golpea a un enemigo (un tip
 ayuda_de(defender, 'defender.      solo en combate: sube tu defensa hasta tu próximo turno').
 ayuda_de(habilidad, 'habilidad(Objetivo). solo en combate: usa la habilidad de tu personaje; la balada de Rufino se escribe habilidad.').
 ayuda_de(por_que_no, 'por_que_no(Accion). por qué NO se puede una acción: qué regla falla y por qué (p. ej. por_que_no(aceptar(gallina_noble)).)').
+ayuda_de(nivel, 'nivel(N).      cuánto detalle tienen explicar y por_que_no: nivel(resumido). o nivel(detallado).').
 ayuda_de(compania,'compania.      muestra a los miembros, su vida, su moral y su estado').
 ayuda_de(inventario, 'inventario.    muestra la despensa (con la edad del queso) y los objetos').
 ayuda_de(explicar, 'explicar.      la prueba de lo último que hiciste; explicar(Accion). la de esa acción').

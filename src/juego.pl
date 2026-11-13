@@ -35,6 +35,7 @@ comando(inventario, 0).
 comando(explicar,   0).
 comando(explicar,   1).
 comando(por_que_no, 1).
+comando(nivel,      1).
 comando(atacar,     1).
 comando(defender,   0).
 comando(habilidad,  0).
@@ -59,10 +60,10 @@ validar_comando(T, Res) :-
 % ---------------------------------------------------------------------------
 % Que comandos se pueden usar en cada fase (la fase se deriva en estado:fase/1).
 % ---------------------------------------------------------------------------
-permitidos(exploracion, [ayuda, mirar, ir, contratos, aceptar, elegir, compania, inventario, explicar, por_que_no, salir]).
-permitidos(taberna,     [ayuda, mirar, ir, contratos, aceptar, elegir, descansar, pagar, compania, inventario, explicar, por_que_no, salir]).
-permitidos(combate,     [ayuda, mirar, atacar, defender, habilidad, compania, inventario, explicar, por_que_no, salir]).
-permitidos(fin,         [ayuda, explicar, por_que_no, salir]).
+permitidos(exploracion, [ayuda, mirar, ir, contratos, aceptar, elegir, compania, inventario, explicar, por_que_no, nivel, salir]).
+permitidos(taberna,     [ayuda, mirar, ir, contratos, aceptar, elegir, descansar, pagar, compania, inventario, explicar, por_que_no, nivel, salir]).
+permitidos(combate,     [ayuda, mirar, atacar, defender, habilidad, compania, inventario, explicar, por_que_no, nivel, salir]).
+permitidos(fin,         [ayuda, explicar, por_que_no, nivel, salir]).
 
 permitido(Fase, Nombre) :-
     permitidos(Fase, Lista),
@@ -306,6 +307,14 @@ ejecutar_en_fase(explicar(Accion), _, Items) :-
         ;   Items = [error(no_hay_prueba(Accion))]
         )
     ;   Items = [error(no_se_explica(Accion))]
+    ).
+
+% nivel(Nivel) : cuanto detalle ensenan explicar y por_que_no. Es un ajuste de sesion que ui aplica al mostrar
+% (el mismo arbol sirve para los dos niveles).
+ejecutar_en_fase(nivel(Nivel), _, Items) :-
+    (   memberchk(Nivel, [resumido, detallado])
+    ->  etapa([ajustar(nivel_explicacion, Nivel), mensaje(nivel, [Nivel])], Items)
+    ;   Items = [error(nivel_desconocido(Nivel))]
     ).
 
 % por_que_no(Accion) : por que la accion NO se puede. Es la misma regla que explica `explicar`, pero

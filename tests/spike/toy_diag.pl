@@ -4,7 +4,8 @@
 
 :- module(toy_diag, [a/1, tiene/1, hecho_d/1,
                      r_builtin/1, r_neg/1, r_dos/1, r_disy/1, r_si/1, r_sino/1, r_solo_si/1,
-                     r_findall/0, r_findall_ligado/0, r_forall/0, r_corte/1, r_vacia/1, r_ok/1, r_anidada/1, r_lib/1]).
+                     r_findall/0, r_findall_ligado/0, r_forall/0, r_corte/1, r_vacia/1, r_ok/1, r_anidada/1, r_lib/1,
+                     r_doble/0, r_triple/0, r_neg_anidada/0]).
 
 :- dynamic hecho_d/1.
 
@@ -52,6 +53,13 @@ r_ok(X) :- a(X).
 
 % Fallo anidado: r_anidada falla por r_builtin.
 r_anidada(X) :- tiene(x), r_builtin(X).
+
+% Negaciones anidadas: \+ \+ Y falla porque Y no se cumple; con tres, por una negacion que si falla.
+r_doble :- \+ \+ a(9).
+r_triple :- \+ \+ \+ a(1).
+
+% Una negacion cuya prueba contiene otra negacion.
+r_neg_anidada :- \+ ( a(1), \+ a(9) ).
 
 % Un predicado de libreria (no es del juego): se trata como hoja.
 r_lib(X) :- atom_length(X, 99).

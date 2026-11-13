@@ -8,7 +8,8 @@
 % resumido/detallado llegan mas adelante.
 
 :- module(explicar, [solve/2, solve/3, prueba_a_lineas/2, meta_de_prueba/2,
-                     por_que_no/2, diag_a_lineas/2, diag_detalle_a_lineas/2, plegar_lineas/3]).
+                     por_que_no/2, diag_a_lineas/2, diag_a_lineas/3, diag_detalle_a_lineas/2,
+                     plegar_lineas/3, lineas_de_prueba/3]).
 :- meta_predicate solve(0, -), solve(0, -, +), por_que_no(0, -).
 
 % Modulos por cuyas clausulas SI se desciende; todo lo demas es hoja.
@@ -283,6 +284,7 @@ hijos(sino(PE), [PE]).
 %   fallo(G, Candidatas)    hay clausulas y todas fallan; la mas cercana primero
 %   builtin_falso(G)        un predefinido instanciado resulto falso (3 > 5)
 %   neg_viola(X, Prueba)    \+ X falla porque X SI se demuestra (se da su prueba)
+%   neg_doble(Y, DiagY)     \+ \+ Y falla porque Y no se cumple (se explica por que)
 %   tras(PruebaDeA, DiagB)  (A, B): A tiene solucion pero B falla con ella
 %   ninguna(DiagA, DiagB)   (A ; B): las dos ramas fallan
 %   limite(G)               se agoto la profundidad de diagnostico
@@ -314,8 +316,13 @@ diag_(conj, (A, B), M, N, Diag) :-
     ;   diag(A, M, N, Diag)
     ).
 % \+ X solo falla si X se demuestra: esa prueba es la razon.
-diag_(neg, (\+ X), M, _, neg_viola(X, P)) :-
-    prueba_de(X, M, P).
+diag_(neg, (\+ X), M, N, Diag) :-
+    (   nonvar(X), X = (\+ Y)                    % \+ \+ Y falla porque Y no se cumple
+    ->  diag(Y, M, N, DY),
+        Diag = neg_doble(Y, DY)
+    ;   prueba_de(X, M, P),
+        Diag = neg_viola(X, P)
+    ).
 diag_(hoja, G, _, _, builtin_falso(G)).
 diag_(findall, G, _, _, builtin_falso(G)).
 diag_(forall, G, _, _, builtin_falso(G)).
@@ -380,37 +387,55 @@ ordenar_por_cercania(C0, C) :-
 
 % ---------------------------------------------------------------------------
 % El diagnostico como arbol de texto ASCII (funciones puras, como prueba_a_lineas/2).
+%
+% Dos niveles (docs/02 6.8), el mismo diagnostico sirve para los dos:
+%   resumido   solo la clausula MAS CERCANA y, si falla una negacion, los hechos que la hacen cierta;
+%   detallado  TODAS las clausulas aplicables, cada una hasta donde llega, y la prueba completa de
+%              por que es cierto lo que la negacion niega (de donde sale cada hecho).
+% diag_a_lineas/2 es el nivel resumido.
 % ---------------------------------------------------------------------------
 diag_a_lineas(Diag, Lineas) :-
-    cabecera(Diag, Cab),
-    detalle(Diag, '  ', Resto),
+    diag_a_lineas(Diag, resumido, Lineas).
+
+diag_a_lineas(Diag, Nivel, Lineas) :-
+    cabecera(Diag, Nivel, Cab),
+    detalle(Diag, Nivel, '  ', Resto),
     append(Cab, Resto, Lineas).
 
 % diag_detalle_a_lineas(+Diag, -Lineas): solo el detalle (lo que se cumplia y lo que falla), sin la
 % cabecera con la meta: para cuando quien lo muestra ya ha dicho de que va.
 diag_detalle_a_lineas(Diag, Lineas) :-
-    detalle(Diag, '  ', Lineas).
+    detalle(Diag, resumido, '  ', Lineas).
 
-cabecera(fallo(G, [cl(I, _, _)|_]), [L]) :-
+cabecera(fallo(G, Cands), Nivel, [L]) :-
     txt(G, T),
-    format(atom(L), '[no] ~w   [clausula ~w]', [T, I]).
-cabecera(sin_clausula(G), [L]) :-
+    (   Nivel == detallado, Cands = [_, _|_]
+    ->  length(Cands, N),
+        format(atom(L), '[no] ~w   [~w clausulas aplicables y ninguna se cumple]', [T, N])
+    ;   Cands = [cl(I, _, _)|_],
+        format(atom(L), '[no] ~w   [clausula ~w]', [T, I])
+    ).
+cabecera(sin_clausula(G), _, [L]) :-
     txt(G, T),
     format(atom(L), '[no] ~w   [no hay ningun hecho ni clausula]', [T]).
-cabecera(builtin_falso(G), [L]) :-
+cabecera(builtin_falso(G), _, [L]) :-
     txt(G, T),
     format(atom(L), '[no] ~w   [falso]', [T]).
-cabecera(neg_viola(X, _), [L]) :-
+cabecera(neg_viola(X, _), _, [L]) :-
     txt(\+ X, T),
     format(atom(L), '[no] ~w', [T]).
-cabecera(tras(_, D), Ls) :-
-    cabecera(D, Ls).
-cabecera(ninguna(_, _), ['[no] ninguna de las dos ramas se cumple']).
-cabecera(limite(G), [L]) :-
+cabecera(neg_doble(Y, _), _, [L]) :-
+    txt(\+ (\+ Y), T),
+    format(atom(L), '[no] ~w', [T]).
+cabecera(tras(_, D), Nivel, Ls) :-
+    cabecera(D, Nivel, Ls).
+cabecera(ninguna(_, _), _, ['[no] ninguna de las dos ramas se cumple']).
+cabecera(limite(G), _, [L]) :-
     txt(G, T),
     format(atom(L), '[no] ~w   [se agoto la profundidad del diagnostico]', [T]).
 
-detalle(fallo(_, [cl(_, Pre, punto(F, D))|_]), S, Ls) :-
+% Una clausula candidata hasta donde llega: lo que se cumplia, lo que falla y por que falla.
+candidata_a_lineas(cl(_, Pre, punto(F, D)), Nivel, S, Ls) :-
     findall(L,
             (   member(P, Pre),
                 meta_de_prueba(P, PG),
@@ -421,34 +446,66 @@ detalle(fallo(_, [cl(_, Pre, punto(F, D))|_]), S, Ls) :-
     txt(F, TF),
     format(atom(LF), '~w\\- [no] ~w', [S, TF]),
     atom_concat(S, '      ', S2),
-    detalle(D, S2, Sub),
+    detalle(D, Nivel, S2, Sub),
     append([Oks, [LF], Sub], Ls).
-detalle(tras(_, D), S, Ls) :-
-    detalle(D, S, Ls).
-detalle(neg_viola(_, P), S, [L]) :-
+
+detalle(fallo(_, Cands), Nivel, S, Ls) :-
+    (   Nivel == detallado, Cands = [_, _|_]
+    ->  atom_concat(S, '   ', S2),
+        candidatas_a_lineas(Cands, 1, Nivel, S, S2, Ls)
+    ;   Cands = [C|_],
+        candidata_a_lineas(C, Nivel, S, Ls)
+    ).
+detalle(tras(_, D), Nivel, S, Ls) :-
+    detalle(D, Nivel, S, Ls).
+detalle(neg_viola(_, P), Nivel, S, Ls) :-
     aplanar_y(P, Ps),
     findall(T, ( member(Q, Ps), meta_de_prueba(Q, QG), txt(QG, T) ), Ts),
     unir_y(Ts, Y),
     (   Ts = [_] -> Verbo = 'es cierto' ; Verbo = 'son ciertos' ),
-    format(atom(L), '~wporque ~w ~w.', [S, Y, Verbo]).
-detalle(sin_clausula(G), S, [L]) :-
+    format(atom(L), '~wporque ~w ~w.', [S, Y, Verbo]),
+    (   Nivel == detallado
+    ->  prueba_a_lineas(P, Arbol),
+        atom_concat(S, '   ', S2),
+        findall(LA, ( member(A, Arbol), atom_concat(S2, A, LA) ), Sangrado),
+        Ls = [L|Sangrado]
+    ;   Ls = [L]
+    ).
+% \+ \+ Y falla porque Y no se cumple: se explica por que no.
+detalle(neg_doble(_, D), Nivel, S, [L|Ramas]) :-
+    format(atom(L), '~wporque lo que niega no se cumple:', [S]),
+    ramas([D], Nivel, S, Ramas).
+detalle(sin_clausula(G), _, S, [L]) :-
     txt(G, T),
     format(atom(L), '~wno hay ningun hecho ni clausula para ~w', [S, T]).
-detalle(builtin_falso(G), S, [L]) :-
+detalle(builtin_falso(G), _, S, [L]) :-
     txt(G, T),
     format(atom(L), '~w~w es falso', [S, T]).
-detalle(ninguna(DA, DB), S, Ls) :-
-    ramas([DA, DB], S, Ls).
-detalle(limite(_), S, [L]) :-
+detalle(ninguna(DA, DB), Nivel, S, Ls) :-
+    ramas([DA, DB], Nivel, S, Ls).
+detalle(limite(_), _, S, [L]) :-
     format(atom(L), '~wno sigo: demasiado profundo', [S]).
 
-ramas([], _, []).
-ramas([D|Ds], S, Ls) :-
-    cabecera(D, Cab),
+% candidatas_a_lineas(+Cands, +Numero, +Nivel, +S, +S2, -Lineas): cada candidata con su titulo.
+candidatas_a_lineas([], _, _, _, _, []).
+candidatas_a_lineas([C|Cs], K, Nivel, S, S2, Ls) :-
+    C = cl(I, _, _),
+    (   K =:= 1
+    ->  format(atom(Titulo), '~wclausula ~w (la mas cercana):', [S, I])
+    ;   format(atom(Titulo), '~wclausula ~w:', [S, I])
+    ),
+    candidata_a_lineas(C, Nivel, S2, Cuerpo),
+    K1 is K + 1,
+    candidatas_a_lineas(Cs, K1, Nivel, S, S2, Resto),
+    append([[Titulo], Cuerpo, Resto], Ls).
+
+ramas([], _, _, []).
+ramas([D|Ds], Nivel, S, Ls) :-
+    cabecera(D, Nivel, Cab),
     atom_concat(S, '   ', S2),
-    detalle(D, S2, Det),
+    detalle(D, Nivel, S2, Det),
     findall(L, ( member(C, Cab), format(atom(L), '~w\\- ~w', [S, C]) ), CabS),
-    ramas(Ds, S, Resto),
+    ramas(Ds, Nivel, S, Resto),
     append([CabS, Det, Resto], Ls).
 
 % unir_y(+Textos, -Atomo): "a", "a y b", "a, b y c".
@@ -458,6 +515,17 @@ unir_y([X, Y], R) :-
 unir_y([X, Y, Z|T], R) :-
     unir_y([Y, Z|T], R1),
     format(atom(R), '~w, ~w', [X, R1]).
+
+% ---------------------------------------------------------------------------
+% Los niveles de una prueba (docs/02 6.8): resumido pliega el arbol a la raiz y sus hijos directos
+% (los nodos de debajo salen como "[+N nodos]"); detallado lo enseña entero.
+% ---------------------------------------------------------------------------
+lineas_de_prueba(Prueba, Nivel, Lineas) :-
+    prueba_a_lineas(Prueba, Completas),
+    (   Nivel == detallado
+    ->  Lineas = Completas
+    ;   plegar_lineas(Completas, 1, Lineas)
+    ).
 
 % ---------------------------------------------------------------------------
 % Plegar un arbol de texto: se conservan las lineas hasta una profundidad y las de debajo se

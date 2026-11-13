@@ -10,6 +10,12 @@
 :- encoding(utf8).
 :- use_module(narrador).
 :- use_module(explicar).
+:- use_module(estado).
+
+% nivel_actual(-Nivel): el nivel de explicacion de la sesion (resumido si no se ha pedido otro).
+% Es lo unico que ui lee del estado: un ajuste que cambia COMO se muestra, no lo que se muestra.
+nivel_actual(Nivel) :-
+    (   estado:ajuste(nivel_explicacion, N) -> Nivel = N ; Nivel = resumido ).
 
 % iniciar: texto en UTF-8 (tildes y signos) y el indicador de entrada "> ".
 iniciar :-
@@ -122,8 +128,8 @@ mostrar_conocido(vista(combate, combate(Ronda, Turno, Enemigos))) :-
 % esencial, y por que no gano ninguna de mayor prioridad (Descartes, calculado al decidir).
 mostrar_conocido(vista(decision, E, Prueba, Descartes)) :-
     narrador:nombre_visible(E, Nombre),
-    explicar:prueba_a_lineas(Prueba, Completas),
-    explicar:plegar_lineas(Completas, 1, Lineas),
+    nivel_actual(Nivel),
+    explicar:lineas_de_prueba(Prueba, Nivel, Lineas),
     format("Por qué ~w hizo eso:~n", [Nombre]),
     (   predicate_property(combate:accion_enemigo(_, _), number_of_clauses(Total))
     ->  (   Prueba = regla(accion_enemigo(_, _), Prioridad, _)
@@ -138,19 +144,21 @@ mostrar_conocido(vista(decision, E, Prueba, Descartes)) :-
     ),
     escribir_lineas(Lineas),
     escribir_descartes(Descartes),
-    narrador:comentario_prueba(Prueba, ambos, 0, Comentario),
+    narrador:comentario_prueba(Prueba, Nivel, 0, Comentario),
     format("Narrador: ~w~n", [Comentario]).
 mostrar_conocido(vista(prueba, Accion, Prueba)) :-
-    explicar:prueba_a_lineas(Prueba, Lineas),
+    nivel_actual(Nivel),
+    explicar:lineas_de_prueba(Prueba, Nivel, Lineas),
     format("Por qué se pudo ~w:~n", [Accion]),
     escribir_lineas(Lineas),
-    narrador:comentario_prueba(Prueba, ambos, 0, Comentario),
+    narrador:comentario_prueba(Prueba, Nivel, 0, Comentario),
     format("Narrador: ~w~n", [Comentario]).
 mostrar_conocido(vista(diag, Accion, Diag)) :-
-    explicar:diag_a_lineas(Diag, Lineas),
+    nivel_actual(Nivel),
+    explicar:diag_a_lineas(Diag, Nivel, Lineas),
     format("Por qué no se puede ~w:~n", [Accion]),
     escribir_lineas(Lineas),
-    narrador:comentario_diag(Diag, ambos, 0, Comentario),
+    narrador:comentario_diag(Diag, Nivel, 0, Comentario),
     format("Narrador: ~w~n", [Comentario]).
 mostrar_conocido(salir) :-
     format("Hasta la próxima, Banda Chapuza.~n", []).

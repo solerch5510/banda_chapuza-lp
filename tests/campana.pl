@@ -148,7 +148,7 @@ test(los_tres_finales_tienen_texto, [nondet]) :-
 test(en_la_fase_final_solo_valen_ayuda_explicar_y_salir) :-
     comandos_disponibles(fin, Cs),
     msort(Cs, S),
-    S == [ayuda, explicar, por_que_no, salir].
+    S == [ayuda, explicar, nivel, por_que_no, salir].
 
 test(cualquier_otro_comando_se_rechaza, [setup(nueva_partida)]) :-
     aplicar_efecto(fin(victoria(chapuza))),
@@ -189,7 +189,7 @@ test(los_comandos_de_la_version_minima, [setup(nueva_partida)]) :-
     findall(N, ( member(Fase, [taberna, exploracion, combate, fin]), comandos_disponibles(Fase, Cs), member(N, Cs) ), Ns0),
     sort(Ns0, Ns),
     Ns == [aceptar, atacar, ayuda, compania, contratos, defender, descansar, elegir, explicar,
-           habilidad, inventario, ir, mirar, pagar, por_que_no, salir].
+           habilidad, inventario, ir, mirar, nivel, pagar, por_que_no, salir].
 
 :- end_tests(pelear_ya_no_existe).
 

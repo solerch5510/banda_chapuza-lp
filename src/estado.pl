@@ -279,6 +279,11 @@ aplicar_conocido(fin(Motivo)) :-         % fin(victoria) o fin(derrota(Motivo));
 aplicar_conocido(guardar_prueba(Accion, Prueba)) :-   % la ultima prueba, para explicar lo que acaba de pasar
     retractall(ultima_prueba(_, _)),
     assertz(ultima_prueba(Accion, Prueba)).
+% Un ajuste de sesion (p. ej. nivel_explicacion): una clave, un valor; cambiarlo sustituye el anterior.
+aplicar_conocido(ajustar(Clave, Valor)) :-
+    atom(Clave), ground(Valor),
+    retractall(ajuste(Clave, _)),
+    assertz(ajuste(Clave, Valor)).
 % Las reglas de mayor prioridad que NO se aplicaron en el ultimo turno enemigo (para explicar el corte).
 aplicar_conocido(guardar_descartes(Enemigo, Descartes)) :-
     is_list(Descartes),
@@ -293,7 +298,7 @@ conocido(mensaje/2).      conocido(dano/2).          conocido(curar/2).
 conocido(mod_moral/2).    conocido(ganar_queso/3).   conocido(gastar_queso/3).
 conocido(envejecer_quesos/0). conocido(marcar/1).    conocido(desmarcar/1).
 conocido(avanzar_dia/0).  conocido(viajar/1).        conocido(fijar_semilla/1).
-conocido(fin/1).          conocido(uso_frase/1).     conocido(guardar_prueba/2). conocido(guardar_descartes/2).
+conocido(fin/1).          conocido(uso_frase/1).     conocido(guardar_prueba/2). conocido(guardar_descartes/2). conocido(ajustar/2).
 conocido(ganar_objeto/3). conocido(gastar_objeto/3). conocido(equipar/2).
 conocido(iniciar_combate/1). conocido(siguiente_turno/0). conocido(siguiente_ronda/1).
 conocido(alterar/3).      conocido(quitar_alteracion/2).  conocido(terminar_combate/0).
