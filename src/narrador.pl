@@ -19,7 +19,8 @@
 :- module(narrador, [frase/3, texto/4, texto_error/2, ayuda_de/2,
                      comentario/4, comentario_prueba/4, nombre_visible/2, texto_recompensa/2,
                      descripcion_evento/2, descripcion_opcion/3,
-                     claves_de_diag/2, clave_de_diag/2, comentario_diag/4]).
+                     claves_de_diag/2, clave_de_diag/2, comentario_diag/4,
+                     comentarios_de_nodo/4, descripcion_contrato/2]).
 
 % La declaracion de modulo va primero; el archivo tiene tildes, asi que se declara UTF-8 justo despues.
 :- encoding(utf8).
@@ -138,6 +139,48 @@ frase(suceso(nivel(resumido)), ambos,
       'Nivel resumido: las explicaciones salen plegadas a lo esencial. Para ver todo, nivel(detallado).').
 frase(suceso(nivel(detallado)), ambos,
       'Nivel detallado: las explicaciones salen enteras, con todas las cláusulas y todas las pruebas. Para acortarlas, nivel(resumido).').
+frase(suceso(golpe(A, B, D)), ambos,
+      'Golpe de ~w a ~w: ~w puntos. Limpio, correcto y olvidable.'-[A, B, D]).
+frase(suceso(golpe(A, B, D)), ambos,
+      '~w alcanza a ~w y le quita ~w. Un testigo toma nota; otro, distancia.'-[A, B, D]).
+frase(suceso(aparece(T)), ambos,
+      '~w te corta el paso con la seguridad de quien no ha leído tu historial.'-[T]).
+frase(suceso(aparece(gran_roquefort)), ambos,
+      'Al fondo de las Cuevas, algo azul y enorme se mueve despacio. Tiene barba de moho y opiniones firmes.').
+frase(suceso(cae(rata_quesera)), ambos,
+      'La Rata Quesera se tumba, cierra los ojos y espera. Esta vez es en serio. Ofendida, pero en serio.').
+frase(suceso(cae(moho_saltarin)), ambos,
+      'El Moho Saltarín se deshace en esporas y en disculpas, por ese orden.').
+frase(suceso(cae(bandido_torpe)), ambos,
+      'El Bandido Torpe huye gritando «¡Esto no ha pasado!». Ha pasado, y con testigos.').
+frase(suceso(cae(bandido_montado)), ambos,
+      'El Bandido Montado se baja del caballo a la fuerza y le pide perdón al caballo, que no escucha.').
+frase(suceso(cae(gran_roquefort)), ambos,
+      'El Gran Roquefort suspira, se agrieta y murmura: «Quizá sí tenía prisa». El moho se retira.').
+frase(suceso(cae(P)), ambos,
+      '~w cae y decide que es un buen momento para reflexionar tumbado.'-[P]).
+frase(suceso(victoria), ambos,
+      'Victoria. Se recoge el botín, se cuenta el queso y se niega todo lo que haya salido mal.').
+frase(suceso(victoria), ambos,
+      'El combate acaba a vuestro favor. Es la clase de noticia que la Banda nunca sabe dónde guardar.').
+frase(suceso(victoria), ambos,
+      'Habéis ganado. Un par de testigos aplauden; el resto prefiere no mojarse.').
+frase(suceso(carga_heroica(B)), ambos,
+      'Carga heroica: Sir Baldomero baja la visera, cierra los ojos y avanza hacia ~w. Funciona.'-[B]).
+frase(suceso(balada), ambos,
+      'Rufino canta. El grupo se anima, el enemigo se desanima y los pájaros emigran.').
+frase(suceso(defiende(P)), ambos,
+      '~w levanta la guardia, la ceja y la moral. En ese orden.'-[P]).
+frase(suceso(descanso), ambos,
+      'Descansáis. La vela se consume, los ronquidos de Rufino riman y Doña Mantecosa cobra las camas con puntualidad.').
+frase(suceso(descanso), ambos,
+      'Una noche en el Cuajo Torcido: poco sueño, mucho ruido y el colchón de siempre.').
+frase(suceso(llegada(taberna)), ambos,
+      'La puerta del Cuajo Torcido cuelga de una sola bisagra. Según Doña Mantecosa, le da carácter.').
+frase(suceso(llegada(aldea)), ambos,
+      'En la aldea todo es tan pacífico que el arma más peligrosa del pueblo es un rodillo.').
+frase(suceso(llegada(camino_real)), ambos,
+      'El Camino Real está empedrado con corteza de queso viejo. Se te pega a las botas y a la conversación.').
 frase(suceso(defiende(A)), ambos,
       '~w se pone a la defensiva: escudo arriba, ojos cerrados y una plegaria a medias.'-[A]).
 
@@ -148,6 +191,42 @@ frase(puede_descansar, ambos,
       'Las camas del Cuajo Torcido aceptan clientes. Han visto cosas y siguen aceptando.').
 frase(puede_pagar_sueldos, ambos,
       'Hay queso para todos los sueldos. Que conste en acta, por si alguien lo duda dentro de una semana.').
+
+% --- explicar una regla (X01 a X19 de docs/05): la clave es la meta; con la raiz de la prueba basta una frase ---
+frase(puede_atacar(baldomero, E), ambos,
+      'Sir Baldomero golpea a ~w. Fue la primera vez en una semana que no le temblaron las rodillas.'-[E]).
+frase(puede_atacar(pimentina, E), ambos,
+      'Madame Pimentina apunta con el cucharón a ~w. Nadie sabe si es un ataque o una degustación.'-[E]).
+frase(puede_atacar(rufino, E), ambos,
+      'Rufino golpea a ~w y lo apunta en el cuaderno: «para la balada». Lo de rimar vendrá luego.'-[E]).
+frase(puede_atacar(tuerca, E), ambos,
+      'Tuerca ataca a ~w por el flanco. Nadie lo ve llegar, y tampoco lo ven irse, que es lo importante.'-[E]).
+frase(puede_atacar(A, E), ambos,
+      'Regla cumplida: ~w puede atacar a ~w. A veces las cosas salen como manda el reglamento.'-[A, E]).
+frase(dano(A, B, D), ambos,
+      '~w deja a ~w sin ~w puntos de vida. Es matemática, no rencor.'-[A, B, D]).
+frase(dano(_, B, 1), ambos,
+      'Daño mínimo: un punto. ~w apenas lo nota, pero el reglamento exige que cuente.'-[B]).
+frase(puede_habilidad(pimentina, _, _), ambos,
+      'Hay queso en la despensa, así que hay magia. La Ley del Cuajo saluda a Madame Pimentina.').
+frase(puede_habilidad(rufino, balada_inspiradora, _), ambos,
+      'Rufino canta y la moral sube. Que el grupo quiera que pare es materia de otra regla.').
+frase(puede_habilidad(tuerca, rebuscar_bolsillos, _), ambos,
+      'Tuerca rebusca en un bolsillo ajeno. Según el acta, había queso; según Tuerca, oportunidades.').
+frase(puede_habilidad(baldomero, carga_heroica, _), ambos,
+      'Carga heroica autorizada. Sir Baldomero embiste sin que nadie le empuje, que conste.').
+frase(puede_aceptar(_), ambos,
+      'Cumples todos los requisitos del contrato. Lo difícil será cumplir el contrato.').
+frase(ignora_miedo(baldomero), ambos,
+      'La Venda de Caballos obra el milagro: si no ve caballos, no hay miedo. Lógica impecable, salud dudosa.').
+frase(en_fila_alcanzable(A, B), ambos,
+      'Frente contra frente: ~w y ~w quedan a la distancia justa para arrepentirse.'-[A, B]).
+frase(vivo(X), detallado,
+      'Comprobado en acta: ~w sigue en pie. En esta compañía, eso no es un trámite menor.'-[X]).
+frase(modificador(A, _, M), detallado,
+      'Ajuste al daño de ~w: ~w. El ánimo, como el queso, también cuenta.'-[A, M]).
+frase(queso_total(N), detallado,
+      'La despensa cuenta ~w quesos, incluidos algunos de procedencia discutible.'-[N]).
 
 % --- explicar el turno de un enemigo (X20 de docs/05): la clave es la decision que tomo la IA ---
 frase(accion_enemigo(rata_quesera, robar_queso), ambos,
@@ -185,6 +264,32 @@ frase(falla(puede_aceptar(_)), ambos,
       'Este contrato no se puede aceptar todavía. Los requisitos están a la vista, como una factura.').
 frase(impide(rasgo(baldomero, teme_caballos)), ambos,
       'Lady Clotilde exige escolta sin miedo a los caballos. Sir Baldomero levanta la mano, muy despacio, por honestidad.').
+
+% --- por_que_no, mas casos: el punto exacto donde falla (docs/05 F04, F10, F16, E18 y propias) ---
+frase(falla(vivo(X)), ambos,
+      'Para atacar hay que seguir en pie, y ~w ha decidido tumbarse a reflexionar sobre sus decisiones.'-[X]).
+frase(falla(puede_descansar, hay_queso_para(_)), ambos,
+      'Descansar se paga en queso, y la despensa no llega. Las camas aceptan queso, no promesas.').
+frase(falla(puede_pagar_sueldos, hay_queso_para(_)), ambos,
+      'No alcanza para todos los sueldos. Al que se queda sin cobrar se le promete, que es el insulto máximo.').
+frase(impide(marca(sueldos_pagados)), ambos,
+      'Los sueldos de hoy ya están pagados. Doña Mantecosa agradece la intención y se queda el queso.').
+frase(impide(contrato_activo(_)), ambos,
+      'Ese contrato ya está firmado. La Ley del Contrato Escrito no admite doble firma ni por cariño.').
+frase(impide(contrato_cumplido(_)), ambos,
+      'Ese contrato ya se cumplió. Repetirlo no lo hace más cumplido, solo más aburrido.').
+frase(falla(puede_aceptar(_), _ < _), ambos,
+      'Ya lleváis tantos contratos como la Banda aguanta. Cumplid alguno antes de firmar otro.').
+frase(falla(contratos_cumplidos_min(N)), ambos,
+      'El rey pide ~w contratos cumplidos antes de fiarse. Con la Banda, hasta la fe necesita referencias.'-[N]).
+frase(falla(visita(Z)), ambos,
+      'Antes hay que presentarse en ~w: el rey no firma con desconocidos.'-[Z]).
+frase(falla(moral_media_min(N)), ambos,
+      'La moral de la Banda no llega a la media de ~w que exige el rey. Un buen descanso no vendría mal.'-[N]).
+frase(falla(miembros_en_pie_min(N)), ambos,
+      'El rey quiere al menos ~w miembros en pie. Los demás pueden mirar, pero no cuentan.'-[N]).
+frase(falla(disponible(_)), ambos,
+      'Ese contrato no está al alcance: ni se ofrece aquí ni todavía. Mira el tablón y deja de soñar.').
 
 % --- frases genericas de reserva (G01 a G08): neutras y cortas; si salen mucho, falta cobertura ---
 frase(generica(exito),      ambos,     'Todo conforme al reglamento. En esta compañía, eso es una noticia.').
@@ -391,7 +496,16 @@ claves_diag(fallo(G0, Cands), Claves) :-
         (   F = (\+ _) -> Propias = [] ; claves_falla(F, Propias) )
     ;   Hondas = [], Propias = []
     ),
-    append([Hondas, Propias, [falla(G)]], Claves).
+    compuesta(G, Propias, Compuestas),
+    append([Hondas, Propias, Compuestas, [falla(G)]], Claves).
+
+% compuesta(+G, +Propias, -Claves): la meta Y el punto donde falla, para frases que dependen de los dos
+% (descansar sin queso no es lo mismo que descansar fuera de la taberna). Solo con el punto de la meta.
+compuesta(G, Propias, Compuestas) :-
+    (   Propias = [falla(Punto)|_]
+    ->  Compuestas = [falla(G, Punto)]
+    ;   Compuestas = []
+    ).
 
 claves_falla(Meta, Claves) :-
     (   Meta = condicion_cumple(C)
@@ -420,6 +534,34 @@ comentario_diag(Diag, Nivel, Uso, Texto) :-
     (   comentario(Clave, Nivel, Uso, T)
     ->  Texto = T
     ;   comentario(generica(fallo), Nivel, Uso, Texto)    % una frase solo de nivel detallado no sale en el resumido
+    ).
+
+% comentarios_de_nodo(+Prueba, +Nivel, +Uso, -Textos): en el nivel detallado, hasta tres frases sueltas
+% sobre los nodos del arbol que tienen frase propia (no la raiz: esa cierra la explicacion). En el
+% resumido no hay ninguna. Sin repetir texto.
+comentarios_de_nodo(Prueba, Nivel, Uso, Textos) :-
+    (   Nivel == detallado
+    ->  metas_de_prueba(Prueba, Metas),
+        (   Metas = [Raiz|Resto]
+        ->  true
+        ;   Raiz = nada, Resto = []
+        ),
+        (   comentario(Raiz, Nivel, Uso, TextoRaiz) -> true ; TextoRaiz = '' ),
+        findall(T, ( member(M, Resto), comentario(M, Nivel, Uso, T), T \== TextoRaiz ), Todos),
+        sin_repetidos(Todos, Unicos),
+        primeros_n(3, Unicos, Textos)
+    ;   Textos = []
+    ).
+
+sin_repetidos([], []).
+sin_repetidos([X|Xs], [X|Ys]) :-
+    exclude(==(X), Xs, Resto),
+    sin_repetidos(Resto, Ys).
+
+primeros_n(N, L, P) :-
+    (   N > 0, L = [X|R]
+    ->  N1 is N - 1, P = [X|P1], primeros_n(N1, R, P1)
+    ;   P = []
     ).
 
 % como_texto(+Termino, -Texto): para repetirle al jugador lo que escribio. Una lista de
@@ -452,6 +594,12 @@ descripcion_opcion(rescate_gato, trepar,              'Tuerca trepa a por él').
 descripcion_opcion(rescate_gato, hechizo_de_raclette, 'Madame Pimentina lo atrae con un hechizo de raclette (cuesta 1 queso)').
 descripcion_opcion(rescate_gato, sacudir_arbol,       'Sir Baldomero sacude el árbol con todo su honor').
 descripcion_opcion(rescate_gato, cantar,              'Rufino le canta una balada (gasta un intento)').
+
+% descripcion_contrato(+Contrato, -Texto): el chiste de cada contrato, que enseña el tablon.
+descripcion_contrato(ratas_del_granero, 'Las ratas dicen tener papeles de alquiler por un queso al siglo y se hacen las muertas para cobrar el seguro.').
+descripcion_contrato(gato_en_el_arbol,  'Su Excelencia Bigotes lleva tres días arriba y dice que desde allí se juzga mejor.').
+descripcion_contrato(gallina_noble,     'Lady Clotilde exige palanquín, escolta y que nadie cante a su alrededor: «Si canta, picoteo».').
+descripcion_contrato(despensa_real,     'El rey contrata a los peores porque los buenos no cobran en promesas de cobro.').
 
 % texto_recompensa(+Premios, -Texto): "9 quesos, poción" a partir de [quesos(9), objeto(pocion)].
 texto_recompensa(Premios, Texto) :-

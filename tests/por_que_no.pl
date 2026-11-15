@@ -400,10 +400,14 @@ test(f10b_el_rasgo_de_baldomero, [setup(nueva_partida), nondet]) :-
     aplicar_efecto(viajar(camino_real)),
     clave_real(contratos:puede_aceptar(gallina_noble), impide(rasgo(baldomero, teme_caballos))).
 
-test(f10a_otro_requisito_cae_en_la_regla_del_contrato, [setup(nueva_partida), nondet]) :-
+test(el_rey_no_firma_con_desconocidos_hay_que_visitar_el_castillo, [setup(nueva_partida), nondet]) :-
     aplicar_efecto(viajar(camino_real)),
-    aplicar_efecto(viajar(castillo)),
-    clave_real(contratos:puede_aceptar(despensa_real), falla(puede_aceptar(despensa_real))).
+    aplicar_efecto(viajar(castillo)),                    % se llega, pero sin visitarlo por la via normal
+    clave_real(contratos:puede_aceptar(despensa_real), falla(visita(castillo))).
+
+test(f10d_faltan_contratos_cumplidos_para_el_rey, [setup(nueva_partida), nondet]) :-
+    ordena(ir(camino_real), _), ordena(ir(castillo), _),
+    clave_real(contratos:puede_aceptar(despensa_real), falla(contratos_cumplidos_min(3))).
 
 test(cada_clave_real_tiene_una_frase_propia_y_no_la_generica, [setup(nueva_partida), nondet]) :-
     aplicar_efecto(viajar(camino_real)),

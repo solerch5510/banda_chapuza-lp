@@ -55,7 +55,7 @@ Se puede **recorrer el mapa, gestionar la compañía y pedir explicaciones**. Ca
 | `pagar.` | Solo en la taberna: paga los sueldos pendientes (5 quesos) empezando por los más rancios. Llegar a la taberna deja sueldos pendientes. |
 | `compania.` | Los miembros: vida, ataque, defensa, moral, fila, sueldo, rasgo y estado (en pie, huelga o caído). |
 | `inventario.` | La despensa lote a lote (con la edad y la categoría del queso) y los objetos. |
-| `contratos.` | El tablón: los contratos a la vista con su zona, dificultad, premio y estado (`disponible`, `bloqueado`, `lejos`, `activo`, `por_cobrar` o `cumplido`). |
+| `contratos.` | El tablón: los contratos a la vista con su zona, dificultad, premio y estado (`disponible`, `bloqueado`, `lejos`, `activo`, `por_cobrar` o `cumplido`) y, debajo de cada uno, su chiste. |
 | `aceptar(Contrato).` | Acepta un contrato (en la taberna o donde lo ofrecen). Hasta 3 a la vez. Si no se puede, el contrato "os mira y decide que no". `explicar(aceptar(Contrato)).` enseña la prueba de por qué se pudo. |
 | `elegir(Opcion).` | Elige una opción del evento abierto, por su número o por su nombre (p. ej. `elegir(trepar).` o `elegir(1).`). `mirar.` vuelve a enseñar las opciones. Un evento se abre al aceptar su contrato en su zona o al llegar a ella con el contrato activo. |
 | `atacar(Objetivo).` | Solo en combate: golpea con el miembro al que le toca. El objetivo es un tipo (`bandido_torpe`) o una instancia (`e(bandido_torpe, 1)`). |
@@ -64,7 +64,7 @@ Se puede **recorrer el mapa, gestionar la compañía y pedir explicaciones**. Ca
 | `explicar.` | La prueba lógica, en árbol, de lo último que se hizo (`ir`, `descansar`, `pagar`, `atacar`, `defender`, `habilidad` o la decisión de un enemigo). Tras el turno de un enemigo cuenta **por qué hizo eso** (la regla de su IA que ganó, con su corte) y **por qué no hizo otra cosa** (por qué no se aplicó ninguna regla de mayor prioridad). |
 | `explicar(ir(aldea)).` | La prueba de esa acción: la guardada si es la última; si no, se resuelve ahora. |
 | `por_que_no(Accion).` | **Por qué NO se puede** una acción: la regla que falla, lo que sí se cumplía antes y, si falla una negación (`\+`), el hecho que la impide. Ejemplos: `por_que_no(aceptar(gallina_noble)).` (el miedo de Baldomero a los caballos), `por_que_no(atacar(bandido_montado)).` en combate, `por_que_no(ir(castillo)).`, `por_que_no(descansar).` Si la acción sí se puede, lo dice. No cambia nada. |
-| `nivel(resumido).` / `nivel(detallado).` | Cuánto detalle tienen `explicar` y `por_que_no`. **Resumido** (el de partida): el árbol plegado a lo esencial (`[+N nodos]`; un ataque cabe en 15 líneas) y solo la cláusula más cercana. **Detallado**: el árbol entero, todas las cláusulas aplicables y, si falla una negación, la prueba de por qué es cierto lo que niega (de dónde sale el miedo de Baldomero). |
+| `nivel(resumido).` / `nivel(detallado).` | Cuánto detalle tienen `explicar` y `por_que_no`. **Resumido** (el de partida): el árbol plegado a lo esencial (`[+N nodos]`; un ataque cabe en 15 líneas) y solo la cláusula más cercana. **Detallado**: el árbol entero, todas las cláusulas aplicables y, si falla una negación, la prueba de por qué es cierto lo que niega (de dónde sale el miedo de Baldomero), más hasta tres notas del narrador sobre nodos del árbol (`  · …`). |
 | `salir.` | Termina la partida. |
 
 **La partida mínima ya se puede jugar de principio a fin.** Si la despensa se queda vacía y no hay nada por cobrar, la partida termina por hambre; si caen los cuatro miembros en un combate, termina en derrota; y si se derrota al Gran Roquefort, se gana con el final `chapuza`.
@@ -165,10 +165,14 @@ Las pruebas usan `plunit`. Desde la raíz del repositorio (PowerShell), con el e
 ```
 
 ```
+& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/banco -g "run_tests,halt" -t "halt(1)"
+```
+
+```
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/spike_explicar -g "run_tests,halt" -t "halt(1)"
 ```
 
-Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (1466 pruebas):
+Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (1524 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -184,9 +188,10 @@ Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 
 | `tests/cierre.pl` (102) | Cómo acaba un contrato: `resultado/3` (éxito, a medias o fracaso según contadores y marcas), sus consecuencias, el cobro automático al llegar a la taberna, el combate que empieza al llegar a la zona de un contrato activo, y partidas completas de aceptar a cobrar. |
 | `tests/eventos.pl` (110) | El motor mínimo de eventos y el comando `elegir`: cuándo se abre el evento del gato, sus opciones y cuáles están disponibles, los intentos, qué pasa al elegir cada una, cómo se resuelve el contrato con las marcas que dejan y la cadena gato → venda → gallina. |
 | `tests/campana.pl` (39) | La partida mínima de principio a fin: los finales (`chapuza`, `derrota_combate`, `derrota_hambre`), la fase final, partidas completas escritas como una lista de comandos (se gana en 7 días y es reproducible) y que `pelear` ya no existe. |
-| `tests/niveles.pl` (63) | Los niveles `resumido`/`detallado` (comando `nivel`, el ajuste de sesión y cómo cambian `explicar`, `por_que_no` y la decisión de un enemigo) y `por_que_no` v2: varias cláusulas aplicables, la prueba de por qué es cierto lo que una negación niega y las negaciones anidadas (`\+ \+ X`). |
+| `tests/banco.pl` (56) | El banco de frases del narrador, sano como conjunto: tamaño, marcas `~w` y argumentos, textos sin repetir, claves con identificadores que existen (detecta erratas), cobertura de las reglas explicables y de los casos reales de `por_que_no` (con frase propia, no la genérica), rotación de las frases frecuentes, comentarios de nodo del nivel detallado y el chiste de cada contrato. |
+| `tests/niveles.pl` (64) | Los niveles `resumido`/`detallado` (comando `nivel`, el ajuste de sesión y cómo cambian `explicar`, `por_que_no` y la decisión de un enemigo) y `por_que_no` v2: varias cláusulas aplicables, la prueba de por qué es cierto lo que una negación niega y las negaciones anidadas (`\+ \+ X`). |
 | `tests/turno_enemigo.pl` (55) | `explicar` tras el turno de un enemigo (demostración central 3): plegar el árbol a lo esencial, las reglas de mayor prioridad que no se aplicaron (calculadas al decidir con `por_que_no`) para cada una de las seis reglas de la IA, la pantalla, las frases del narrador y combates enteros explicados turno a turno. |
-| `tests/por_que_no.pl` (81) | `por_que_no`, el segundo meta-intérprete: cada forma de diagnóstico con un módulo de juguete (`tests/spike/toy_diag.pl`), las dos demostraciones centrales (el miedo de Baldomero y la gallina noble), otras reglas del juego (viajar, descansar, pagar, huelga, aturdimiento, fila, hechizo), que las claves del narrador salgan igual que con los diagnósticos a mano, y el comando y su pantalla. |
+| `tests/por_que_no.pl` (82) | `por_que_no`, el segundo meta-intérprete: cada forma de diagnóstico con un módulo de juguete (`tests/spike/toy_diag.pl`), las dos demostraciones centrales (el miedo de Baldomero y la gallina noble), otras reglas del juego (viajar, descansar, pagar, huelga, aturdimiento, fila, hechizo), que las claves del narrador salgan igual que con los diagnósticos a mano, y el comando y su pantalla. |
 | `tests/escolta.pl` (41) | La escolta de Clotilde: la regla (un golpe por ronda al primer enemigo que actúa), el aviso, el turno enemigo con su prueba guardada y el `explicar` de la escolta, el resultado por umbrales (2 / 4 / 5), el fracaso con reintento y que los demás combates no cuentan golpes. |
 | `tests/habilidades.pl` (82) | Las habilidades: la tabla de datos `efecto_habilidad/2`, las reglas `puede_habilidad/2` y `/3`, los efectos de la carga, la fondue, la balada y rebuscar, el comando `habilidad` (errores sin efecto, prueba guardada, `explicar`), las pantallas y combates enteros jugados con habilidades. |
 | `tests/diagnosticos.pl` (63) | Del diagnóstico de `por_que_no` a la frase: `claves_de_diag/2` y `comentario_diag/4` con diagnósticos escritos a mano (`neg_viola`, `fallo`, `tras`, `ninguna`, `sin_clausula`, `builtin_falso`, `limite`), las claves del núcleo (huelga, aturdido, fila, hechizo, viaje, descanso, contrato, miedo a los caballos) y las frases de reserva. |

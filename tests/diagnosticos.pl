@@ -69,8 +69,8 @@ diag_f08(fallo(economia:puede_descansar,
 
 % Un contrato con un requisito de dinero o de rango cualquiera (sin frase propia).
 diag_f10a(fallo(contratos:puede_aceptar(despensa_real),
-                [cl(1, [], punto(contratos:condicion_cumple(contratos_cumplidos_min(3)),
-                                 fallo(contratos:condicion_cumple(contratos_cumplidos_min(3)),
+                [cl(1, [], punto(contratos:condicion_cumple(requisito_raro(3)),
+                                 fallo(contratos:condicion_cumple(requisito_raro(3)),
                                        [cl(1, [], punto(0 >= 3, builtin_falso(0 >= 3)))])))])).
 
 % Gallina noble con Baldomero sin venda: la condicion rasgo_no(teme_caballos) se viola.
@@ -150,7 +150,7 @@ test(ninguna_junta_las_dos_ramas_en_orden) :-
 
 test(fallo_pone_lo_hondo_luego_el_punto_y_al_final_la_meta) :-
     claves_de_diag(fallo(g(1), [cl(1, [], punto(f(2), sin_clausula(h(3))))]),
-                   [falla(h(3)), falla(f(2)), falla(g(1))]).
+                   [falla(h(3)), falla(f(2)), falla(g(1), f(2)), falla(g(1))]).
 
 test(fallo_con_una_negacion_no_repite_el_punto) :-
     claves_de_diag(fallo(g, [cl(1, [], punto((\+ f), neg_viola(f, hecho(f))))]),
@@ -158,18 +158,19 @@ test(fallo_con_una_negacion_no_repite_el_punto) :-
 
 test(fallo_solo_mira_la_primera_candidata) :-
     claves_de_diag(fallo(g, [cl(1, [], punto(f1, sin_clausula(h1))), cl(2, [], punto(f2, sin_clausula(h2)))]),
-                   [falla(h1), falla(f1), falla(g)]).
+                   [falla(h1), falla(f1), falla(g, f1), falla(g)]).
 
 test(fallo_sin_candidatas_da_solo_la_meta) :-
     claves_de_diag(fallo(g, []), [falla(g)]).
 
 test(fallo_con_modulos_los_pela) :-
     claves_de_diag(fallo(a:g, [cl(1, [], punto(b:f, sin_clausula(c:h)))]),
-                   [falla(h), falla(f), falla(g)]).
+                   [falla(h), falla(f), falla(g, f), falla(g)]).
 
 test(una_condicion_de_contrato_en_el_punto_prueba_el_envoltorio_y_luego_la_condicion) :-
     claves_de_diag(fallo(puede_aceptar(c), [cl(1, [], punto(condicion_cumple(moral_media_min(4)), builtin_falso(2 >= 4)))]),
-                   [falla(condicion_cumple(moral_media_min(4))), falla(moral_media_min(4)), falla(puede_aceptar(c))]).
+                   [falla(condicion_cumple(moral_media_min(4))), falla(moral_media_min(4)),
+                    falla(puede_aceptar(c), condicion_cumple(moral_media_min(4))), falla(puede_aceptar(c))]).
 
 test(una_forma_desconocida_da_lista_vacia) :-
     claves_de_diag(patata(1), []).

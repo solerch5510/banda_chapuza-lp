@@ -411,17 +411,23 @@ test(el_detallado_enseña_el_rasgo_en_la_demo_1, [setup(combate_con([bandido_mon
     contiene(T, 'ignora_miedo(baldomero)'),
     contiene(T, 'Narrador: Sir Baldomero ve el caballo').
 
-test(el_resumido_no_cae_en_el_error_de_una_frase_solo_detallada, [setup(nueva_partida), nondet]) :-
+test(el_resumido_no_cae_en_el_error_de_una_frase_solo_detallada, [nondet]) :-
     % la frase generica de "algo lo impide" es solo del nivel detallado: en el resumido sale la general
-    pantalla(por_que_no(pagar), T),
-    contiene(T, 'Narrador:'),
-    \+ contiene(T, 'vista('),
+    D = neg_viola(zzz, hecho(zzz)),
+    comentario_diag(D, resumido, 0, T),
     contiene(T, 'No se cumple').
 
-test(el_detallado_si_usa_la_frase_de_algo_lo_impide, [setup(nueva_partida), nondet]) :-
-    ordena(nivel(detallado), _),
-    pantalla(por_que_no(pagar), T),
+test(el_detallado_si_usa_la_frase_de_algo_lo_impide, [nondet]) :-
+    D = neg_viola(zzz, hecho(zzz)),
+    comentario_diag(D, detallado, 0, T),
     contiene(T, 'Algo lo impide').
+
+test(pagar_sueldos_ya_pagados_tiene_frase_propia_en_los_dos_niveles, [setup(nueva_partida), nondet]) :-
+    forall(member(Nivel, [resumido, detallado]),
+           (   ordena(nivel(Nivel), _),
+               pantalla(por_que_no(pagar), T),
+               contiene(T, 'Narrador:'), contiene(T, 'ya están pagados')
+           )).
 
 test(los_dos_niveles_nunca_ensenan_terminos_crudos, [setup(nueva_partida), nondet]) :-
     forall(( member(Nivel, [resumido, detallado]),

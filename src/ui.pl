@@ -112,7 +112,11 @@ mostrar_conocido(vista(contratos, Fichas)) :-
            (   narrador:nombre_visible(Id, Nombre),
                narrador:nombre_visible(Zona, NombreZona),
                narrador:texto_recompensa(Recompensa, Premio),
-               format("  [~w] ~w (~w, dificultad ~w): ~w~n", [Estado, Nombre, NombreZona, Dificultad, Premio])
+               format("  [~w] ~w (~w, dificultad ~w): ~w~n", [Estado, Nombre, NombreZona, Dificultad, Premio]),
+               (   narrador:descripcion_contrato(Id, Descripcion)
+               ->  format("      ~w~n", [Descripcion])
+               ;   true
+               )
            )).
 mostrar_conocido(vista(combate, combate(Ronda, Turno, Enemigos))) :-
     narrador:nombre_visible(Turno, QuienJuega),
@@ -151,6 +155,8 @@ mostrar_conocido(vista(prueba, Accion, Prueba)) :-
     explicar:lineas_de_prueba(Prueba, Nivel, Lineas),
     format("Por qué se pudo ~w:~n", [Accion]),
     escribir_lineas(Lineas),
+    narrador:comentarios_de_nodo(Prueba, Nivel, 0, Notas),          % solo en el nivel detallado
+    forall(member(Nota, Notas), format("  · ~w~n", [Nota])),
     narrador:comentario_prueba(Prueba, Nivel, 0, Comentario),
     format("Narrador: ~w~n", [Comentario]).
 mostrar_conocido(vista(diag, Accion, Diag)) :-
