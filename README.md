@@ -82,7 +82,7 @@ ir(castillo).  aceptar(despensa_real).
 ir(camino_real).  ir(cuevas). % el Gran Roquefort
 ```
 
-En combate manda cada miembro en su turno (`mirar.` dice de quién es y cuánta vida tiene cada enemigo); los enemigos actúan solos, al ganar hay botín y moral, y los caídos se levantan con 1 de vida. `explicar.` justifica lo último que pasó, también las decisiones de los enemigos. **La escolta de Lady Clotilde:** al aceptar `gallina_noble` en el Camino Real, en cada ronda del combate el primer enemigo que actúa se ceba con ella (anota un golpe y no ataca a la Banda). Con 2 golpes o menos, éxito (14 quesos y un brie); con 3 o 4, a medias (la mitad); con 5 o más, fracaso (−3 quesos y −2 de moral; se puede reintentar). Cuanto antes acabes el combate, menos plumas pierde. Todavía no están implementados el narrador completo ni los finales de nivel Objetivo.
+En combate manda cada miembro en su turno (tras cada orden se ve de quién es el siguiente turno y cuánta vida tiene cada enemigo; `mirar.` lo repite); los enemigos actúan solos, al ganar hay botín y moral, y los caídos se levantan con 1 de vida. `explicar.` justifica lo último que pasó, también las decisiones de los enemigos. **La escolta de Lady Clotilde:** al aceptar `gallina_noble` en el Camino Real, en cada ronda del combate el primer enemigo que actúa se ceba con ella (anota un golpe y no ataca a la Banda). Con 2 golpes o menos, éxito (14 quesos y un brie); con 3 o 4, a medias (la mitad); con 5 o más, fracaso (−3 quesos y −2 de moral; se puede reintentar). Cuanto antes acabes el combate, menos plumas pierde. Todavía no están implementados el narrador completo ni los finales de nivel Objetivo.
 
 ## Pruebas
 
@@ -169,10 +169,14 @@ Las pruebas usan `plunit`. Desde la raíz del repositorio (PowerShell), con el e
 ```
 
 ```
+& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/playtest -g "run_tests,halt" -t "halt(1)"
+```
+
+```
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/spike_explicar -g "run_tests,halt" -t "halt(1)"
 ```
 
-Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (1524 pruebas):
+Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (1569 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -188,6 +192,7 @@ Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 
 | `tests/cierre.pl` (102) | Cómo acaba un contrato: `resultado/3` (éxito, a medias o fracaso según contadores y marcas), sus consecuencias, el cobro automático al llegar a la taberna, el combate que empieza al llegar a la zona de un contrato activo, y partidas completas de aceptar a cobrar. |
 | `tests/eventos.pl` (110) | El motor mínimo de eventos y el comando `elegir`: cuándo se abre el evento del gato, sus opciones y cuáles están disponibles, los intentos, qué pasa al elegir cada una, cómo se resuelve el contrato con las marcas que dejan y la cadena gato → venda → gallina. |
 | `tests/campana.pl` (39) | La partida mínima de principio a fin: los finales (`chapuza`, `derrota_combate`, `derrota_hambre`), la fase final, partidas completas escritas como una lista de comandos (se gana en 7 días y es reproducible) y que `pelear` ya no existe. |
+| `tests/playtest.pl` (45) | El primer playtest guiado convertido en pruebas: la partida completa por la vía cómoda (se gana, en pocos días y comandos, sin pantallas crudas ni errores y reproducible), las tres rutas degeneradas (no pagar, ignorar la comida, contratos sin condiciones) y los ajustes que salieron de él: el estado del combate tras cada orden, el día y la ración, las variantes que rotan de verdad y las pistas de `por_que_no`. |
 | `tests/banco.pl` (56) | El banco de frases del narrador, sano como conjunto: tamaño, marcas `~w` y argumentos, textos sin repetir, claves con identificadores que existen (detecta erratas), cobertura de las reglas explicables y de los casos reales de `por_que_no` (con frase propia, no la genérica), rotación de las frases frecuentes, comentarios de nodo del nivel detallado y el chiste de cada contrato. |
 | `tests/niveles.pl` (64) | Los niveles `resumido`/`detallado` (comando `nivel`, el ajuste de sesión y cómo cambian `explicar`, `por_que_no` y la decisión de un enemigo) y `por_que_no` v2: varias cláusulas aplicables, la prueba de por qué es cierto lo que una negación niega y las negaciones anidadas (`\+ \+ X`). |
 | `tests/turno_enemigo.pl` (55) | `explicar` tras el turno de un enemigo (demostración central 3): plegar el árbol a lo esencial, las reglas de mayor prioridad que no se aplicaron (calculadas al decidir con `por_que_no`) para cada una de las seis reglas de la IA, la pantalla, las frases del narrador y combates enteros explicados turno a turno. |
@@ -239,6 +244,7 @@ Documentos en `docs/`:
 | [04-guion-y-contratos.md](docs/04-guion-y-contratos.md) | Guion y contratos. |
 | [05-comedia-y-narracion.md](docs/05-comedia-y-narracion.md) | Comedia y narración. |
 | [06-revision-y-decisiones.md](docs/06-revision-y-decisiones.md) | Revisión de coherencia y decisiones. |
+| [07-playtest-1.md](docs/07-playtest-1.md) | Primer playtest completo (PT-1): resultados, ajustes y observaciones de balance. |
 
 ## Contexto académico
 

@@ -258,7 +258,7 @@ test(el_paso_no_modifica_el_estado) :-
 test(baldomero_golpea_al_bandido_torpe) :-
     combate_listo([bandido_torpe]),
     ordena(atacar(bandido_torpe), Items),
-    Items == [msg(golpe, [baldomero, e(bandido_torpe, 1), 9], 0)],
+    Items = [msg(golpe, [baldomero, e(bandido_torpe, 1), 9], 0), vista(combate, _)],
     estado:vida(e(bandido_torpe, 1), V),
     V == 3.
 
@@ -342,7 +342,7 @@ test(con_la_venda_baldomero_si_ataca_al_montado) :-
     combate_listo([bandido_montado]),
     aplicar_efecto(equipar(baldomero, venda_de_caballos)),
     ordena(atacar(bandido_montado), Items),
-    Items == [msg(golpe, [baldomero, e(bandido_montado, 1), 5], 0)].
+    Items = [msg(golpe, [baldomero, e(bandido_montado, 1), 5], 0), vista(combate, _)].
 
 test(un_error_no_toca_el_estado) :-
     combate_listo([bandido_montado]),
@@ -386,7 +386,7 @@ test(ataca_el_miembro_al_que_le_toca) :-
     combate_listo([bandido_torpe]),
     cola_a([tuerca, baldomero]),
     ordena(atacar(bandido_torpe), Items),
-    Items == [msg(golpe, [tuerca, e(bandido_torpe, 1), 5], 0)].
+    Items = [msg(golpe, [tuerca, e(bandido_torpe, 1), 5], 0), vista(combate, _)].
 
 test(un_aturdido_no_ataca) :-
     combate_listo([bandido_torpe]),
@@ -398,12 +398,12 @@ test(la_moral_baja_se_nota_en_el_golpe) :-
     combate_listo([bandido_torpe]),
     moral_a(baldomero, 3),                             % baja: -1
     ordena(atacar(bandido_torpe), Items),
-    Items == [msg(golpe, [baldomero, e(bandido_torpe, 1), 8], 0)].
+    Items = [msg(golpe, [baldomero, e(bandido_torpe, 1), 8], 0), vista(combate, _)].
 
 test(el_contador_de_uso_de_la_frase_sube) :-
     combate_listo([bandido_torpe]),
     ordena(atacar(bandido_torpe), _),
-    estado:usos_frase(golpe(baldomero, e(bandido_torpe, 1), 9), U),
+    estado:usos_frase(golpe, U),                       % el grupo es el mensaje, no quien golpea
     U == 1.
 
 test(dos_golpes_en_dos_turnos_acaban_con_el_enemigo) :-
@@ -411,7 +411,7 @@ test(dos_golpes_en_dos_turnos_acaban_con_el_enemigo) :-
     ordena(atacar(bandido_torpe), I1),
     cola_a([baldomero]),
     ordena(atacar(bandido_torpe), I2),
-    I1 = [msg(golpe, _, _)],
+    I1 = [msg(golpe, _, _), vista(combate, _)],
     memberchk(msg(cae, [e(bandido_torpe, 1)], _), I2),
     \+ compania:vivo(e(bandido_torpe, 1)).
 
@@ -422,7 +422,7 @@ test(dos_golpes_en_dos_turnos_acaban_con_el_enemigo) :-
 test(defender_pone_el_estado_y_pasa_el_turno) :-
     combate_listo([bandido_torpe]),
     ordena(defender, Items),
-    Items == [msg(defiende, [baldomero], 0)],
+    Items = [msg(defiende, [baldomero], 0), vista(combate, _)],
     estado:alterado(baldomero, defendiendo, 1),
     estado:cola_turnos([Siguiente|_]),
     Siguiente \== baldomero.
@@ -444,7 +444,7 @@ test(defender_reduce_el_dano_que_se_recibe) :-
 test(defiende_el_miembro_al_que_le_toca) :-
     combate_listo([bandido_torpe]),
     cola_a([rufino, baldomero]),
-    ordena(defender, [msg(defiende, [rufino], _)]),
+    ordena(defender, [msg(defiende, [rufino], _), vista(combate, _)]),
     estado:alterado(rufino, defendiendo, 1),
     \+ estado:alterado(baldomero, defendiendo, _).
 

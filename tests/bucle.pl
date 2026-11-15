@@ -306,7 +306,7 @@ test(la_decision_no_modifica_el_estado) :-
 
 test(al_empezar_actua_el_primero_y_se_espera_al_jugador) :-
     empieza([bandido_torpe], Items),
-    Items = [msg(aparece, [bandido_torpe], 0)],
+    Items = [msg(aparece, [bandido_torpe], 0), vista(combate, _)],
     estado:cola_turnos([Primero|_]),
     Primero == baldomero.
 

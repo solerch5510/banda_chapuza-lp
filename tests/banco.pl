@@ -171,7 +171,7 @@ functor_valido(F) :-
                llegada, descanso, sin_comida, come_rancio, pago, impago, fin_hambre, final, golpe, cae,
                evento_abre, evento_elige, intento_fallido, objetivo, contrato_resuelto, cobra, acepta, aparece,
                victoria, botin, derrota_combate, aturdido, pasa, se_cura, invoca_moho, roba_queso, embiste,
-               defiende, carga_heroica, fondue, balada, rebuscar, nivel, golpea_a_clotilde,
+               defiende, carga_heroica, fondue, balada, rebuscar, nivel, golpea_a_clotilde, dia_nuevo,
                % reglas
                puede_viajar, puede_descansar, puede_pagar_sueldos, puede_atacar, dano, puede_habilidad,
                puede_aceptar, ignora_miedo, en_fila_alcanzable, vivo, modificador, queso_total,

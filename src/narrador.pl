@@ -171,6 +171,12 @@ frase(suceso(balada), ambos,
       'Rufino canta. El grupo se anima, el enemigo se desanima y los pájaros emigran.').
 frase(suceso(defiende(P)), ambos,
       '~w levanta la guardia, la ceja y la moral. En ese orden.'-[P]).
+frase(suceso(dia_nuevo(D, N)), ambos,
+      'Día ~w. Los quesos maduran y las deudas también. La ración de hoy: ~w quesos.'-[D, N]).
+frase(suceso(dia_nuevo(D, N)), ambos,
+      'Amanece el día ~w. Alguien tiene hambre y alguien más, una cuenta pendiente. Ración: ~w quesos.'-[D, N]).
+frase(suceso(dia_nuevo(D, N)), ambos,
+      'Día ~w de la Banda Chapuza. El Registro de Compañías sigue donde estaba: abajo. Ración: ~w quesos.'-[D, N]).
 frase(suceso(descanso), ambos,
       'Descansáis. La vela se consume, los ronquidos de Rufino riman y Doña Mantecosa cobra las camas con puntualidad.').
 frase(suceso(descanso), ambos,
@@ -618,13 +624,13 @@ texto_premio(objeto(Objeto), Texto) :-
 % ---------------------------------------------------------------------------
 texto_error(no_puede_viajar(Zona), Texto) :-
     (   mundo:zona(Zona, Nombre)
-    ->  format(atom(Texto), 'No puedes ir a ~w desde aquí: no hay camino directo.', [Nombre])
+    ->  format(atom(Texto), 'No puedes ir a ~w desde aquí: no hay camino directo. Pregunta por_que_no(ir(~w)) para ver por qué.', [Nombre, Zona])
     ;   como_texto(Zona, Dicho),
         format(atom(Texto), 'No conozco ningún lugar llamado "~w".', [Dicho])
     ).
 texto_error(no_puede_descansar, Texto) :-
     mundo:parametro(coste_descanso, Coste),
-    format(atom(Texto), 'Descansar cuesta ~w quesos y la despensa no llega.', [Coste]).
+    format(atom(Texto), 'Descansar cuesta ~w quesos y la despensa no llega. Pregunta por_que_no(descansar) para ver por qué.', [Coste]).
 texto_error(fuera_de_fase(Cmd, Fase), Texto) :-
     (   Fase == fin
     ->  Texto = 'La partida ha terminado.'
@@ -642,7 +648,7 @@ texto_error(contrato_desconocido(C), Texto) :-
     format(atom(Texto), 'No hay ningún contrato llamado "~w". Escribe contratos. para ver los que hay.', [Dicho]).
 texto_error(no_puede_aceptar(C), Texto) :-
     nombre_visible(C, Nombre),
-    format(atom(Texto), 'El contrato «~w» os mira, mira a la Banda y decide que no. Ahora mismo no podéis aceptarlo.', [Nombre]).
+    format(atom(Texto), 'El contrato «~w» os mira, mira a la Banda y decide que no. Ahora mismo no podéis aceptarlo: pregunta por_que_no(aceptar(~w)).', [Nombre, C]).
 texto_error(no_hay_evento, 'No hay ningún evento abierto: no hay nada que elegir.').
 texto_error(opcion_desconocida(X), Texto) :-
     como_texto(X, Dicho),
@@ -654,11 +660,11 @@ texto_error(no_puede_atacar(Actor, Objetivo), Texto) :-
     nombre_visible(Actor, A),
     nombre_visible(Objetivo, B),
     con_a(B, ConA),
-    format(atom(Texto), '~w no puede atacar ~w ahora mismo.', [A, ConA]).
+    format(atom(Texto), '~w no puede atacar ~w ahora mismo. Pregunta por_que_no(atacar(...)) con esa misma orden.', [A, ConA]).
 texto_error(no_puede_habilidad(Actor, Habilidad), Texto) :-
     nombre_visible(Actor, A),
     nombre_visible(Habilidad, H),
-    format(atom(Texto), '~w no puede usar ~w ahora mismo: falta lo que necesita, o el objetivo no está a su alcance.', [A, H]).
+    format(atom(Texto), '~w no puede usar ~w ahora mismo: falta lo que necesita, o el objetivo no está a su alcance. Pregunta por_que_no(habilidad(...)).', [A, H]).
 texto_error(habilidad_pide_objetivo(Habilidad), Texto) :-
     nombre_visible(Habilidad, H),
     format(atom(Texto), '~w necesita un enemigo: escribe habilidad(Objetivo).', [H]).
@@ -669,7 +675,7 @@ texto_error(objetivo_desconocido(Objetivo), Texto) :-
     como_texto(Objetivo, Dicho),
     format(atom(Texto), 'No hay nada llamado "~w" a lo que atacar.', [Dicho]).
 texto_error(nada_que_pagar, 'No debes nada: los sueldos ya están pagados.').
-texto_error(no_puede_pagar, 'Los sueldos no se pueden pagar a medias y la despensa no llega.').
+texto_error(no_puede_pagar, 'Los sueldos no se pueden pagar a medias y la despensa no llega. Pregunta por_que_no(pagar).').
 texto_error(nada_que_explicar, 'Todavía no has hecho nada que explicar. Prueba con explicar(ir(aldea)).').
 texto_error(no_hay_prueba(Accion), Texto) :-
     como_texto(Accion, Dicho),

@@ -337,7 +337,16 @@ accion_de_turno(Clave, Actor, Accion, Meta, Items) :-
     append([guardar_prueba(Clave, Prueba)|Efectos], [siguiente_turno], Todos),
     etapa(Todos, I1),
     avanzar_combate(I2),
-    append(I1, I2, Items).
+    append(I1, I2, Items0),
+    con_estado_de_combate(Items0, Items).
+
+% con_estado_de_combate(+Items0, -Items): si el combate sigue y espera al jugador, se le enseña de quien es el
+% turno y como estan los enemigos (sin tener que escribir mirar. despues de cada orden).
+con_estado_de_combate(Items0, Items) :-
+    (   estado:en_combate(_), \+ estado:fin_partida(_), datos_de_combate(Datos)
+    ->  append(Items0, [vista(combate, Datos)], Items)
+    ;   Items = Items0
+    ).
 
 % usar_habilidad(+Objetivo, -Items): Objetivo es ninguno, un tipo o una instancia.
 usar_habilidad(Objetivo, Items) :-
@@ -374,7 +383,8 @@ comenzar_combate(Tipos, Items) :-
     append(Efectos, Avisos, Todos),
     etapa(Todos, I1),
     avanzar_combate(I2),
-    append(I1, I2, Items).
+    append(I1, I2, Items0),
+    con_estado_de_combate(Items0, Items).
 
 % avanzar_combate(-Items): el limite evita un bucle sin fin si algo falla en el diseno.
 avanzar_combate(Items) :-
@@ -513,7 +523,11 @@ pasar_dia(Items) :-
     etapa([envejecer_quesos], I1),
     economia:efectos_racion(Efectos),
     etapa(Efectos, I2),
-    etapa([avanzar_dia], I3),
+    findall(x, member(gastar_queso(_, _, _), Efectos), Comidos),
+    length(Comidos, Racion),                               % los quesos que se comieron hoy
+    once(estado:dia(Hoy)),
+    Manana is Hoy + 1,
+    etapa([avanzar_dia, mensaje(dia_nuevo, [Manana, Racion])], I3),
     append([I1, I2, I3], Items).
 
 % Llegar a la taberna trae sueldos pendientes: se quita la bandera sueldos_pagados.
@@ -607,8 +621,10 @@ comprobar_fin(Items) :-
 
 % etapa(+Efectos, -Mensajes): recoge los mensajes con su contador de uso (antes de
 % incrementarlo) y aplica TODO en una transaccion. ui no escribe nada en el estado.
-% El contador es por GRUPO: el mensaje entero con sus argumentos (llegada(aldea) y
-% llegada(taberna) cuentan por separado), que es lo que rota las variantes del narrador.
+% El contador es por GRUPO: el conjunto de frases que rotan entre si. Para un mensaje cuyo ARGUMENTO elige
+% la frase (llegada(aldea) y llegada(taberna) tienen cada una la suya) el grupo lleva ese argumento; para el
+% resto (una carga, un golpe, una victoria) el grupo es el mensaje, sea quien sea el que golpea o el golpeado,
+% asi las variantes se alternan de verdad.
 etapa(Efectos, Mensajes) :-
     findall(msg(Clave, Args, Uso),
             (   member(mensaje(Clave, Args), Efectos),
@@ -625,7 +641,20 @@ etapa(Efectos, Mensajes) :-
     con_transaccion(estado:aplicar_efectos(Todos)).
 
 grupo_de(Clave, Args, Grupo) :-
-    Grupo =.. [Clave|Args].
+    (   grupo_por_argumento(Clave, Args, G) -> Grupo = G ; Grupo = Clave ).
+
+% grupo_por_argumento(+Clave, +Args, -Grupo): los mensajes cuyo argumento decide que frases les tocan.
+grupo_por_argumento(llegada, [Zona], llegada(Zona)).
+grupo_por_argumento(aparece, [Tipo], aparece(Tipo)).
+grupo_por_argumento(cae, [Quien], cae(Tipo)) :-
+    (   nonvar(Quien), Quien = e(T, _) -> Tipo = T ; Tipo = miembro ).
+grupo_por_argumento(evento_elige, [Evento, Opcion], evento_elige(Evento, Opcion)).
+grupo_por_argumento(contrato_resuelto, [_, Resultado], contrato_resuelto(Resultado)).
+grupo_por_argumento(intento_fallido, [_, Quedan], intento_fallido(Quedan)).
+grupo_por_argumento(rebuscar, [_, Resultado], rebuscar(Resultado)).
+grupo_por_argumento(botin, [N], botin(N)).
+grupo_por_argumento(nivel, [N], nivel(N)).
+grupo_por_argumento(final, [F], final(F)).
 
 uso_de(Grupo, Uso) :-
     (   estado:usos_frase(Grupo, U0) -> Uso = U0 ; Uso = 0 ).
