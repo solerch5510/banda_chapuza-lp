@@ -84,6 +84,25 @@ ir(camino_real).  ir(cuevas). % el Gran Roquefort
 
 En combate manda cada miembro en su turno (tras cada orden se ve de quién es el siguiente turno y cuánta vida tiene cada enemigo; `mirar.` lo repite); los enemigos actúan solos, al ganar hay botín y moral, y los caídos se levantan con 1 de vida. `explicar.` justifica lo último que pasó, también las decisiones de los enemigos. **La escolta de Lady Clotilde:** al aceptar `gallina_noble` en el Camino Real, en cada ronda del combate el primer enemigo que actúa se ceba con ella (anota un golpe y no ataca a la Banda). Con 2 golpes o menos, éxito (14 quesos y un brie); con 3 o 4, a medias (la mitad); con 5 o más, fracaso (−3 quesos y −2 de moral; se puede reintentar). Cuanto antes acabes el combate, menos plumas pierde. Todavía no están implementados el narrador completo ni los finales de nivel Objetivo.
 
+## Demostración
+
+Para la exposición hay cinco **escenas** preparadas de antemano, para no depender de jugar desde cero. Se piden con un meta-comando (no es un comando del juego: es una ayuda para presentarlo):
+
+```
+demo.               lista las escenas
+demo(economia).     el queso madura (min. 3:00)
+demo(combate).      el miedo de Baldomero (min. 5:00)
+demo(ia).           la IA enemiga y el corte (min. 9:30)
+demo(gallina).      Lady Clotilde y el miedo a los caballos (min. 11:00)
+demo(venda).        continuación: Baldomero con la venda de caballos
+```
+
+Cada escena parte de una partida nueva (salvo `venda`, que continúa la actual), así que es reproducible, y termina con una lista de comandos sugeridos para probar. En `examples/` están los guiones de comandos y sus **transcripciones guardadas** (ver [examples/README.md](examples/README.md)); para pasar la demostración entera de golpe:
+
+```
+& "C:\Program Files\pl\bin\swipl.exe" -q -s src/main -g main -t halt < examples/demo-comandos.txt
+```
+
 ## Pruebas
 
 Las pruebas usan `plunit`. **Una sola orden** las corre todas (desde la raíz del repositorio, con el ejecutable por su ruta completa porque no está en el PATH):
@@ -98,7 +117,7 @@ Cada suite corre en su propio proceso (así ninguna contagia a otra), se escribe
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/combate -g "run_tests,halt" -t "halt(1)"
 ```
 
-Suites actuales (1611 pruebas):
+Suites actuales (1646 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -116,6 +135,7 @@ Suites actuales (1611 pruebas):
 | `tests/campana.pl` (39) | La partida mínima de principio a fin: los finales (`chapuza`, `derrota_combate`, `derrota_hambre`), la fase final, partidas completas escritas como una lista de comandos (se gana en 7 días y es reproducible) y que `pelear` ya no existe. |
 | `tests/equivalencia.pl` (42) | **La prueba de equivalencia del meta-intérprete**: más de 20 objetivos del juego (compañía, economía, combate, contratos, fase, negación, `->`, aritmética, `findall`, `forall`) × 8 escenarios (inicio, hambre, huelga, combate con rasgos, con venda, el jefe, contratos en marcha, partida acabada): ejecutarlos directamente y con `solve/2` da las **mismas soluciones en el mismo orden**; el oráculo del corte (IA con corte = IA sin corte), la prueba de modo, los casos de error y que demostrar no cambia el estado. |
 | `tests/todas.pl` | El agregador: corre todas las suites en procesos separados y devuelve 0 o 1. |
+| `tests/demo.pl` (35) | La demostración reproducible: las cinco escenas (se montan, dejan el estado que dicen y dan siempre la misma pantalla), `demo.` y la escena desconocida, los guiones de `examples/` y que **lo guardado coincide carácter a carácter con lo que el juego produce ahora** (si cambia una frase hay que regenerar). |
 | `tests/playtest.pl` (45) | El primer playtest guiado convertido en pruebas: la partida completa por la vía cómoda (se gana, en pocos días y comandos, sin pantallas crudas ni errores y reproducible), las tres rutas degeneradas (no pagar, ignorar la comida, contratos sin condiciones) y los ajustes que salieron de él: el estado del combate tras cada orden, el día y la ración, las variantes que rotan de verdad y las pistas de `por_que_no`. |
 | `tests/banco.pl` (56) | El banco de frases del narrador, sano como conjunto: tamaño, marcas `~w` y argumentos, textos sin repetir, claves con identificadores que existen (detecta erratas), cobertura de las reglas explicables y de los casos reales de `por_que_no` (con frase propia, no la genérica), rotación de las frases frecuentes, comentarios de nodo del nivel detallado y el chiste de cada contrato. |
 | `tests/niveles.pl` (64) | Los niveles `resumido`/`detallado` (comando `nivel`, el ajuste de sesión y cómo cambian `explicar`, `por_que_no` y la decisión de un enemigo) y `por_que_no` v2: varias cláusulas aplicables, la prueba de por qué es cierto lo que una negación niega y las negaciones anidadas (`\+ \+ X`). |
@@ -135,16 +155,17 @@ Se ejecutan en procesos distintos porque los módulos de juguete del spike expor
 banda_chapuza-lp/
 ├─ README.md
 ├─ docs/            documentación de diseño
-├─ src/             código fuente (12 módulos)
+├─ src/             código fuente (13 módulos)
 ├─ tests/           pruebas (plunit)
 └─ examples/        partidas y explicaciones de ejemplo
 ```
 
-Los 12 módulos de `src/`:
+Los 13 módulos de `src/`:
 
 | Módulo | Función |
 |---|---|
-| `main.pl` | Punto de entrada y bucle principal del juego. |
+| `main.pl` | Punto de entrada, bucle principal y el meta-comando `demo` (y la transcripción de sesiones para `examples/`). |
+| `demo.pl` | Las escenas de la demostración (datos): estados del juego preparados para la exposición. |
 | `juego.pl` | Orquestación de comandos: valida el comando y lo ejecuta con `ejecutar/2`. |
 | `estado.pl` | Estado dinámico: único módulo que escribe en la base de datos y aplica efectos. |
 | `mundo.pl` | Zonas, conexiones y hechos estáticos. |

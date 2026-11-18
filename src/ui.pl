@@ -80,7 +80,15 @@ mostrar_conocido(vista(ayuda, Comandos)) :-
            (   narrador:ayuda_de(Nombre, Texto)
            ->  format("  ~w~n", [Texto])
            ;   format("  ~w~n", [Nombre])
-           )).
+           )),
+    (   narrador:ayuda_de(demo, Demo) -> format("  ~w~n", [Demo]) ; true ).
+mostrar_conocido(vista(escena, _, Titulo, Descripcion, Sugerencias)) :-
+    format("~n=== ESCENA: ~w ===~n~w~n", [Titulo, Descripcion]),
+    format("Para probar:~n", []),
+    forall(member(S, Sugerencias), format("  ~W.~n", [S, [quoted(true), spacing(next_argument)]])).
+mostrar_conocido(vista(escenas, Escenas)) :-
+    format("Escenas de la demostración (escribe demo(Nombre). para prepararla):~n", []),
+    forall(member(Nombre-Titulo, Escenas), format("  demo(~w).   ~w~n", [Nombre, Titulo])).
 mostrar_conocido(vista(compania, Filas)) :-
     format("La compañía:~n", []),
     forall(member(miembro(_, Nombre, Rol, Vida, VidaMax, Ataque, Defensa, Moral, Fila, Rasgo, Sueldo, Estado), Filas),

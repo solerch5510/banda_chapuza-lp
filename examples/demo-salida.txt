@@ -1,0 +1,288 @@
+
+=== BANDA CHAPUZA ===
+Diriges una compañía de mercenarios incompetentes que cobran en queso.
+Escribe ayuda. para ver los comandos (cada comando termina con un punto).
+
+
+== Taberna del Cuajo Torcido ==
+El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
+Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
+Día 1 · Queso en la despensa: 12
+
+> demo(economia)
+
+=== ESCENA: La economía: el queso madura (min. 3:00 de la exposición) ===
+Día 12, en la taberna, con queso fresco, curado y rancio mezclados y los sueldos por pagar. Cada día que pasa los quesos envejecen: uno pasa de curado a rancio.
+Para probar:
+  mirar.
+  inventario.
+  pagar.
+  ir(aldea).
+  ir(bosque).
+  inventario.
+
+== Taberna del Cuajo Torcido ==
+El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
+Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
+Día 12 · Queso en la despensa: 15
+
+> mirar
+
+== Taberna del Cuajo Torcido ==
+El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
+Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
+Día 12 · Queso en la despensa: 15
+
+> inventario
+Despensa (día 12): 15 quesos (valor informativo: 33)
+  cheddar x12   edad 0 (fresco)
+  cheddar x2   edad 8 (curado)
+  brie x1   edad 14 (rancio)
+Objetos: ninguno
+
+> pagar
+Sueldos pagados: 5 quesos. Doña Mantecosa asiente; los mercenarios también, y eso es raro.
+
+> ir(aldea)
+Día 13. Los quesos maduran y las deudas también. La ración de hoy: 4 quesos.
+Aldea Requesón: casitas blancas, leche tibia y vecinos preguntando cuándo se les paga.
+
+> ir(bosque)
+Amanece el día 14. Alguien tiene hambre y alguien más, una cuenta pendiente. Ración: 4 quesos.
+El Bosque del Moho te recibe con pelusilla. Hasta la sombra tiene moho; las setas opinan de tu forma de caminar.
+
+> inventario
+Despensa (día 14): 2 quesos (valor informativo: 4)
+  cheddar x2   edad 2 (fresco)
+Objetos: ninguno
+
+> demo(combate)
+
+=== ESCENA: Demostración 1: el combate y el miedo de Baldomero (min. 5:00) ===
+Camino Real, combate contra un Bandido Torpe y un Bandido Montado. Baldomero, sin la venda de caballos, no puede atacar al montado: por_que_no lo explica.
+Para probar:
+  explicar(atacar(baldomero, bandido_torpe)).
+  por_que_no(atacar(baldomero, bandido_montado)).
+  nivel(detallado).
+  por_que_no(atacar(baldomero, bandido_montado)).
+  nivel(resumido).
+El Bandido Montado se interpone en tu camino. Nadie ha preguntado si tenía permiso.
+El Bandido Torpe se interpone en tu camino. Nadie ha preguntado si tenía permiso.
+Combate · ronda 1 · turno de Sir Baldomero
+  el Bandido Montado: vida 18/18 (frente)
+  el Bandido Torpe: vida 12/12 (frente)
+
+> explicar(atacar(baldomero, bandido_torpe))
+Por qué se pudo atacar(baldomero,bandido_torpe):
+[ok] puede_atacar(baldomero, e(bandido_torpe, 1))   [clausula 1]
+   [ok] vivo(baldomero)   [clausula 1]   [+2 nodos]
+   [ok] \+ esta_en_huelga(baldomero)   [no demostrable]
+   [ok] vivo(e(bandido_torpe, 1))   [clausula 1]   [+2 nodos]
+   [ok] en_fila_alcanzable(baldomero, e(bandido_torpe, 1))   [clausula 1]   [+5 nodos]
+   [ok] \+ aturdido(baldomero)   [no demostrable]
+   [ok] \+ (teme(baldomero, A), clase_de(e(bandido_torpe, 1), A))   [no demostrable]
+[ok] dano(baldomero, e(bandido_torpe, 1), 9)   [clausula 1]
+   [ok] ataque(baldomero, 11)   [clausula 1]   [+2 nodos]
+   [ok] defensa(e(bandido_torpe, 1), 2)   [clausula 1]   [+9 nodos]
+   [ok] modificador(baldomero, e(bandido_torpe, 1), 0)   [clausula 1]   [+17 nodos]
+   [ok] 9 is max(1, 11-2+0)   [builtin]
+Narrador: Sir Baldomero golpea al Bandido Torpe. Fue la primera vez en una semana que no le temblaron las rodillas.
+
+> por_que_no(atacar(baldomero, bandido_montado))
+Por qué no se puede atacar(baldomero,bandido_montado):
+[no] puede_atacar(baldomero, e(bandido_montado, 1))   [clausula 1]
+  |- [ok] vivo(baldomero)
+  |- [ok] \+ esta_en_huelga(baldomero)
+  |- [ok] vivo(e(bandido_montado, 1))
+  |- [ok] en_fila_alcanzable(baldomero, e(bandido_montado, 1))
+  |- [ok] \+ aturdido(baldomero)
+  \- [no] \+ (teme(baldomero, caballo), clase_de(e(bandido_montado, 1), caballo))
+        porque teme(baldomero, caballo) y clase_de(e(bandido_montado, 1), caballo) son ciertos.
+Narrador: Sir Baldomero ve el caballo, recuerda su infancia, y decide revisar sus calcetines.
+
+> nivel(detallado)
+Nivel detallado: las explicaciones salen enteras, con todas las cláusulas y todas las pruebas. Para acortarlas, nivel(resumido).
+
+> por_que_no(atacar(baldomero, bandido_montado))
+Por qué no se puede atacar(baldomero,bandido_montado):
+[no] puede_atacar(baldomero, e(bandido_montado, 1))   [clausula 1]
+  |- [ok] vivo(baldomero)
+  |- [ok] \+ esta_en_huelga(baldomero)
+  |- [ok] vivo(e(bandido_montado, 1))
+  |- [ok] en_fila_alcanzable(baldomero, e(bandido_montado, 1))
+  |- [ok] \+ aturdido(baldomero)
+  \- [no] \+ (teme(baldomero, caballo), clase_de(e(bandido_montado, 1), caballo))
+        porque teme(baldomero, caballo) y clase_de(e(bandido_montado, 1), caballo) son ciertos.
+           [ok] teme(baldomero, caballo)   [clausula 1]
+              [ok] rasgo(baldomero, teme_caballos)   [hecho]
+              [ok] \+ ignora_miedo(baldomero)   [no demostrable]
+           [ok] clase_de(e(bandido_montado, 1), caballo)   [clausula 1]
+              [ok] tipo_de(e(bandido_montado, 1), bandido_montado)   [clausula 1]
+                 [ok] nonvar(e(bandido_montado, 1)), e(bandido_montado, 1)=e(bandido_montad...   [rama then]
+                    [ok] bandido_montado=bandido_montado   [builtin]
+              [ok] clase(bandido_montado, caballo)   [hecho]
+Narrador: Sir Baldomero ve el caballo, recuerda su infancia, y decide revisar sus calcetines.
+
+> nivel(resumido)
+Nivel resumido: las explicaciones salen plegadas a lo esencial. Para ver todo, nivel(detallado).
+
+> demo(ia)
+
+=== ESCENA: Demostración 3: la IA enemiga, el corte y las prioridades (min. 9:30) ===
+Un Bandido Torpe, a solas, contra la Banda. Tras su turno, explicar cuenta por qué eligió esa regla de su lista y por qué no se aplicó ninguna de mayor prioridad.
+Para probar:
+  defender.
+  defender.
+  defender.
+  explicar.
+El Bandido Torpe se interpone en tu camino. Nadie ha preguntado si tenía permiso.
+Combate · ronda 1 · turno de Sir Baldomero
+  el Bandido Torpe: vida 12/12 (frente)
+
+> defender
+Sir Baldomero levanta la guardia, la ceja y la moral. En ese orden.
+Combate · ronda 1 · turno de Madame Pimentina
+  el Bandido Torpe: vida 12/12 (frente)
+
+> defender
+Madame Pimentina se pone a la defensiva: escudo arriba, ojos cerrados y una plegaria a medias.
+Combate · ronda 1 · turno de Tuerca
+  el Bandido Torpe: vida 12/12 (frente)
+
+> defender
+Tuerca levanta la guardia, la ceja y la moral. En ese orden.
+El Bandido Torpe golpea a Tuerca y le quita 1 de vida. Cuentas claras, modales mejorables.
+Combate · ronda 1 · turno de Rufino
+  el Bandido Torpe: vida 12/12 (frente)
+
+> explicar
+Por qué el Bandido Torpe hizo eso:
+Eligió la regla de prioridad 5 de 6 (el corte descartó las demás).
+[ok] accion_enemigo(e(bandido_torpe, 1), atacar(tuerca))   [clausula 5 + corte]
+   [ok] objetivo_mas_debil(e(bandido_torpe, 1), tuerca)   [clausula 1]   [+39 nodos]
+   [ok] corte   [corte: se descartaron las clausulas siguientes]
+Las reglas de más prioridad no se aplicaron:
+  prioridad 1 (curarse):
+    \- [no] vida_baja(e(bandido_torpe, 1))
+          |- [ok] vida(e(bandido_torpe, 1), 12)
+          |- [ok] tipo_de(e(bandido_torpe, 1), bandido_torpe)
+          |- [ok] enemigo(bandido_torpe, vida(12), ataque(5), defensa(2))
+          |- [ok] parametro(umbral_vida_baja, 30)
+          \- [no] 12*100=<12*30
+                12*100=<12*30 es falso
+  prioridad 2 (invocar_moho):
+    \- [no] debe_invocar_moho(e(bandido_torpe, 1))
+          \- [no] tipo_de(e(bandido_torpe, 1), gran_roquefort)
+                \- [no] (nonvar(e(bandido_torpe, 1)), e(bandido_torpe, 1)=e(bandido_torpe, 1)...
+                      gran_roquefort=bandido_torpe es falso
+  prioridad 3 (robar_queso):
+    \- [no] puede_robar_queso(e(bandido_torpe, 1))
+          \- [no] tipo_de(e(bandido_torpe, 1), rata_quesera)
+                \- [no] (nonvar(e(bandido_torpe, 1)), e(bandido_torpe, 1)=e(bandido_torpe, 1)...
+                      rata_quesera=bandido_torpe es falso
+  prioridad 4 (embestir):
+    \- [no] puede_embestir(e(bandido_torpe, 1), A)
+          \- [no] tipo_de(e(bandido_torpe, 1), bandido_montado)
+                \- [no] (nonvar(e(bandido_torpe, 1)), e(bandido_torpe, 1)=e(bandido_torpe, 1)...
+                      bandido_montado=bandido_torpe es falso
+Narrador: El Bandido Torpe elige al más débil. Torpe, sí; tonto, solo a ratos.
+
+> demo(gallina)
+
+=== ESCENA: Demostración 2: Lady Clotilde y el miedo a los caballos (min. 11:00) ===
+Camino Real. Baldomero lleva sin venda y teme a los caballos: la gallina exige una escolta sin miedo. por_que_no baja hasta la negación que lo impide.
+Para probar:
+  contratos.
+  por_que_no(aceptar(gallina_noble)).
+  nivel(detallado).
+  por_que_no(aceptar(gallina_noble)).
+  nivel(resumido).
+
+== Camino Real ==
+Un camino empedrado con corteza de queso viejo que se pega a las botas, con un peaje cada cien pasos. Lo recorren carretas, gansos con permiso de cobro y bandidos con más ambición que puntería.
+Salidas: bosque (Bosque del Moho), castillo (Castillo Camembert), cuevas (Cuevas del Roquefort), taberna (Taberna del Cuajo Torcido)
+Día 1 · Queso en la despensa: 12
+
+> contratos
+El tablón de contratos:
+  [lejos] Ratas del Granero (la Aldea Requesón, dificultad 1): 9 quesos, poción
+      Las ratas dicen tener papeles de alquiler por un queso al siglo y se hacen las muertas para cobrar el seguro.
+  [lejos] El Gato en el Árbol (la Aldea Requesón, dificultad 1): 7 quesos, venda de caballos
+      Su Excelencia Bigotes lleva tres días arriba y dice que desde allí se juzga mejor.
+  [bloqueado] Lady Clotilde Plumífera (el Camino Real, dificultad 3): 14 quesos, 1 brie
+      Lady Clotilde exige palanquín, escolta y que nadie cante a su alrededor: «Si canta, picoteo».
+
+> por_que_no(aceptar(gallina_noble))
+Por qué no se puede aceptar(gallina_noble):
+[no] puede_aceptar(gallina_noble)   [clausula 1]
+  |- [ok] disponible(gallina_noble)
+  |- [ok] \+ contrato_cumplido(gallina_noble)
+  |- [ok] \+ contrato_activo(gallina_noble)
+  |- [ok] contratos_activos(0)
+  |- [ok] parametro(max_contratos, 3)
+  |- [ok] 0<3
+  |- [ok] contrato(gallina_noble, camino_real, escoltar(gallina_noble, castillo...
+  \- [no] cumple_todas([requiere(rasgo_no(teme_caballos))])
+        \- [no] condicion_cumple(rasgo_no(teme_caballos))
+              \- [no] \+ (activo(baldomero), rasgo(baldomero, teme_caballos), \+ ignora_mie...
+                    porque activo(baldomero), rasgo(baldomero, teme_caballos) y \+ ignora_miedo(baldomero) son ciertos.
+Narrador: Lady Clotilde exige escolta sin miedo a los caballos. Sir Baldomero levanta la mano, muy despacio, por honestidad.
+
+> nivel(detallado)
+Nivel detallado: las explicaciones salen enteras, con todas las cláusulas y todas las pruebas. Para acortarlas, nivel(resumido).
+
+> por_que_no(aceptar(gallina_noble))
+Por qué no se puede aceptar(gallina_noble):
+[no] puede_aceptar(gallina_noble)   [clausula 1]
+  |- [ok] disponible(gallina_noble)
+  |- [ok] \+ contrato_cumplido(gallina_noble)
+  |- [ok] \+ contrato_activo(gallina_noble)
+  |- [ok] contratos_activos(0)
+  |- [ok] parametro(max_contratos, 3)
+  |- [ok] 0<3
+  |- [ok] contrato(gallina_noble, camino_real, escoltar(gallina_noble, castillo...
+  \- [no] cumple_todas([requiere(rasgo_no(teme_caballos))])
+        \- [no] condicion_cumple(rasgo_no(teme_caballos))
+              \- [no] \+ (activo(baldomero), rasgo(baldomero, teme_caballos), \+ ignora_mie...
+                    porque activo(baldomero), rasgo(baldomero, teme_caballos) y \+ ignora_miedo(baldomero) son ciertos.
+                       [ok] activo(baldomero)   [clausula 1]
+                          [ok] miembro(baldomero)   [clausula 1]
+                             [ok] en_compania(baldomero)   [hecho]
+                          [ok] vivo(baldomero)   [clausula 1]
+                             [ok] vida(baldomero, 30)   [hecho]
+                             [ok] 30>0   [builtin]
+                       [ok] rasgo(baldomero, teme_caballos)   [hecho]
+                       [ok] \+ ignora_miedo(baldomero)   [no demostrable]
+Narrador: Lady Clotilde exige escolta sin miedo a los caballos. Sir Baldomero levanta la mano, muy despacio, por honestidad.
+
+> nivel(resumido)
+Nivel resumido: las explicaciones salen plegadas a lo esencial. Para ver todo, nivel(detallado).
+
+> demo(venda)
+
+=== ESCENA: Continuación: tras el contrato del gato, Baldomero lleva la venda ===
+Se le pone a Baldomero la venda de caballos (el premio del contrato del gato). Ahora la misma pregunta ya no falla y la gallina se puede aceptar.
+Para probar:
+  por_que_no(aceptar(gallina_noble)).
+  aceptar(gallina_noble).
+
+== Camino Real ==
+Un camino empedrado con corteza de queso viejo que se pega a las botas, con un peaje cada cien pasos. Lo recorren carretas, gansos con permiso de cobro y bandidos con más ambición que puntería.
+Salidas: bosque (Bosque del Moho), castillo (Castillo Camembert), cuevas (Cuevas del Roquefort), taberna (Taberna del Cuajo Torcido)
+Día 1 · Queso en la despensa: 12
+
+> por_que_no(aceptar(gallina_noble))
+No falla nada: la acción es perfectamente posible. Prueba con explicar(...) y verás por qué. (aceptar(gallina_noble))
+
+> aceptar(gallina_noble)
+Contrato aceptado: «Lady Clotilde Plumífera». Todos asienten con convicción; nadie ha leído la letra pequeña.
+Habéis llegado: «Lady Clotilde Plumífera» os espera. Ahora toca ganarse el queso, que es lo que se espera de unos mercenarios.
+El Bandido Montado se interpone en tu camino. Nadie ha preguntado si tenía permiso.
+El Bandido Torpe se interpone en tu camino. Nadie ha preguntado si tenía permiso.
+Combate · ronda 1 · turno de Sir Baldomero
+  el Bandido Montado: vida 18/18 (frente)
+  el Bandido Torpe: vida 12/12 (frente)
+  el Bandido Torpe: vida 12/12 (frente)
+
+> salir
+Hasta la próxima, Banda Chapuza.

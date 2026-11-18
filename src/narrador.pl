@@ -680,6 +680,9 @@ texto_error(nada_que_explicar, 'Todavía no has hecho nada que explicar. Prueba 
 texto_error(no_hay_prueba(Accion), Texto) :-
     como_texto(Accion, Dicho),
     format(atom(Texto), 'Ahora mismo no se puede hacer ~w, así que no hay prueba que enseñar. Prueba con por_que_no(~w) para ver qué falla.', [Dicho, Dicho]).
+texto_error(escena_desconocida(Nombre), Texto) :-
+    como_texto(Nombre, Dicho),
+    format(atom(Texto), 'No hay ninguna escena llamada "~w". Escribe demo. para ver las que hay.', [Dicho]).
 texto_error(nivel_desconocido(Nivel), Texto) :-
     como_texto(Nivel, Dicho),
     format(atom(Texto), 'No existe el nivel "~w": usa nivel(resumido). o nivel(detallado).', [Dicho]).
@@ -723,6 +726,7 @@ ayuda_de(defender, 'defender.      solo en combate: sube tu defensa hasta tu pr�
 ayuda_de(habilidad, 'habilidad(Objetivo). solo en combate: usa la habilidad de tu personaje; la balada de Rufino se escribe habilidad.').
 ayuda_de(por_que_no, 'por_que_no(Accion). por qué NO se puede una acción: qué regla falla y por qué (p. ej. por_que_no(aceptar(gallina_noble)).)').
 ayuda_de(nivel, 'nivel(N).      cuánto detalle tienen explicar y por_que_no: nivel(resumido). o nivel(detallado).').
+ayuda_de(demo, 'demo.          las escenas de la demostración (demo(Nombre). prepara una y la deja lista para jugar)').
 ayuda_de(compania,'compania.      muestra a los miembros, su vida, su moral y su estado').
 ayuda_de(inventario, 'inventario.    muestra la despensa (con la edad del queso) y los objetos').
 ayuda_de(explicar, 'explicar.      la prueba de lo último que hiciste; explicar(Accion). la de esa acción').

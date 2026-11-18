@@ -12,7 +12,9 @@
 % (explicar:solve/2): asi `explicar.` puede decir por que se pudo aunque el estado ya cambio.
 
 :- module(juego, [ejecutar/2, validar_comando/2, comandos_disponibles/2, permitido/2,
-                  objetivo_de_accion/2, comenzar_combate/2, avanzar_combate/1]).
+                  objetivo_de_accion/2, comenzar_combate/2, avanzar_combate/1,
+                  escenas_de_demo/1, preparar_escena/2]).
+:- use_module(demo).
 :- use_module(mundo).
 :- use_module(estado).
 :- use_module(compania).
@@ -369,6 +371,38 @@ usar_habilidad(Objetivo, Items) :-
         )
     ;   Items = [error(no_es_tu_turno)]
     ).
+
+% ---------------------------------------------------------------------------
+% Las escenas de la demostracion (demo.pl): estados preparados para la exposicion. main las pide con
+% el meta-comando `demo`; aqui se montan con los mismos efectos que usa el resto del juego.
+% ---------------------------------------------------------------------------
+% escenas_de_demo(-Lista): Nombre-Titulo de cada escena, en el orden de la exposicion.
+escenas_de_demo(Lista) :-
+    findall(Nombre-Titulo, demo:escena(Nombre, Titulo, _, _, _), Lista).
+
+% preparar_escena(+Nombre, -Items): monta la escena y devuelve lo que se ve (el rotulo, el combate o la zona).
+preparar_escena(Nombre, Items) :-
+    (   demo:escena(Nombre, Titulo, Descripcion, Pasos, Sugerencias)
+    ->  pasos_de_escena(Pasos, Montaje),
+        (   estado:en_combate(_)
+        ->  Final = []
+        ;   ejecutar(mirar, resultado(Final))
+        ),
+        append([[vista(escena, Nombre, Titulo, Descripcion, Sugerencias)], Montaje, Final], Items)
+    ;   Items = [error(escena_desconocida(Nombre))]
+    ).
+
+pasos_de_escena([], []).
+pasos_de_escena([reiniciar|Resto], Items) :-
+    estado:nueva_partida,
+    pasos_de_escena(Resto, Items).
+pasos_de_escena([efectos(Efectos)|Resto], Items) :-
+    estado:aplicar_efectos(Efectos),
+    pasos_de_escena(Resto, Items).
+pasos_de_escena([combate(Tipos)|Resto], Items) :-
+    comenzar_combate(Tipos, I1),
+    pasos_de_escena(Resto, I2),
+    append(I1, I2, Items).
 
 % ---------------------------------------------------------------------------
 % El combate por turnos. comenzar_combate/2 lo abre y avanzar_combate/1 lo lleva hasta que le

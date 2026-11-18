@@ -1,0 +1,45 @@
+
+=== BANDA CHAPUZA ===
+Diriges una compañía de mercenarios incompetentes que cobran en queso.
+Escribe ayuda. para ver los comandos (cada comando termina con un punto).
+
+
+== Taberna del Cuajo Torcido ==
+El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
+Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
+Día 1 · Queso en la despensa: 12
+
+> demo(combate)
+
+=== ESCENA: Demostración 1: el combate y el miedo de Baldomero (min. 5:00) ===
+Camino Real, combate contra un Bandido Torpe y un Bandido Montado. Baldomero, sin la venda de caballos, no puede atacar al montado: por_que_no lo explica.
+Para probar:
+  explicar(atacar(baldomero, bandido_torpe)).
+  por_que_no(atacar(baldomero, bandido_montado)).
+  nivel(detallado).
+  por_que_no(atacar(baldomero, bandido_montado)).
+  nivel(resumido).
+El Bandido Montado se interpone en tu camino. Nadie ha preguntado si tenía permiso.
+El Bandido Torpe se interpone en tu camino. Nadie ha preguntado si tenía permiso.
+Combate · ronda 1 · turno de Sir Baldomero
+  el Bandido Montado: vida 18/18 (frente)
+  el Bandido Torpe: vida 12/12 (frente)
+
+> explicar(atacar(baldomero, bandido_torpe))
+Por qué se pudo atacar(baldomero,bandido_torpe):
+[ok] puede_atacar(baldomero, e(bandido_torpe, 1))   [clausula 1]
+   [ok] vivo(baldomero)   [clausula 1]   [+2 nodos]
+   [ok] \+ esta_en_huelga(baldomero)   [no demostrable]
+   [ok] vivo(e(bandido_torpe, 1))   [clausula 1]   [+2 nodos]
+   [ok] en_fila_alcanzable(baldomero, e(bandido_torpe, 1))   [clausula 1]   [+5 nodos]
+   [ok] \+ aturdido(baldomero)   [no demostrable]
+   [ok] \+ (teme(baldomero, A), clase_de(e(bandido_torpe, 1), A))   [no demostrable]
+[ok] dano(baldomero, e(bandido_torpe, 1), 9)   [clausula 1]
+   [ok] ataque(baldomero, 11)   [clausula 1]   [+2 nodos]
+   [ok] defensa(e(bandido_torpe, 1), 2)   [clausula 1]   [+9 nodos]
+   [ok] modificador(baldomero, e(bandido_torpe, 1), 0)   [clausula 1]   [+17 nodos]
+   [ok] 9 is max(1, 11-2+0)   [builtin]
+Narrador: Sir Baldomero golpea al Bandido Torpe. Fue la primera vez en una semana que no le temblaron las rodillas.
+
+> salir
+Hasta la próxima, Banda Chapuza.

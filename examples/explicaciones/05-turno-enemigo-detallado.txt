@@ -1,0 +1,116 @@
+
+=== BANDA CHAPUZA ===
+Diriges una compañía de mercenarios incompetentes que cobran en queso.
+Escribe ayuda. para ver los comandos (cada comando termina con un punto).
+
+
+== Taberna del Cuajo Torcido ==
+El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
+Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
+Día 1 · Queso en la despensa: 12
+
+> demo(ia)
+
+=== ESCENA: Demostración 3: la IA enemiga, el corte y las prioridades (min. 9:30) ===
+Un Bandido Torpe, a solas, contra la Banda. Tras su turno, explicar cuenta por qué eligió esa regla de su lista y por qué no se aplicó ninguna de mayor prioridad.
+Para probar:
+  defender.
+  defender.
+  defender.
+  explicar.
+El Bandido Torpe se interpone en tu camino. Nadie ha preguntado si tenía permiso.
+Combate · ronda 1 · turno de Sir Baldomero
+  el Bandido Torpe: vida 12/12 (frente)
+
+> nivel(detallado)
+Nivel detallado: las explicaciones salen enteras, con todas las cláusulas y todas las pruebas. Para acortarlas, nivel(resumido).
+
+> defender
+Sir Baldomero levanta la guardia, la ceja y la moral. En ese orden.
+Combate · ronda 1 · turno de Madame Pimentina
+  el Bandido Torpe: vida 12/12 (frente)
+
+> defender
+Madame Pimentina se pone a la defensiva: escudo arriba, ojos cerrados y una plegaria a medias.
+Combate · ronda 1 · turno de Tuerca
+  el Bandido Torpe: vida 12/12 (frente)
+
+> defender
+Tuerca levanta la guardia, la ceja y la moral. En ese orden.
+El Bandido Torpe golpea a Tuerca y le quita 1 de vida. Cuentas claras, modales mejorables.
+Combate · ronda 1 · turno de Rufino
+  el Bandido Torpe: vida 12/12 (frente)
+
+> explicar
+Por qué el Bandido Torpe hizo eso:
+Eligió la regla de prioridad 5 de 6 (el corte descartó las demás).
+[ok] accion_enemigo(e(bandido_torpe, 1), atacar(tuerca))   [clausula 5 + corte]
+   [ok] objetivo_mas_debil(e(bandido_torpe, 1), tuerca)   [clausula 1]
+      [ok] findall(A-B, (combatiente(B, C), puede_atacar(e(bandido_torpe, 1), B)...   [findall: 2 solucion(es)]
+         [ok] combatiente(baldomero, jugador)   [hecho]
+         [ok] puede_atacar(e(bandido_torpe, 1), baldomero)   [clausula 1]
+            [ok] vivo(e(bandido_torpe, 1))   [clausula 1]
+               [ok] vida(e(bandido_torpe, 1), 12)   [hecho]
+               [ok] 12>0   [builtin]
+            [ok] \+ esta_en_huelga(e(bandido_torpe, 1))   [no demostrable]
+            [ok] vivo(baldomero)   [clausula 1]
+               [ok] vida(baldomero, 30)   [hecho]
+               [ok] 30>0   [builtin]
+            [ok] en_fila_alcanzable(e(bandido_torpe, 1), baldomero)   [clausula 1]
+               [ok] bando_contrario(e(bandido_torpe, 1), baldomero)   [clausula 1]
+                  [ok] combatiente(e(bandido_torpe, 1), enemigo)   [hecho]
+                  [ok] combatiente(baldomero, jugador)   [hecho]
+                  [ok] enemigo\==jugador   [builtin]
+               [ok] fila(baldomero, frente)   [hecho]
+            [ok] \+ aturdido(e(bandido_torpe, 1))   [no demostrable]
+            [ok] \+ (teme(e(bandido_torpe, 1), A), clase_de(baldomero, A))   [no demostrable]
+         [ok] vida(baldomero, 30)   [hecho]
+         [ok] combatiente(tuerca, jugador)   [hecho]
+         [ok] puede_atacar(e(bandido_torpe, 1), tuerca)   [clausula 1]
+            [ok] vivo(e(bandido_torpe, 1))   [clausula 1]
+               [ok] vida(e(bandido_torpe, 1), 12)   [hecho]
+               [ok] 12>0   [builtin]
+            [ok] \+ esta_en_huelga(e(bandido_torpe, 1))   [no demostrable]
+            [ok] vivo(tuerca)   [clausula 1]
+               [ok] vida(tuerca, 22)   [hecho]
+               [ok] 22>0   [builtin]
+            [ok] en_fila_alcanzable(e(bandido_torpe, 1), tuerca)   [clausula 1]
+               [ok] bando_contrario(e(bandido_torpe, 1), tuerca)   [clausula 1]
+                  [ok] combatiente(e(bandido_torpe, 1), enemigo)   [hecho]
+                  [ok] combatiente(tuerca, jugador)   [hecho]
+                  [ok] enemigo\==jugador   [builtin]
+               [ok] fila(tuerca, frente)   [hecho]
+            [ok] \+ aturdido(e(bandido_torpe, 1))   [no demostrable]
+            [ok] \+ (teme(e(bandido_torpe, 1), A), clase_de(tuerca, A))   [no demostrable]
+         [ok] vida(tuerca, 22)   [hecho]
+      [ok] [30-baldomero, 22-tuerca]=[30-baldomero, 22-tuerca]   [builtin]
+      [ok] msort([30-baldomero, 22-tuerca], [22-tuerca, 30-baldomero])   [builtin]
+   [ok] corte   [corte: se descartaron las clausulas siguientes]
+Las reglas de más prioridad no se aplicaron:
+  prioridad 1 (curarse):
+    \- [no] vida_baja(e(bandido_torpe, 1))
+          |- [ok] vida(e(bandido_torpe, 1), 12)
+          |- [ok] tipo_de(e(bandido_torpe, 1), bandido_torpe)
+          |- [ok] enemigo(bandido_torpe, vida(12), ataque(5), defensa(2))
+          |- [ok] parametro(umbral_vida_baja, 30)
+          \- [no] 12*100=<12*30
+                12*100=<12*30 es falso
+  prioridad 2 (invocar_moho):
+    \- [no] debe_invocar_moho(e(bandido_torpe, 1))
+          \- [no] tipo_de(e(bandido_torpe, 1), gran_roquefort)
+                \- [no] (nonvar(e(bandido_torpe, 1)), e(bandido_torpe, 1)=e(bandido_torpe, 1)...
+                      gran_roquefort=bandido_torpe es falso
+  prioridad 3 (robar_queso):
+    \- [no] puede_robar_queso(e(bandido_torpe, 1))
+          \- [no] tipo_de(e(bandido_torpe, 1), rata_quesera)
+                \- [no] (nonvar(e(bandido_torpe, 1)), e(bandido_torpe, 1)=e(bandido_torpe, 1)...
+                      rata_quesera=bandido_torpe es falso
+  prioridad 4 (embestir):
+    \- [no] puede_embestir(e(bandido_torpe, 1), A)
+          \- [no] tipo_de(e(bandido_torpe, 1), bandido_montado)
+                \- [no] (nonvar(e(bandido_torpe, 1)), e(bandido_torpe, 1)=e(bandido_torpe, 1)...
+                      bandido_montado=bandido_torpe es falso
+Narrador: El Bandido Torpe elige al más débil. Torpe, sí; tonto, solo a ratos.
+
+> salir
+Hasta la próxima, Banda Chapuza.

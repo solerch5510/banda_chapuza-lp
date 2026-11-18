@@ -1,0 +1,45 @@
+
+=== BANDA CHAPUZA ===
+Diriges una compañía de mercenarios incompetentes que cobran en queso.
+Escribe ayuda. para ver los comandos (cada comando termina con un punto).
+
+
+== Taberna del Cuajo Torcido ==
+El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
+Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
+Día 1 · Queso en la despensa: 12
+
+> demo(gallina)
+
+=== ESCENA: Demostración 2: Lady Clotilde y el miedo a los caballos (min. 11:00) ===
+Camino Real. Baldomero lleva sin venda y teme a los caballos: la gallina exige una escolta sin miedo. por_que_no baja hasta la negación que lo impide.
+Para probar:
+  contratos.
+  por_que_no(aceptar(gallina_noble)).
+  nivel(detallado).
+  por_que_no(aceptar(gallina_noble)).
+  nivel(resumido).
+
+== Camino Real ==
+Un camino empedrado con corteza de queso viejo que se pega a las botas, con un peaje cada cien pasos. Lo recorren carretas, gansos con permiso de cobro y bandidos con más ambición que puntería.
+Salidas: bosque (Bosque del Moho), castillo (Castillo Camembert), cuevas (Cuevas del Roquefort), taberna (Taberna del Cuajo Torcido)
+Día 1 · Queso en la despensa: 12
+
+> por_que_no(aceptar(gallina_noble))
+Por qué no se puede aceptar(gallina_noble):
+[no] puede_aceptar(gallina_noble)   [clausula 1]
+  |- [ok] disponible(gallina_noble)
+  |- [ok] \+ contrato_cumplido(gallina_noble)
+  |- [ok] \+ contrato_activo(gallina_noble)
+  |- [ok] contratos_activos(0)
+  |- [ok] parametro(max_contratos, 3)
+  |- [ok] 0<3
+  |- [ok] contrato(gallina_noble, camino_real, escoltar(gallina_noble, castillo...
+  \- [no] cumple_todas([requiere(rasgo_no(teme_caballos))])
+        \- [no] condicion_cumple(rasgo_no(teme_caballos))
+              \- [no] \+ (activo(baldomero), rasgo(baldomero, teme_caballos), \+ ignora_mie...
+                    porque activo(baldomero), rasgo(baldomero, teme_caballos) y \+ ignora_miedo(baldomero) son ciertos.
+Narrador: Lady Clotilde exige escolta sin miedo a los caballos. Sir Baldomero levanta la mano, muy despacio, por honestidad.
+
+> salir
+Hasta la próxima, Banda Chapuza.

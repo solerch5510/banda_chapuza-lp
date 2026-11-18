@@ -1,0 +1,335 @@
+
+=== BANDA CHAPUZA ===
+Diriges una compañía de mercenarios incompetentes que cobran en queso.
+Escribe ayuda. para ver los comandos (cada comando termina con un punto).
+
+
+== Taberna del Cuajo Torcido ==
+El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
+Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
+Día 1 · Queso en la despensa: 12
+
+> ayuda
+Comandos disponibles ahora:
+  ayuda.         lista los comandos disponibles ahora
+  mirar.         describe dónde estás y a dónde puedes ir
+  ir(Zona).      viaja a una zona conectada (cuesta un día)
+  contratos.     el tablón: los contratos a la vista y si se pueden aceptar
+  aceptar(Contrato). acepta un contrato (en la taberna o donde lo ofrecen)
+  elegir(Opcion). elige una opción del evento abierto (su número o su nombre)
+  descansar.     solo en la taberna: cuesta 2 quesos, cura a todos y pasa un día
+  pagar.         solo en la taberna: paga los sueldos pendientes con lo más rancio
+  compania.      muestra a los miembros, su vida, su moral y su estado
+  inventario.    muestra la despensa (con la edad del queso) y los objetos
+  explicar.      la prueba de lo último que hiciste; explicar(Accion). la de esa acción
+  por_que_no(Accion). por qué NO se puede una acción: qué regla falla y por qué (p. ej. por_que_no(aceptar(gallina_noble)).)
+  nivel(N).      cuánto detalle tienen explicar y por_que_no: nivel(resumido). o nivel(detallado).
+  salir.         termina la partida
+  demo.          las escenas de la demostración (demo(Nombre). prepara una y la deja lista para jugar)
+
+> contratos
+El tablón de contratos:
+  [disponible] Ratas del Granero (la Aldea Requesón, dificultad 1): 9 quesos, poción
+      Las ratas dicen tener papeles de alquiler por un queso al siglo y se hacen las muertas para cobrar el seguro.
+  [disponible] El Gato en el Árbol (la Aldea Requesón, dificultad 1): 7 quesos, venda de caballos
+      Su Excelencia Bigotes lleva tres días arriba y dice que desde allí se juzga mejor.
+  [bloqueado] Lady Clotilde Plumífera (el Camino Real, dificultad 3): 14 quesos, 1 brie
+      Lady Clotilde exige palanquín, escolta y que nadie cante a su alrededor: «Si canta, picoteo».
+
+> aceptar(ratas_del_granero)
+Contrato aceptado: «Ratas del Granero». Todos asienten con convicción; nadie ha leído la letra pequeña.
+
+> aceptar(gato_en_el_arbol)
+Contrato aceptado: «El Gato en el Árbol». Todos asienten con convicción; nadie ha leído la letra pequeña.
+
+> ir(aldea)
+Día 2. Los quesos maduran y las deudas también. La ración de hoy: 4 quesos.
+Aldea Requesón: casitas blancas, leche tibia y vecinos preguntando cuándo se les paga.
+Habéis llegado: «Ratas del Granero» os espera. Ahora toca ganarse el queso, que es lo que se espera de unos mercenarios.
+La Rata Quesera se interpone en tu camino. Nadie ha preguntado si tenía permiso.
+Combate · ronda 1 · turno de Sir Baldomero
+  la Rata Quesera: vida 8/8 (frente)
+  la Rata Quesera: vida 8/8 (frente)
+
+> habilidad(rata_quesera)
+Sir Baldomero grita «¡Por mi honor!» y carga contra la Rata Quesera. Hay más honor que puntería, pero llega.
+Sir Baldomero golpea a la Rata Quesera y le quita 15 de vida. Cuentas claras, modales mejorables.
+La Rata Quesera se tumba, cierra los ojos y espera. Esta vez es en serio. Ofendida, pero en serio.
+Combate · ronda 1 · turno de Madame Pimentina
+  la Rata Quesera: caído
+  la Rata Quesera: vida 8/8 (frente)
+
+> habilidad(rata_quesera)
+Madame Pimentina lanza una Fondue Flamígera contra la Rata Quesera. Huele a cena y a problemas para el enemigo.
+Madame Pimentina le suelta un golpe a la Rata Quesera: 8 de vida menos. Ha sido casi técnico.
+La Rata Quesera se tumba, cierra los ojos y espera. Esta vez es en serio. Ofendida, pero en serio.
+Victoria. Nadie la esperaba, y menos que nadie la propia Banda.
+Contrato resuelto con éxito: «Ratas del Granero». La recompensa os espera en la taberna, en cuanto Doña Mantecosa deje de contarla.
+Su Excelencia Bigotes lleva tres días en lo alto del árbol y dice que desde allí se juzga mejor. Tenéis tres intentos y ninguna idea.
+El Gato en el Árbol: Su Excelencia Bigotes no piensa bajar solo.
+  1. trepar: Tuerca trepa a por él (Tuerca)
+  2. hechizo_de_raclette: Madame Pimentina lo atrae con un hechizo de raclette (cuesta 1 queso) (Madame Pimentina)
+  3. sacudir_arbol: Sir Baldomero sacude el árbol con todo su honor (Sir Baldomero)
+  4. cantar: Rufino le canta una balada (gasta un intento) (Rufino)
+Intentos que quedan: 3. Elige con elegir(Opcion). (el número o el nombre).
+
+> elegir(trepar)
+Tuerca trepa sin ruido, saluda al gato con una reverencia y baja con él bajo el brazo. Las alturas le sientan bien.
+Contrato resuelto con éxito: «El Gato en el Árbol». La recompensa os espera en la taberna, en cuanto Doña Mantecosa deje de contarla.
+
+> ir(taberna)
+Amanece el día 3. Alguien tiene hambre y alguien más, una cuenta pendiente. Ración: 4 quesos.
+Llegas al Cuajo Torcido. Huele a sopa de ayer y a una promesa de pago que nadie ha visto cumplida.
+Cobráis por «Ratas del Granero». Los quesos entran en la despensa y los sueldos, como siempre, esperan su turno.
+Cobráis por «El Gato en el Árbol». Los quesos entran en la despensa y los sueldos, como siempre, esperan su turno.
+
+> inventario
+Despensa (día 3): 19 quesos (valor informativo: 38)
+  cheddar x3   edad 2 (fresco)
+  cheddar x16   edad 0 (fresco)
+Objetos: pocion x1, venda_de_caballos x1
+
+> pagar
+Sueldos pagados: 5 quesos. Doña Mantecosa asiente; los mercenarios también, y eso es raro.
+
+> compania
+La compañía:
+  Sir Baldomero (caballero)  vida 30/30  ataque 11  defensa 3  moral 9/10  fila frente  sueldo 1  rasgo teme_caballos  [en_pie]
+  Madame Pimentina (maga)  vida 18/18  ataque 6  defensa 1  moral 9/10  fila retaguardia  sueldo 2  rasgo hechizos_de_cocina  [en_pie]
+  Rufino (bardo)  vida 20/20  ataque 4  defensa 2  moral 9/10  fila retaguardia  sueldo 1  rasgo cobra_por_callar  [en_pie]
+  Tuerca (ladron)  vida 22/22  ataque 7  defensa 2  moral 9/10  fila frente  sueldo 1  rasgo manos_largas  [en_pie]
+
+> ir(camino_real)
+Día 4 de la Banda Chapuza. El Registro de Compañías sigue donde estaba: abajo. Ración: 4 quesos.
+Camino Real: un peaje cada cien pasos, corteza vieja pegada a las suelas y bandidos con más ambición que puntería.
+
+> aceptar(gallina_noble)
+Contrato aceptado: «Lady Clotilde Plumífera». Todos asienten con convicción; nadie ha leído la letra pequeña.
+Habéis llegado: «Lady Clotilde Plumífera» os espera. Ahora toca ganarse el queso, que es lo que se espera de unos mercenarios.
+El Bandido Montado se interpone en tu camino. Nadie ha preguntado si tenía permiso.
+El Bandido Torpe se interpone en tu camino. Nadie ha preguntado si tenía permiso.
+Combate · ronda 1 · turno de Sir Baldomero
+  el Bandido Montado: vida 18/18 (frente)
+  el Bandido Torpe: vida 12/12 (frente)
+  el Bandido Torpe: vida 12/12 (frente)
+
+> habilidad(bandido_montado)
+Carga heroica: Sir Baldomero baja la visera, cierra los ojos y avanza hacia el Bandido Montado. Funciona.
+Golpe de Sir Baldomero al Bandido Montado: 10 puntos. Limpio, correcto y olvidable.
+Combate · ronda 1 · turno de Madame Pimentina
+  el Bandido Montado: vida 8/18 (frente)
+  el Bandido Torpe: vida 12/12 (frente)
+  el Bandido Torpe: vida 12/12 (frente)
+
+> habilidad(bandido_montado)
+Madame Pimentina lanza una Fondue Flamígera contra el Bandido Montado. Huele a cena y a problemas para el enemigo.
+Madame Pimentina alcanza al Bandido Montado y le quita 8. Un testigo toma nota; otro, distancia.
+El Bandido Montado se baja del caballo a la fuerza y le pide perdón al caballo, que no escucha.
+Combate · ronda 1 · turno de Tuerca
+  el Bandido Montado: caído
+  el Bandido Torpe: vida 12/12 (frente)
+  el Bandido Torpe: vida 12/12 (frente)
+
+> habilidad(bandido_torpe)
+Tuerca rebusca en los bolsillos del Bandido Torpe y encuentra un queso. «Lo tomo prestado», dice.
+Combate · ronda 1 · turno de Rufino
+  el Bandido Montado: caído
+  el Bandido Torpe: vida 12/12 (frente)
+  el Bandido Torpe: vida 12/12 (frente)
+
+> habilidad
+Rufino entona la Balada Inspiradora. La moral sube; los oídos se despiden.
+El Bandido Torpe se abalanza sobre Lady Clotilde y le arranca una pluma (golpe 1). Ella lo anota para la factura.
+El Bandido Torpe golpea a Tuerca y le quita 3 de vida. Cuentas claras, modales mejorables.
+Combate · ronda 2 · turno de Sir Baldomero
+  el Bandido Montado: caído
+  el Bandido Torpe: vida 12/12 (frente)
+  el Bandido Torpe: vida 12/12 (frente)
+
+> habilidad(bandido_torpe)
+Sir Baldomero grita «¡Por mi honor!» y carga contra el Bandido Torpe. Hay más honor que puntería, pero llega.
+Sir Baldomero le suelta un golpe al Bandido Torpe: 14 de vida menos. Ha sido casi técnico.
+El Bandido Torpe huye gritando «¡Esto no ha pasado!». Ha pasado, y con testigos.
+Combate · ronda 2 · turno de Madame Pimentina
+  el Bandido Montado: caído
+  el Bandido Torpe: caído
+  el Bandido Torpe: vida 12/12 (frente)
+
+> habilidad(bandido_torpe)
+Madame Pimentina lanza una Fondue Flamígera contra el Bandido Torpe. Huele a cena y a problemas para el enemigo.
+Golpe de Madame Pimentina al Bandido Torpe: 8 puntos. Limpio, correcto y olvidable.
+Combate · ronda 2 · turno de Tuerca
+  el Bandido Montado: caído
+  el Bandido Torpe: caído
+  el Bandido Torpe: vida 4/12 (frente)
+
+> habilidad(bandido_torpe)
+Tuerca rebusca en los bolsillos del Bandido Torpe y encuentra un queso. «Lo tomo prestado», dice.
+Combate · ronda 2 · turno de Rufino
+  el Bandido Montado: caído
+  el Bandido Torpe: caído
+  el Bandido Torpe: vida 4/12 (frente)
+
+> habilidad
+Rufino canta. El grupo se anima, el enemigo se desanima y los pájaros emigran.
+El Bandido Torpe se abalanza sobre Lady Clotilde y le arranca una pluma (golpe 2). Ella lo anota para la factura.
+Combate · ronda 3 · turno de Sir Baldomero
+  el Bandido Montado: caído
+  el Bandido Torpe: caído
+  el Bandido Torpe: vida 4/12 (frente)
+
+> habilidad(bandido_torpe)
+Carga heroica: Sir Baldomero baja la visera, cierra los ojos y avanza hacia el Bandido Torpe. Funciona.
+Sir Baldomero alcanza al Bandido Torpe y le quita 14. Un testigo toma nota; otro, distancia.
+El Bandido Torpe huye gritando «¡Esto no ha pasado!». Ha pasado, y con testigos.
+Victoria. Se recoge el botín, se cuenta el queso y se niega todo lo que haya salido mal.
+Botín: 3 quesos frescos. Los guardaban «para emergencias». Esto lo era.
+Contrato resuelto con éxito: «Lady Clotilde Plumífera». La recompensa os espera en la taberna, en cuanto Doña Mantecosa deje de contarla.
+
+> ir(castillo)
+Día 5. Los quesos maduran y las deudas también. La ración de hoy: 4 quesos.
+El Castillo Camembert se hunde un poquito cada año, pero los guardias saludan con una rigidez ejemplar.
+
+> aceptar(despensa_real)
+Contrato aceptado: «La Despensa Real». Todos asienten con convicción; nadie ha leído la letra pequeña.
+
+> ir(camino_real)
+Amanece el día 6. Alguien tiene hambre y alguien más, una cuenta pendiente. Ración: 4 quesos.
+El Camino Real está empedrado con corteza de queso viejo. Se te pega a las botas y a la conversación.
+
+> ir(cuevas)
+Día 7 de la Banda Chapuza. El Registro de Compañías sigue donde estaba: abajo. Ración: 4 quesos.
+Cuevas del Roquefort: aire de sótano, un goteo cada tres segundos y la sensación de que el suelo te mira.
+Habéis llegado: «La Despensa Real» os espera. Ahora toca ganarse el queso, que es lo que se espera de unos mercenarios.
+Al fondo de las Cuevas, algo azul y enorme se mueve despacio. Tiene barba de moho y opiniones firmes.
+Combate · ronda 1 · turno de Sir Baldomero
+  el Gran Roquefort: vida 60/60 (frente)
+
+> habilidad(gran_roquefort)
+Sir Baldomero grita «¡Por mi honor!» y carga contra el Gran Roquefort. Hay más honor que puntería, pero llega.
+Sir Baldomero golpea al Gran Roquefort y le quita 12 de vida. Cuentas claras, modales mejorables.
+El Gran Roquefort murmura algo antiguo y de la pared se despega un moho saltarín, con ganas de conocer gente.
+Combate · ronda 1 · turno de Madame Pimentina
+  el Gran Roquefort: vida 48/60 (frente)
+  el Moho Saltarín: vida 10/10 (frente)
+
+> habilidad(gran_roquefort)
+Madame Pimentina lanza una Fondue Flamígera contra el Gran Roquefort. Huele a cena y a problemas para el enemigo.
+Madame Pimentina le suelta un golpe al Gran Roquefort: 8 de vida menos. Ha sido casi técnico.
+Combate · ronda 1 · turno de Tuerca
+  el Gran Roquefort: vida 40/60 (frente)
+  el Moho Saltarín: vida 10/10 (frente)
+
+> habilidad(gran_roquefort)
+Tuerca rebusca en el Gran Roquefort y no halla nada. Se queda con la dignidad, que no cotiza.
+Combate · ronda 1 · turno de Rufino
+  el Gran Roquefort: vida 40/60 (frente)
+  el Moho Saltarín: vida 10/10 (frente)
+
+> habilidad
+Rufino entona la Balada Inspiradora. La moral sube; los oídos se despiden.
+Combate · ronda 2 · turno de Sir Baldomero
+  el Gran Roquefort: vida 40/60 (frente)
+  el Moho Saltarín: vida 10/10 (frente)
+
+> habilidad(gran_roquefort)
+Carga heroica: Sir Baldomero baja la visera, cierra los ojos y avanza hacia el Gran Roquefort. Funciona.
+Golpe de Sir Baldomero al Gran Roquefort: 12 puntos. Limpio, correcto y olvidable.
+El Gran Roquefort alcanza a Tuerca y le quita 9. Un testigo toma nota; otro, distancia.
+Combate · ronda 2 · turno de Madame Pimentina
+  el Gran Roquefort: vida 28/60 (frente)
+  el Moho Saltarín: vida 10/10 (frente)
+
+> atacar(gran_roquefort)
+Madame Pimentina golpea al Gran Roquefort y le quita 3 de vida. Cuentas claras, modales mejorables.
+Combate · ronda 2 · turno de Tuerca
+  el Gran Roquefort: vida 25/60 (frente)
+  el Moho Saltarín: vida 10/10 (frente)
+
+> atacar(gran_roquefort)
+Tuerca le suelta un golpe al Gran Roquefort: 4 de vida menos. Ha sido casi técnico.
+Golpe del Moho Saltarín a Tuerca: 2 puntos. Limpio, correcto y olvidable.
+Combate · ronda 2 · turno de Rufino
+  el Gran Roquefort: vida 21/60 (frente)
+  el Moho Saltarín: vida 10/10 (frente)
+
+> habilidad
+Rufino canta. El grupo se anima, el enemigo se desanima y los pájaros emigran.
+Combate · ronda 3 · turno de Sir Baldomero
+  el Gran Roquefort: vida 21/60 (frente)
+  el Moho Saltarín: vida 10/10 (frente)
+
+> habilidad(gran_roquefort)
+Sir Baldomero grita «¡Por mi honor!» y carga contra el Gran Roquefort. Hay más honor que puntería, pero llega.
+Sir Baldomero alcanza al Gran Roquefort y le quita 12. Un testigo toma nota; otro, distancia.
+El Gran Roquefort se bebe lo que lleva encima y recupera 8 de vida. Hasta los malos tienen botiquín.
+Combate · ronda 3 · turno de Madame Pimentina
+  el Gran Roquefort: vida 17/60 (frente)
+  el Moho Saltarín: vida 10/10 (frente)
+
+> atacar(gran_roquefort)
+Madame Pimentina golpea al Gran Roquefort y le quita 3 de vida. Cuentas claras, modales mejorables.
+Combate · ronda 3 · turno de Tuerca
+  el Gran Roquefort: vida 14/60 (frente)
+  el Moho Saltarín: vida 10/10 (frente)
+
+> atacar(gran_roquefort)
+Tuerca le suelta un golpe al Gran Roquefort: 4 de vida menos. Ha sido casi técnico.
+Golpe del Moho Saltarín a Tuerca: 2 puntos. Limpio, correcto y olvidable.
+Combate · ronda 3 · turno de Rufino
+  el Gran Roquefort: vida 10/60 (frente)
+  el Moho Saltarín: vida 10/10 (frente)
+
+> habilidad
+Rufino entona la Balada Inspiradora. La moral sube; los oídos se despiden.
+Combate · ronda 4 · turno de Sir Baldomero
+  el Gran Roquefort: vida 10/60 (frente)
+  el Moho Saltarín: vida 10/10 (frente)
+
+> habilidad(gran_roquefort)
+Carga heroica: Sir Baldomero baja la visera, cierra los ojos y avanza hacia el Gran Roquefort. Funciona.
+Sir Baldomero alcanza al Gran Roquefort y le quita 12. Un testigo toma nota; otro, distancia.
+El Gran Roquefort suspira, se agrieta y murmura: «Quizá sí tenía prisa». El moho se retira.
+Combate · ronda 4 · turno de Madame Pimentina
+  el Gran Roquefort: caído
+  el Moho Saltarín: vida 10/10 (frente)
+
+> atacar(moho_saltarin)
+Madame Pimentina golpea al Moho Saltarín y le quita 7 de vida. Cuentas claras, modales mejorables.
+Combate · ronda 4 · turno de Tuerca
+  el Gran Roquefort: caído
+  el Moho Saltarín: vida 3/10 (frente)
+
+> habilidad(moho_saltarin)
+Tuerca rebusca en el Moho Saltarín y no halla nada. Se queda con la dignidad, que no cotiza.
+El Moho Saltarín le suelta un golpe a Tuerca: 2 de vida menos. Ha sido casi técnico.
+Combate · ronda 4 · turno de Rufino
+  el Gran Roquefort: caído
+  el Moho Saltarín: vida 3/10 (frente)
+
+> habilidad
+Rufino canta. El grupo se anima, el enemigo se desanima y los pájaros emigran.
+Combate · ronda 5 · turno de Sir Baldomero
+  el Gran Roquefort: caído
+  el Moho Saltarín: vida 3/10 (frente)
+
+> habilidad(moho_saltarin)
+Sir Baldomero grita «¡Por mi honor!» y carga contra el Moho Saltarín. Hay más honor que puntería, pero llega.
+Golpe de Sir Baldomero al Moho Saltarín: 16 puntos. Limpio, correcto y olvidable.
+El Moho Saltarín se deshace en esporas y en disculpas, por ese orden.
+El combate acaba a vuestro favor. Es la clase de noticia que la Banda nunca sabe dónde guardar.
+Contrato resuelto con éxito: «La Despensa Real». La recompensa os espera en la taberna, en cuanto Doña Mantecosa deje de contarla.
+Chapuza de toda la vida. Ganáis. Más o menos. El Gran Roquefort cae, el moho retrocede y el rey os paga... en dos plazos: el primero, hoy; el segundo, «cuando la despensa se recupere», que es una forma de decir «nunca».
+El Registro os sube al puesto 31, con una nota a lápiz: «a confirmar». Baldomero jura que lo planeó todo y Pimentina ha probado el moho y opina que le falta fondo.
+Narrador: «Un éxito rotundo, en el sentido de que rodó escaleras abajo y llegó.»
+Fin de la partida.
+
+> explicar
+Por qué se pudo resultado(despensa_real):
+[ok] resultado(despensa_real, [contador(golpes_a_clotilde, 2), marca(gato_...   [clausula 1]
+   [ok] findall(A-B, resolucion(despensa_real, A, B), [exito-[]])   [findall: 1 solucion(es)]   [+1 nodo]
+   [ok] primero_que_cumple([exito-[]], [contador(golpes_a_clotilde, 2), marca...   [clausula 1]   [+1 nodo]
+Narrador: Todo conforme al reglamento. En esta compañía, eso es una noticia.
+
+> salir
+Hasta la próxima, Banda Chapuza.

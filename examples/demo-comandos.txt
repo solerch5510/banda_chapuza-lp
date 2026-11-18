@@ -1,0 +1,40 @@
+% Guion de la demostración (la exposición de ~13 minutos). Un comando por línea; los `demo(...)` preparan
+% el estado de cada bloque para no depender de jugar desde cero. Se puede teclear en directo o pasar entero:
+%   swipl -q -s src/main -g main -t halt < examples/demo-comandos.txt
+% La transcripción guardada (con cada orden tras "> ") está en demo-salida.txt.
+
+% --- 3:00  La economía: el queso madura ------------------------------------------------------------
+demo(economia).
+mirar.
+inventario.
+pagar.
+ir(aldea).
+ir(bosque).
+inventario.
+
+% --- 5:00  Demostración 1: el combate y el miedo de Baldomero ----------------------------------------
+demo(combate).
+explicar(atacar(baldomero, bandido_torpe)).
+por_que_no(atacar(baldomero, bandido_montado)).
+nivel(detallado).
+por_que_no(atacar(baldomero, bandido_montado)).
+nivel(resumido).
+
+% --- 9:30  Demostración 3: la IA enemiga y el corte --------------------------------------------------
+demo(ia).
+defender.
+defender.
+defender.
+explicar.
+
+% --- 11:00  Demostración 2: Lady Clotilde y el miedo a los caballos -----------------------------------
+demo(gallina).
+contratos.
+por_que_no(aceptar(gallina_noble)).
+nivel(detallado).
+por_que_no(aceptar(gallina_noble)).
+nivel(resumido).
+demo(venda).
+por_que_no(aceptar(gallina_noble)).
+aceptar(gallina_noble).
+salir.

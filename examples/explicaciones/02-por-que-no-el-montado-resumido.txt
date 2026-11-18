@@ -1,0 +1,41 @@
+
+=== BANDA CHAPUZA ===
+Diriges una compañía de mercenarios incompetentes que cobran en queso.
+Escribe ayuda. para ver los comandos (cada comando termina con un punto).
+
+
+== Taberna del Cuajo Torcido ==
+El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
+Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
+Día 1 · Queso en la despensa: 12
+
+> demo(combate)
+
+=== ESCENA: Demostración 1: el combate y el miedo de Baldomero (min. 5:00) ===
+Camino Real, combate contra un Bandido Torpe y un Bandido Montado. Baldomero, sin la venda de caballos, no puede atacar al montado: por_que_no lo explica.
+Para probar:
+  explicar(atacar(baldomero, bandido_torpe)).
+  por_que_no(atacar(baldomero, bandido_montado)).
+  nivel(detallado).
+  por_que_no(atacar(baldomero, bandido_montado)).
+  nivel(resumido).
+El Bandido Montado se interpone en tu camino. Nadie ha preguntado si tenía permiso.
+El Bandido Torpe se interpone en tu camino. Nadie ha preguntado si tenía permiso.
+Combate · ronda 1 · turno de Sir Baldomero
+  el Bandido Montado: vida 18/18 (frente)
+  el Bandido Torpe: vida 12/12 (frente)
+
+> por_que_no(atacar(baldomero, bandido_montado))
+Por qué no se puede atacar(baldomero,bandido_montado):
+[no] puede_atacar(baldomero, e(bandido_montado, 1))   [clausula 1]
+  |- [ok] vivo(baldomero)
+  |- [ok] \+ esta_en_huelga(baldomero)
+  |- [ok] vivo(e(bandido_montado, 1))
+  |- [ok] en_fila_alcanzable(baldomero, e(bandido_montado, 1))
+  |- [ok] \+ aturdido(baldomero)
+  \- [no] \+ (teme(baldomero, caballo), clase_de(e(bandido_montado, 1), caballo))
+        porque teme(baldomero, caballo) y clase_de(e(bandido_montado, 1), caballo) son ciertos.
+Narrador: Sir Baldomero ve el caballo, recuerda su infancia, y decide revisar sus calcetines.
+
+> salir
+Hasta la próxima, Banda Chapuza.
