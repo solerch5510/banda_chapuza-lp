@@ -103,6 +103,24 @@ Cada escena parte de una partida nueva (salvo `venda`, que continúa la actual),
 & "C:\Program Files\pl\bin\swipl.exe" -q -s src/main -g main -t halt < examples/demo-comandos.txt
 ```
 
+## Frontend web (extra opcional)
+
+El juego también se puede jugar desde un navegador: `src/servidor.pl` es un servidor HTTP mínimo (solo biblioteca estándar de SWI-Prolog) que no contiene reglas del juego; recibe la orden escrita, la pasa por el mismo `ejecutar/2` de siempre y devuelve JSON (`src/api.pl`).
+
+```
+& "C:\Program Files\pl\bin\swipl.exe" -q -s src/servidor -g "servidor(8080)" -t halt
+```
+
+| Ruta | Qué hace |
+|---|---|
+| `GET /api/estado` | Estado completo: banda, despensa, zona, mapa, contratos, combate y **acciones** (cada una habilitada o con el motivo de por qué no). |
+| `POST /api/orden` | Cuerpo `{"orden": "ir(aldea)."}`; devuelve `{orden, items, estado}`. También `GET /api/orden?orden=...`. |
+| `POST /api/nueva` | Partida nueva. |
+| `GET /api/escenas` | Las escenas de la demostración. |
+| `GET /...` | Los archivos estáticos de `web/`. |
+
+El árbol de `explicar` y `por_que_no` sale como lista plana de **nodos** con profundidad, estado (`ok`/`no`/`info`), tipo (`hecho`, `calculo`, `negacion`, `regla`, `corte`…) y pliegue, construidos a partir de las mismas líneas que enseña la consola. La consola sigue siendo la versión de referencia (y el plan B de la exposición).
+
 ## Pruebas
 
 Las pruebas usan `plunit`. **Una sola orden** las corre todas (desde la raíz del repositorio, con el ejecutable por su ruta completa porque no está en el PATH):
@@ -117,7 +135,7 @@ Cada suite corre en su propio proceso (así ninguna contagia a otra), se escribe
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/combate -g "run_tests,halt" -t "halt(1)"
 ```
 
-Suites actuales (1646 pruebas):
+Suites actuales (1720 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -135,6 +153,8 @@ Suites actuales (1646 pruebas):
 | `tests/campana.pl` (39) | La partida mínima de principio a fin: los finales (`chapuza`, `derrota_combate`, `derrota_hambre`), la fase final, partidas completas escritas como una lista de comandos (se gana en 7 días y es reproducible) y que `pelear` ya no existe. |
 | `tests/equivalencia.pl` (42) | **La prueba de equivalencia del meta-intérprete**: más de 20 objetivos del juego (compañía, economía, combate, contratos, fase, negación, `->`, aritmética, `findall`, `forall`) × 8 escenarios (inicio, hambre, huelga, combate con rasgos, con venda, el jefe, contratos en marcha, partida acabada): ejecutarlos directamente y con `solve/2` da las **mismas soluciones en el mismo orden**; el oráculo del corte (IA con corte = IA sin corte), la prueba de modo, los casos de error y que demostrar no cambia el estado. |
 | `tests/todas.pl` | El agregador: corre todas las suites en procesos separados y devuelve 0 o 1. |
+| `tests/api.pl` (70) | El adaptador JSON y el servidor: el árbol como nodos (profundidad, estado, tipo, pliegue), todos los items con su JSON, `ejecutar_orden/2` (errores como la consola, nunca falla), estado y acciones habilitadas ciertos y sin tocar la partida, **lo que cuenta la web es lo que cuenta la consola**, y el servidor HTTP real (GET, POST, UTF-8, estáticos, 404, rutas fuera de `web/`, cerrojo). |
+| `tests/agregador.pl` (4) | Vigila a `tests/todas.pl`: una suite buena da verde, una que falla da código 1, **también si falla con `assertion/1`** (en 5.10.4 eso abre el depurador y el proceso sale con 0). |
 | `tests/demo.pl` (35) | La demostración reproducible: las cinco escenas (se montan, dejan el estado que dicen y dan siempre la misma pantalla), `demo.` y la escena desconocida, los guiones de `examples/` y que **lo guardado coincide carácter a carácter con lo que el juego produce ahora** (si cambia una frase hay que regenerar). |
 | `tests/playtest.pl` (45) | El primer playtest guiado convertido en pruebas: la partida completa por la vía cómoda (se gana, en pocos días y comandos, sin pantallas crudas ni errores y reproducible), las tres rutas degeneradas (no pagar, ignorar la comida, contratos sin condiciones) y los ajustes que salieron de él: el estado del combate tras cada orden, el día y la ración, las variantes que rotan de verdad y las pistas de `por_que_no`. |
 | `tests/banco.pl` (56) | El banco de frases del narrador, sano como conjunto: tamaño, marcas `~w` y argumentos, textos sin repetir, claves con identificadores que existen (detecta erratas), cobertura de las reglas explicables y de los casos reales de `por_que_no` (con frase propia, no la genérica), rotación de las frases frecuentes, comentarios de nodo del nivel detallado y el chiste de cada contrato. |
@@ -155,12 +175,12 @@ Se ejecutan en procesos distintos porque los módulos de juguete del spike expor
 banda_chapuza-lp/
 ├─ README.md
 ├─ docs/            documentación de diseño
-├─ src/             código fuente (13 módulos)
+├─ src/             código fuente (15 módulos)
 ├─ tests/           pruebas (plunit)
 └─ examples/        partidas y explicaciones de ejemplo
 ```
 
-Los 13 módulos de `src/`:
+Los 15 módulos de `src/`:
 
 | Módulo | Función |
 |---|---|
@@ -177,6 +197,8 @@ Los 13 módulos de `src/`:
 | `explicar.pl` | Meta-intérprete, árbol de derivación y modo explicar. |
 | `narrador.pl` | Frases del narrador. |
 | `ui.pl` | Entrada y salida por consola (único módulo con E/S). |
+| `api.pl` | Adaptador JSON (gemelo de `ui` para la web): estado, resultados, árbol de `explicar` como nodos y acciones habilitadas. No escribe nada. |
+| `servidor.pl` | Servidor HTTP mínimo sobre `api.pl` (extra opcional): `/api/estado`, `/api/orden`, `/api/nueva`, `/api/escenas` y los archivos de `web/`. |
 
 Documentos en `docs/`:
 

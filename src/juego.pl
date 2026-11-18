@@ -13,7 +13,8 @@
 
 :- module(juego, [ejecutar/2, validar_comando/2, comandos_disponibles/2, permitido/2,
                   objetivo_de_accion/2, comenzar_combate/2, avanzar_combate/1,
-                  escenas_de_demo/1, preparar_escena/2]).
+                  escenas_de_demo/1, preparar_escena/2,
+                  datos_de_zona/1, datos_de_combate/1, actor_del_turno/1]).
 :- use_module(demo).
 :- use_module(mundo).
 :- use_module(estado).
