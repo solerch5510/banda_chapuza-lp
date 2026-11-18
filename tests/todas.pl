@@ -53,12 +53,24 @@ ejecutar_suite(Nombre, Estado, Salida) :-
     file_directory_name(Dir, Raiz),
     process_create(Exe,
                    ['-q', '-s', Ruta, '-g', 'run_tests,halt', '-t', 'halt(1)'],
-                   [stdout(null), stderr(pipe(Err)), cwd(Raiz), process(Pid)]),
+                   [stdin(null), stdout(null), stderr(pipe(Err)), cwd(Raiz), process(Pid)]),
     read_stream_to_codes(Err, Codigos),
     close(Err),
     process_wait(Pid, Salida0),
     atom_codes(Salida, Codigos),
-    (   Salida0 = exit(0) -> Estado = ok ; Estado = fallo(Salida0) ).
+    (   Salida0 \= exit(0)
+    ->  Estado = fallo(Salida0)
+    ;   aserto_fallido(Salida)
+    ->  Estado = fallo(aserto_fallido)
+    ;   Estado = ok
+    ).
+
+% Un assertion/1 que falla en el hilo principal NO tumba el proceso: SWI-Prolog 5.10.4 abre el depurador, y con
+% la entrada cerrada sale con codigo 0. Por eso no basta el codigo de salida: se mira tambien el mensaje.
+aserto_fallido(Salida) :-
+    sub_atom(Salida, _, _, _, 'Assertion failed'), !.
+aserto_fallido(Salida) :-
+    sub_atom(Salida, _, _, _, 'assumption_failed'), !.
 
 run_tests :-
     suites(Nombres),
