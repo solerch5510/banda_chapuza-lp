@@ -1,0 +1,3 @@
+# Las salidas guardadas de examples/ se comparan byte a byte con lo que genera el juego (LF):
+# que un clon en Windows con autocrlf no las convierta a CRLF.
+examples/** text eol=lf
