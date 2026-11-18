@@ -86,97 +86,19 @@ En combate manda cada miembro en su turno (tras cada orden se ve de quién es el
 
 ## Pruebas
 
-Las pruebas usan `plunit`. Desde la raíz del repositorio (PowerShell), con el ejecutable por su ruta completa, cada suite se ejecuta por separado:
+Las pruebas usan `plunit`. **Una sola orden** las corre todas (desde la raíz del repositorio, con el ejecutable por su ruta completa porque no está en el PATH):
 
 ```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/mundo_estado -g "run_tests,halt" -t "halt(1)"
+& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/todas -g "run_tests,halt" -t "halt(1)"
 ```
 
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/juego -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/pagos -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/explicar_juego -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/narrador -g "run_tests,halt" -t "halt(1)"
-```
+Cada suite corre en su propio proceso (así ninguna contagia a otra), se escribe una línea por suite y un resumen, y el **código de salida es 0 si todo pasa y 1 si algo falla** (en ese caso se enseña el final de lo que dijo la suite que falla). Para correr solo algunas: `-g "run_tests([combate, ia]),halt"`. Una suite concreta, sin el agregador:
 
 ```
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/combate -g "run_tests,halt" -t "halt(1)"
 ```
 
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/acciones -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/bucle -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/ia -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/contratos -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/cierre -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/eventos -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/campana -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/diagnosticos -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/habilidades -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/escolta -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/por_que_no -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/turno_enemigo -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/niveles -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/banco -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/playtest -g "run_tests,halt" -t "halt(1)"
-```
-
-```
-& "C:\Program Files\pl\bin\swipl.exe" -q -s tests/spike_explicar -g "run_tests,halt" -t "halt(1)"
-```
-
-Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 si alguna falla. Suites actuales (1569 pruebas):
+Suites actuales (1611 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -192,6 +114,8 @@ Cada punto es una prueba que pasa; el código de salida es 0 si todas pasan y 1 
 | `tests/cierre.pl` (102) | Cómo acaba un contrato: `resultado/3` (éxito, a medias o fracaso según contadores y marcas), sus consecuencias, el cobro automático al llegar a la taberna, el combate que empieza al llegar a la zona de un contrato activo, y partidas completas de aceptar a cobrar. |
 | `tests/eventos.pl` (110) | El motor mínimo de eventos y el comando `elegir`: cuándo se abre el evento del gato, sus opciones y cuáles están disponibles, los intentos, qué pasa al elegir cada una, cómo se resuelve el contrato con las marcas que dejan y la cadena gato → venda → gallina. |
 | `tests/campana.pl` (39) | La partida mínima de principio a fin: los finales (`chapuza`, `derrota_combate`, `derrota_hambre`), la fase final, partidas completas escritas como una lista de comandos (se gana en 7 días y es reproducible) y que `pelear` ya no existe. |
+| `tests/equivalencia.pl` (42) | **La prueba de equivalencia del meta-intérprete**: más de 20 objetivos del juego (compañía, economía, combate, contratos, fase, negación, `->`, aritmética, `findall`, `forall`) × 8 escenarios (inicio, hambre, huelga, combate con rasgos, con venda, el jefe, contratos en marcha, partida acabada): ejecutarlos directamente y con `solve/2` da las **mismas soluciones en el mismo orden**; el oráculo del corte (IA con corte = IA sin corte), la prueba de modo, los casos de error y que demostrar no cambia el estado. |
+| `tests/todas.pl` | El agregador: corre todas las suites en procesos separados y devuelve 0 o 1. |
 | `tests/playtest.pl` (45) | El primer playtest guiado convertido en pruebas: la partida completa por la vía cómoda (se gana, en pocos días y comandos, sin pantallas crudas ni errores y reproducible), las tres rutas degeneradas (no pagar, ignorar la comida, contratos sin condiciones) y los ajustes que salieron de él: el estado del combate tras cada orden, el día y la ración, las variantes que rotan de verdad y las pistas de `por_que_no`. |
 | `tests/banco.pl` (56) | El banco de frases del narrador, sano como conjunto: tamaño, marcas `~w` y argumentos, textos sin repetir, claves con identificadores que existen (detecta erratas), cobertura de las reglas explicables y de los casos reales de `por_que_no` (con frase propia, no la genérica), rotación de las frases frecuentes, comentarios de nodo del nivel detallado y el chiste de cada contrato. |
 | `tests/niveles.pl` (64) | Los niveles `resumido`/`detallado` (comando `nivel`, el ajuste de sesión y cómo cambian `explicar`, `por_que_no` y la decisión de un enemigo) y `por_que_no` v2: varias cláusulas aplicables, la prueba de por qué es cierto lo que una negación niega y las negaciones anidadas (`\+ \+ X`). |
