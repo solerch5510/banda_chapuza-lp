@@ -27,11 +27,12 @@
 :- use_module(api).
 :- use_module(estado).
 
-:- dynamic carpeta_web/1.
-:- prolog_load_context(directory, Dir),
-   file_directory_name(Dir, Raiz),
-   atomic_list_concat([Raiz, '/web'], Web),
-   assertz(carpeta_web(Web)).
+% La carpeta web/ esta junto a src/: se deduce de donde esta este archivo (sin escribir en la base de datos).
+carpeta_web(Web) :-
+    module_property(servidor, file(Archivo)),
+    file_directory_name(Archivo, Src),
+    file_directory_name(Src, Raiz),
+    atomic_list_concat([Raiz, '/web'], Web).
 
 :- http_handler(root('api/estado'),  manejar_estado,  []).
 :- http_handler(root('api/orden'),   manejar_orden,   []).

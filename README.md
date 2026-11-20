@@ -201,6 +201,8 @@ banda_chapuza-lp/
 ├─ docs/            documentación de diseño
 ├─ src/             código fuente (15 módulos)
 ├─ tests/           pruebas (plunit)
+├─ web/             frontend web opcional (HTML, CSS y JavaScript sin dependencias)
+├─ scripts/         verificar-entrega.ps1: la lista de verificación de la entrega, automatizada
 └─ examples/        partidas y explicaciones de ejemplo
 ```
 
@@ -236,6 +238,9 @@ Documentos en `docs/`:
 | [05-comedia-y-narracion.md](docs/05-comedia-y-narracion.md) | Comedia y narración. |
 | [06-revision-y-decisiones.md](docs/06-revision-y-decisiones.md) | Revisión de coherencia y decisiones. |
 | [07-playtest-1.md](docs/07-playtest-1.md) | Primer playtest completo (PT-1): resultados, ajustes y observaciones de balance. |
+| [08-informe.md](docs/08-informe.md) | Informe del proyecto. |
+| [09-guion-exposicion.md](docs/09-guion-exposicion.md) | Guion de la exposición, plan B y preguntas probables. |
+| [10-checklist-entrega.md](docs/10-checklist-entrega.md) | Lista de verificación de la entrega y etiquetas propuestas. |
 
 ## Contexto académico
 
