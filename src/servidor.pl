@@ -78,10 +78,19 @@ orden_de_la_peticion(Peticion, Texto) :-
         Texto = T1
     ).
 
-manejar_nueva(_Peticion) :-
+manejar_nueva(Peticion) :-
+    consumir_cuerpo(Peticion),
     con_cerrojo(( estado:nueva_partida, api:ejecutar_orden(mirar, Json) )),
     sin_cache,
     responder(Json).
+
+% Un POST cuyo cuerpo no se lee deja esos bytes en la conexion (que el navegador reutiliza): la peticion siguiente
+% llega precedida de basura y el servidor da 500 ("Syntax error: http_request"). Se lee siempre.
+consumir_cuerpo(Peticion) :-
+    (   memberchk(method(post), Peticion)
+    ->  catch(http_read_json(Peticion, _), _, true)
+    ;   true
+    ).
 
 manejar_escenas(_Peticion) :-
     api:escenas_json(Js),

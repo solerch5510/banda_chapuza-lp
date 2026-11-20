@@ -14,6 +14,7 @@
 :- use_module(library('http/json')).
 :- use_module(library('http/http_header')).
 :- use_module(library('http/http_open')).
+:- use_module(library(socket)).
 :- use_module(library('http/thread_httpd')).
 :- use_module(library('http/http_dispatch')).
 :- use_module(library(readutil)).
@@ -501,6 +502,34 @@ test(las_acciones_ofrecidas_son_comandos_validos_de_verdad) :-
 :- end_tests(las_acciones).
 
 % ---------------------------------------------------------------------------
+% La campana entera por la API
+% ---------------------------------------------------------------------------
+:- begin_tests(la_campana_por_la_api).
+
+test(la_partida_de_respaldo_se_juega_entera_sin_items_desconocidos_ni_errores) :-
+    nueva_partida,
+    main:leer_guion('examples/campana-comandos.txt', Terminos),
+    findall(Tipos,
+            (   member(T, Terminos),
+                format(atom(Texto), '~q', [T]),
+                orden(Texto, R),
+                tipos_de(R, Tipos),
+                estado_de(R, E), assertion(E \== @(null))
+            ),
+            Todos),
+    append(Todos, Planos),
+    assertion(\+ memberchk(desconocido, Planos)),
+    assertion(\+ memberchk(error, Planos)),
+    assertion(memberchk(combate, Planos)), assertion(memberchk(evento, Planos)),
+    assertion(( memberchk(decision, Planos) ; memberchk(prueba, Planos) )),
+    orden(mirar, Final), estado_de(Final, Est),
+    campo(Est, fase, F), campo(Est, fin, Fin),
+    assertion(F == fin), assertion(Fin \== @(null)),
+    campo(Est, acciones, As), assertion(As == []).
+
+:- end_tests(la_campana_por_la_api).
+
+% ---------------------------------------------------------------------------
 % Lo que cuenta la web es lo que cuenta la consola
 % ---------------------------------------------------------------------------
 :- begin_tests(web_y_consola).
@@ -591,6 +620,51 @@ trabajo_http :-
                item_de_tipo(J, zona, _)
            )).
 
+:- begin_tests(la_web).
+
+% la_web: el contenido de web/ es coherente (sin servidor)
+leer_texto(Ruta, Texto) :-
+    setup_call_cleanup(open(Ruta, read, S, [type(binary)]),
+                       ( set_stream(S, encoding(utf8)), read_stream_to_codes(S, Cs) ),
+                       close(S)),
+    atom_codes(Texto, Cs).
+
+test(el_html_solo_referencia_archivos_que_existen) :-
+    leer_texto('web/index.html', H),
+    forall(member(Ref, ['estilos.css', 'app.css', 'app.js', 'favicon.svg']),
+           (   assertion(contiene(H, Ref)),
+               atomic_list_concat(['web/', Ref], R), assertion(exists_file(R))
+           )).
+
+test(el_html_declara_idioma_utf8_y_viewport) :-
+    leer_texto('web/index.html', H),
+    assertion(contiene(H, 'lang="es"')), assertion(contiene(H, 'charset="UTF-8"')),
+    assertion(contiene(H, 'name="viewport"')).
+
+test(el_javascript_pide_solo_las_rutas_de_la_api_que_existen) :-
+    leer_texto('web/app.js', J),
+    forall(member(Ruta, ['/api/orden', '/api/nueva', '/api/estado']), assertion(contiene(J, Ruta))),
+    assertion(\+ contiene(J, 'fetch("http')).      % nada de servidores externos
+
+test(la_web_no_carga_nada_de_fuera) :-
+    forall(member(F, ['web/index.html', 'web/app.js', 'web/estilos.css', 'web/app.css']),
+           (   leer_texto(F, T),
+               assertion(\+ contiene(T, 'https://')), assertion(\+ contiene(T, '//cdn')),
+               assertion(\+ contiene(T, 'googleapis'))
+           )).
+
+test(el_diseno_define_los_dos_temas_con_los_mismos_tokens) :-
+    leer_texto('web/estilos.css', C),
+    forall(member(Tok, ['--paper:', '--ink:', '--cheddar:', '--ok:', '--no:', '.game-frame.dark']), assertion(contiene(C, Tok))).
+
+test(el_javascript_tiene_los_paneles_del_diseno) :-
+    leer_texto('web/app.js', J),
+    forall(member(Pieza, ['panelContratos', 'panelZona', 'panelExplicar', 'decisionHTML', 'arbolHTML', 'juegoMovil',
+                          'pantallaInicio', 'pantallaFinal', 'accionesRapidas']),
+           assertion(contiene(J, Pieza))).
+
+:- end_tests(la_web).
+
 :- begin_tests(el_servidor, [setup(arrancar), cleanup(parar_servidor)]).
 
 arrancar :-
@@ -644,6 +718,24 @@ test(nueva_partida_reinicia) :-
     assertion(Id == taberna),
     obtener('/api/estado', J2), campo(J2, dia, D), assertion(D == 1).
 
+test(un_post_y_otra_peticion_por_la_misma_conexion_no_dan_500) :-
+    % regresion: /api/nueva no leia su cuerpo y esos bytes rompian la peticion siguiente de la MISMA conexion
+    % (el navegador reutiliza conexiones). http_open abre una por peticion, asi que se habla por un socket.
+    puerto(P),
+    atom_codes(CRLF, [13, 10]),
+    atomic_list_concat(['POST /api/nueva HTTP/1.1', 'Host: localhost', 'Content-Type: application/json',
+                        'Content-Length: 2', '', '{}GET /api/estado HTTP/1.1', 'Host: localhost',
+                        'Connection: close', '', ''], CRLF, Pet),
+    tcp_socket(Socket),
+    tcp_connect(Socket, localhost:P),
+    tcp_open_socket(Socket, In, Out),
+    format(Out, '~w', [Pet]), flush_output(Out),
+    read_stream_to_codes(In, Cs), atom_codes(Resp, Cs),
+    close(Out), close(In),
+    atomic_list_concat(Partes, 'HTTP/1.1 200', Resp), length(Partes, N),
+    assertion(N == 3),                                   % dos respuestas 200
+    assertion(\+ contiene(Resp, '500 Internal')).
+
 test(las_escenas_por_http) :-
     obtener('/api/escenas', J), campo(J, escenas, Es),
     length(Es, N), assertion(N == 5).
@@ -651,6 +743,15 @@ test(las_escenas_por_http) :-
 test(un_archivo_estatico_se_sirve) :-
     estado_http('/index.html', C1), estado_http('/', C2),
     assertion(C1 == 200), assertion(C2 == 200).
+
+test(los_archivos_de_la_web_se_sirven_con_su_tipo) :-
+    forall(member(A-Tipo, [ '/app.js'-'javascript', '/estilos.css'-'css', '/app.css'-'css', '/favicon.svg'-'svg', '/index.html'-'html' ]),
+           (   url(A, Url),
+               setup_call_cleanup(http_open(Url, S, [status_code(C), header(content_type, T)]),
+                                  read_stream_to_codes(S, Cs), close(S)),
+               assertion(C == 200), assertion(contiene(T, Tipo)),
+               assertion(Cs \== [])
+           )).
 
 test(un_archivo_que_no_existe_da_404) :-
     estado_http('/no_existe.html', C), assertion(C == 404).
