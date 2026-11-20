@@ -38,7 +38,8 @@ Sigue con `atacar(...)`, `defender.` y `habilidad(...)` hasta ganar el combate. 
 
 ## Lo que importa en cada día
 
-- **Queso:** `inventario.` enseña la despensa. Cada viaje cuesta un día y cuatro raciones. Si se acaba, pierdes.
+- **Queso:** `inventario.` enseña la despensa. Cada día come toda la Banda (cuatro raciones) y cada viaje es un día. El número de la cabecera (por ejemplo `12 · 3 días`) es el queso y para cuántos días de comida te llega; si se pone amarillo o rojo, ve a cobrar. Si el queso llega a cero y no tienes nada por cobrar, pierdes.
+- **Junta los contratos:** ir y volver a la aldea cuesta dos días (8 quesos) y sus dos contratos pagan 9 y 7. Hacerlos en un solo viaje sale mucho más barato que uno por uno.
 - **Sueldos:** al volver a la taberna hay sueldos por pagar (`pagar.`). Si sales sin pagar, baja la moral, y con la moral por los suelos alguien se pone en **huelga**.
 - **Descansar** (`descansar.`, solo en la taberna) cura a todos pero cuesta queso.
 - **Contratos:** los premios se cobran en la taberna. Algunos contratos están **bloqueados** por algo de la Banda (por ejemplo, a Baldomero le dan miedo los caballos).

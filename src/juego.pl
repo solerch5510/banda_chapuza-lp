@@ -162,7 +162,8 @@ ejecutar_(Cmd, resultado(Items)) :-
             (   permitido(Fase, Nombre)
             ->  % Sin "estado:" delante: con_transaccion/1 es un meta-predicado y debe
                 % resolver ejecutar_en_fase/3 en ESTE modulo, no en estado.
-                con_transaccion(ejecutar_en_fase(Cmd, Fase, Items))
+                con_transaccion(ejecutar_en_fase(Cmd, Fase, Items0)),
+                avisos_de_comida(Cmd, Items0, Items)
             ;   Items = [error(fuera_de_fase(Cmd, Fase))]
             )
         ;   % ir(X) con X sin ligar no es un comando: ejecutarlo elegiria una zona cualquiera.
@@ -170,6 +171,19 @@ ejecutar_(Cmd, resultado(Items)) :-
         )
     ;   Items = [error(no_entiendo(Cmd))]
     ).
+
+% avisos_de_comida(+Cmd, +Items0, -Items): tras viajar, descansar o pagar, si la despensa esta justa se avisa
+% (vista(comida, Riesgo)); en combate o con la partida acabada no.
+avisos_de_comida(Cmd, Items0, Items) :-
+    (   memberchk(Cmd, [descansar, pagar]) ; Cmd = ir(_) ),
+    \+ memberchk(error(_), Items0),              % si la orden fallo, no hay que avisar de nada
+    \+ estado:fin_partida(_),
+    \+ estado:en_combate(_),
+    economia:riesgo_de_gasto(0, Riesgo),
+    Riesgo \== ninguno,
+    !,
+    append(Items0, [vista(comida, Riesgo)], Items).
+avisos_de_comida(_, Items, Items).
 
 ejecutar_en_fase(ayuda, Fase, [vista(ayuda, Comandos)]) :-
     comandos_disponibles(Fase, Comandos).
@@ -526,7 +540,8 @@ datos_de_combate(combate(Ronda, Turno, Enemigos)) :-
 % ---------------------------------------------------------------------------
 % mirar: los datos de la zona donde estas.
 % ---------------------------------------------------------------------------
-datos_de_zona([nombre(Nombre), descripcion(Texto), salidas(Salidas), dia(Dia), queso(Queso)]) :-
+datos_de_zona([nombre(Nombre), descripcion(Texto), salidas(Salidas), dia(Dia), queso(Queso),
+               racion(Racion), dias(Dias), riesgo(Riesgo)]) :-
     once(estado:en_zona(Zona)),
     mundo:zona(Zona, Nombre),
     mundo:descripcion_zona(Zona, Texto),
@@ -535,7 +550,10 @@ datos_de_zona([nombre(Nombre), descripcion(Texto), salidas(Salidas), dia(Dia), q
             Salidas0),
     sort(Salidas0, Salidas),
     once(estado:dia(Dia)),
-    economia:queso_total(Queso).
+    economia:queso_total(Queso),
+    economia:racion_diaria(Racion),
+    economia:dias_de_comida(Dias),
+    economia:riesgo_de_gasto(0, Riesgo).
 
 % ---------------------------------------------------------------------------
 % Salir de la taberna sin haber pagado los sueldos: cada miembro activo pierde moral.

@@ -118,6 +118,9 @@
           S.log.push({ t: CLAVES_SISTEMA.test(it.clave) ? "sys" : (combate ? "imp" : "msg"), texto: it.texto });
           if (it.texto.indexOf("Fin de la partida") < 0) textosFinal.push(it.texto);
           break;
+        case "aviso_comida":
+          S.log.push({ t: "aviso", texto: it.texto });
+          break;
         case "error":
           S.log.push({ t: "error", texto: it.texto, porQueNo: it.por_que_no, motivo: it.motivo });
           break;
@@ -609,6 +612,7 @@
 
   function entradaLog(e) {
     switch (e.t) {
+      case "aviso": return '<div class="narration-line aviso-comida"><span class="line-mark">⚠</span><p>' + esc(e.texto) + "</p></div>";
       case "dia": return '<div class="day-divider"><span>DÍA ' + e.dia + "</span></div>";
       case "cmd": return '<div class="command-line"><span>&gt;</span> ' + esc(e.texto) + "</div>";
       case "sys": return '<div class="narration-line system"><span class="line-mark">◆</span><p>' + esc(e.texto) + "</p></div>";
@@ -699,6 +703,7 @@
 
   function razonDe(a) {
     if (!a.habilitada) return a.motivo || "No disponible";
+    if (a.aviso) return "⚠ " + a.aviso;
     if (a.familia === "atacar") {
       var c = S.estado.combate, e = c && c.enemigos.filter(function (x) { return a.comando.indexOf("(" + x.tipo_enemigo + ")") >= 0 && !x.caido; })[0];
       return e ? mayus(e.fila) + " · " + e.vida + "/" + e.vida_max + " vida" : "Disponible";
@@ -749,10 +754,18 @@
     return '<div class="menu-backdrop"><section class="game-menu" role="dialog" aria-modal="true" aria-label="Menú de partida">' + cabecera + cuerpo + "</section></div>";
   }
 
+  // El queso y para cuantos dias llega; en amarillo o rojo cuando esta justo. Tolera un servidor viejo sin `comida`.
+  function indicadorComida(e) {
+    var c = e.comida;
+    if (!c) return '<span title="Quesos en la despensa">' + icono("cheese", 17) + e.despensa.total + "</span>";
+    return '<span class="comida ' + esc(c.riesgo) + '" title="' + esc("Ración: " + c.racion + " quesos al día. " + (c.aviso || "Hay margen.")) + '">' + icono("cheese", 17) +
+      e.despensa.total + " <small>" + c.dias + (c.dias === 1 ? " día" : " días") + "</small></span>";
+  }
+
   function cabecera() {
     var e = S.estado;
     return '<header class="game-header">' + logo(28) + '<div class="location">' + icono("map", 16) + "<span>" + esc(e.zona.nombre) + "</span><i></i>Día " + e.dia + "</div>" +
-      '<div class="header-stats"><span title="Quesos en la despensa">' + icono("cheese", 17) + e.despensa.total + '</span><button data-act="menu" aria-haspopup="dialog">Menú</button></div></header>';
+      '<div class="header-stats">' + indicadorComida(e) + '<button data-act="menu" aria-haspopup="dialog">Menú</button></div></header>';
   }
 
   // ---------------------------------------------------------------------------------------------------------

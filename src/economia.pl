@@ -10,7 +10,7 @@
                      valor_queso/3, valor_despensa/1, inventario/1,
                      puede_descansar/0, efectos_racion/1, efectos_descanso/1,
                      total_sueldos/1, puede_pagar_sueldos/0, efectos_sueldos/1,
-                     efectos_perdida/2]).
+                     efectos_perdida/2, racion_diaria/1, dias_de_comida/1, riesgo_de_gasto/2]).
 :- use_module(mundo).
 :- use_module(estado).
 :- use_module(compania).
@@ -201,6 +201,34 @@ efectos_sueldos([marcar(sueldos_pagados), mensaje(pago, [Total])|Gastos]) :-
     total_sueldos(Total),
     despensa_para_pago(Despensa),
     tomar(Despensa, Total, Gastos).
+
+% racion_diaria(-N): lo que come la Banda en un dia (la racion de cada miembro activo).
+racion_diaria(N) :-
+    findall(Id, compania:activo(Id), Miembros),
+    length(Miembros, K),
+    mundo:parametro(racion_por_miembro, Racion),
+    N is K * Racion.
+
+% dias_de_comida(-D): cuantos dias enteros de racion hay en la despensa.
+dias_de_comida(D) :-
+    queso_total(Queso),
+    racion_diaria(Racion),
+    (   Racion > 0 -> D is Queso // Racion ; D = 0 ).
+
+% riesgo_de_gasto(+Coste, -Riesgo): que le pasa a la despensa si se gasta Coste y ademas pasa un dia (la racion).
+%   hambre_mortal  se queda a cero y no hay nada por cobrar: fin de la partida (ver juego:comprobar_fin)
+%   sin_queso      se queda a cero, pero hay algo por cobrar
+%   escaso         queda menos de un dia de racion
+%   ninguno        hay margen
+riesgo_de_gasto(Coste, Riesgo) :-
+    queso_total(Queso),
+    racion_diaria(Racion),
+    Resto is Queso - Coste - Racion,
+    (   Resto =< 0, \+ estado:contrato_por_cobrar(_, _) -> Riesgo = hambre_mortal
+    ;   Resto =< 0                                       -> Riesgo = sin_queso
+    ;   Resto < Racion                                   -> Riesgo = escaso
+    ;   Riesgo = ninguno
+    ).
 
 % efectos_perdida(+N, -Efectos): se pierden N quesos (los mas rancios primero) o todos si hay menos.
 efectos_perdida(N, Efectos) :-

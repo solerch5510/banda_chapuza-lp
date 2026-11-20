@@ -149,9 +149,9 @@ En la segunda pestaña lanzo las pruebas (unos 20 segundos):
 swipl -q -s tests/todas -g "run_tests,halt" -t "halt(1)"
 ```
 
-Se ve: «27 suites en verde, 0 con fallos; 1762 pruebas declaradas» y «TODO EN VERDE».
+Se ve: «28 suites en verde, 0 con fallos; 1784 pruebas declaradas» y «TODO EN VERDE».
 
-> Para terminar: la verificación fue tan importante como el código. Veintisiete suites, más de mil setecientas pruebas, pruebas de mutación —rompo el código a propósito y compruebo que alguna prueba falla— y la prueba de equivalencia del meta-intérprete que les contaba.
+> Para terminar: la verificación fue tan importante como el código. Veintiocho suites, más de mil setecientas pruebas, pruebas de mutación —rompo el código a propósito y compruebo que alguna prueba falla— y la prueba de equivalencia del meta-intérprete que les contaba.
 >
 > Y cada concepto del curso tiene su sitio: hechos y reglas en el combate, unificación en los resultados, resolución y retroceso en el árbol de derivación, negación como fallo en `por_que_no`, el corte en la IA, aritmética en el daño y el queso, metaprogramación en `explicar.pl` y base de datos dinámica aislada en `estado.pl`. No hay programación funcional, y lo digo abiertamente. Con más tiempo haría guardar y cargar, más contratos y un ajuste fino del balance. Gracias.
 

@@ -82,6 +82,14 @@ body[data-tema="light"] { background: #f8edcd; }
 .game-frame .quick-actions .disabled-action small { position: static; display: block; font-size: 12px; }
 .game-frame .quick-actions button { line-height: 1.25; }
 
+/* La comida: indicador de la cabecera y avisos */
+.header-stats .comida small { font-size: 12px; color: var(--muted); }
+.header-stats .comida.escaso, .header-stats .comida.sin_queso { color: var(--cheddar); }
+.header-stats .comida.hambre_mortal { color: var(--no); font-weight: 700; }
+.header-stats .comida.hambre_mortal small, .header-stats .comida.sin_queso small, .header-stats .comida.escaso small { color: inherit; }
+.narration-line.aviso-comida { border-left: 3px solid var(--no); background: color-mix(in srgb, var(--no) 8%, transparent); padding-left: 8px; }
+.narration-line.aviso-comida .line-mark { color: var(--no); }
+
 /* La ficha de un personaje */
 .member-card.clicable { cursor: pointer; }
 .member-card.clicable:hover { border-color: var(--cheddar); }

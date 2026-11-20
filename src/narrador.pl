@@ -16,7 +16,7 @@
 % entre ellas con Uso mod N. Si varias claves encajan, gana la mas especifica (menos variables).
 % Texto provisional: el banco con todo el humor (docs/05-comedia-y-narracion.md) crece despues.
 
-:- module(narrador, [frase/3, texto/4, texto_error/2, ayuda_de/2, bienvenida/1, consejo_de_ayuda/2,
+:- module(narrador, [frase/3, texto/4, texto_error/2, ayuda_de/2, bienvenida/1, consejo_de_ayuda/2, texto_riesgo/2,
                      comentario/4, comentario_prueba/4, nombre_visible/2, texto_recompensa/2,
                      descripcion_evento/2, descripcion_opcion/3,
                      claves_de_diag/2, clave_de_diag/2, comentario_diag/4,
@@ -732,6 +732,11 @@ ayuda_de(inventario, 'inventario.    muestra la despensa (con la edad del queso)
 ayuda_de(explicar, 'explicar.      la prueba de lo último que hiciste; explicar(Accion). la de esa acción').
 ayuda_de(salir, 'salir.         termina la partida').
 
+% texto_riesgo(+Riesgo, -Texto): el aviso de comida (economia:riesgo_de_gasto/2). ninguno no tiene texto.
+texto_riesgo(hambre_mortal, '¡Peligro! Otro día así y la despensa se queda a cero sin nada por cobrar: perderías por hambre.').
+texto_riesgo(sin_queso, 'Otro día así y la despensa se queda a cero (aunque tienes algo por cobrar).').
+texto_riesgo(escaso, 'Ojo: otro día así y te quedaría menos de un día de ración.').
+
 % bienvenida(-Lineas): lo primero que ve el jugador (consola y web): quien es, el objetivo y como empezar.
 bienvenida(['=== BANDA CHAPUZA ===',
             'Diriges una compañía de mercenarios incompetentes que cobran en queso.',
@@ -747,6 +752,6 @@ consejo_de_ayuda(Comandos, Texto) :-
     ;   memberchk(atacar, Comandos)
     ->  Texto = 'Estás en combate: cada miembro actúa en su turno. atacar(Tipo). golpea (p. ej. atacar(rata_quesera).), defender. sube la defensa y habilidad. usa la de tu personaje. Con explicar. ves por qué pasó lo último.'
     ;   memberchk(pagar, Comandos)
-    ->  Texto = 'Estás en la taberna: contratos. enseña el tablón, aceptar(Contrato). acepta uno, pagar. paga los sueldos pendientes, descansar. cura (cuesta queso) e ir(Zona). viaja (cuesta un día y la ración de queso).'
-    ;   Texto = 'Estás de viaje: mirar. te dice dónde estás y las salidas, ir(Zona). viaja y aceptar(Contrato). acepta un contrato donde te lo ofrecen. Si algo no se puede, por_que_no(Accion). cuenta por qué.'
+    ->  Texto = 'Estás en la taberna: contratos. enseña el tablón, aceptar(Contrato). acepta uno, pagar. paga los sueldos pendientes, descansar. cura (cuesta queso) e ir(Zona). viaja (cuesta un día y la ración de queso). Ahorra queso: cada día come toda la Banda, así que junta los contratos de una misma zona antes de volver.'
+    ;   Texto = 'Estás de viaje: mirar. te dice dónde estás y las salidas, ir(Zona). viaja y aceptar(Contrato). acepta un contrato donde te lo ofrecen. Cada día come toda la Banda: no vuelvas con las manos vacías. Si algo no se puede, por_que_no(Accion). cuenta por qué.'
     ).

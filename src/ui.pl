@@ -71,7 +71,19 @@ mostrar_conocido(vista(zona, Datos)) :-
     memberchk(queso(Queso), Datos),
     format("~n== ~w ==~n~w~n", [Nombre, Descripcion]),
     escribir_salidas(Salidas),
-    format("Día ~w · Queso en la despensa: ~w~n", [Dia, Queso]).
+    format("Día ~w · Queso en la despensa: ~w", [Dia, Queso]),
+    (   memberchk(racion(R), Datos), memberchk(dias(D), Datos)
+    ->  format(" · ración ~w al día (te alcanza para ~w)", [R, D])
+    ;   true
+    ),
+    nl,
+    (   memberchk(riesgo(Riesgo), Datos), narrador:texto_riesgo(Riesgo, Aviso)
+    ->  format("~w~n", [Aviso])
+    ;   true
+    ).
+mostrar_conocido(vista(comida, Riesgo)) :-
+    narrador:texto_riesgo(Riesgo, Texto),
+    format("~w~n", [Texto]).
 mostrar_conocido(vista(ayuda, Comandos)) :-
     format("Comandos disponibles ahora:~n", []),
     forall(member(Nombre, Comandos),

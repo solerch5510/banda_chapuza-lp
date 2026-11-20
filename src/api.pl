@@ -191,6 +191,8 @@ item(error(Motivo), json([tipo=error, motivo=M, texto=Texto, por_que_no=Accion])
 item(salir, json([tipo=salir])).
 item(fase(F), json([tipo=fase, fase=F])).
 item(vista(zona, Datos), Json) :- zona_json(Datos, Json).
+item(vista(comida, Riesgo), json([tipo=aviso_comida, riesgo=Riesgo, texto=Texto])) :-
+    narrador:texto_riesgo(Riesgo, Texto).
 item(vista(ayuda, Comandos), json([tipo=ayuda, comandos=Js, consejo=Consejo])) :-
     findall(json([nombre=N, texto=T]),
             ( member(N, Comandos), ( narrador:ayuda_de(N, T) -> true ; T = N ) ),
@@ -404,7 +406,7 @@ combate_json(combate(Ronda, Turno, Enemigos),
 % El estado completo (lo que pinta el frontend entre orden y orden)
 % ---------------------------------------------------------------------------
 
-estado_json(json([fase=Fase, dia=Dia, nivel=Nivel, zona=Zona, mapa=Mapa, banda=Banda, despensa=Despensa,
+estado_json(json([fase=Fase, dia=Dia, nivel=Nivel, zona=Zona, mapa=Mapa, banda=Banda, despensa=Despensa, comida=Comida,
                   contratos=Contratos, combate=Combate, fin=Fin, acciones=Acciones])) :-
     ( once(estado:fase(Fase)) -> true ; Fase = desconocida ),
     ( once(estado:dia(Dia)) -> true ; Dia = 0 ),
@@ -416,6 +418,7 @@ estado_json(json([fase=Fase, dia=Dia, nivel=Nivel, zona=Zona, mapa=Mapa, banda=B
     maplist(miembro_json, Filas, Banda),
     economia:inventario(DI),
     despensa_json(DI, Despensa),
+    comida_json(Comida),
     findall(F, ( contratos:contrato(C, _, _, _, _), contratos:ficha(C, F) ), Fichas),
     maplist(contrato_json, Fichas, Contratos),
     (   estado:en_combate(_), juego:datos_de_combate(DC)
@@ -424,6 +427,14 @@ estado_json(json([fase=Fase, dia=Dia, nivel=Nivel, zona=Zona, mapa=Mapa, banda=B
     ),
     (   estado:fin_partida(Motivo) -> termino_texto(Motivo, MT), Fin = json([motivo=MT]) ; Fin = @(null) ),
     acciones_json(Acciones).
+
+% comida_json(-Json): cuanto queso hay, lo que come la Banda al dia, para cuantos dias llega y el aviso si esta justa.
+comida_json(json([queso=Queso, racion=Racion, dias=Dias, riesgo=Riesgo, aviso=Aviso])) :-
+    economia:queso_total(Queso),
+    economia:racion_diaria(Racion),
+    economia:dias_de_comida(Dias),
+    economia:riesgo_de_gasto(0, Riesgo),
+    (   narrador:texto_riesgo(Riesgo, T) -> Aviso = T ; Aviso = @(null) ).
 
 mapa_json(json([zonas=Zonas, conexiones=Conex])) :-
     findall(json([id=Id, nombre=N]), mundo:zona(Id, N), Zonas),
@@ -473,8 +484,9 @@ habilidad_candidata(Cmd) :-
 
 accion_json(Fase, Cmd, Familia,
             json([comando=Texto, familia=Familia, etiqueta=Etiqueta, habilitada=Hab, motivo=Motivo,
-                  por_que_no=PQN])) :-
+                  por_que_no=PQN, aviso=Aviso])) :-
     termino_texto(Cmd, Texto),
+    aviso_de_gasto(Cmd, Aviso),
     etiqueta_de(Cmd, Etiqueta),
     functor(Cmd, Nombre, _),
     (   catch(once(juego:objetivo_de_accion(Cmd, Meta)), _, fail)
@@ -486,6 +498,18 @@ accion_json(Fase, Cmd, Familia,
         )
     ;   permitido_o_motivo(Fase, Nombre, Cmd, Hab, Motivo, PQN)
     ).
+
+% aviso_de_gasto(+Cmd, -Aviso): viajar cuesta la racion de un dia y descansar, ademas, su coste. Si la despensa
+% queda justa, el aviso (si no, null). Solo tiene sentido en las acciones que gastan queso.
+aviso_de_gasto(Cmd, Aviso) :-
+    (   Cmd = ir(_) -> Coste = 0
+    ;   Cmd == descansar -> mundo:parametro(coste_descanso, Coste)
+    ),
+    economia:riesgo_de_gasto(Coste, Riesgo),
+    narrador:texto_riesgo(Riesgo, Texto),
+    !,
+    Aviso = Texto.
+aviso_de_gasto(_, @(null)).
 
 permitido_o_motivo(Fase, Nombre, Cmd, Hab, Motivo, PQN) :-
     (   juego:permitido(Fase, Nombre)

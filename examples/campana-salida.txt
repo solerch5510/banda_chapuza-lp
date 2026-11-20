@@ -9,7 +9,7 @@ Escribe ayuda. para ver los comandos; explicar. y por_que_no(Accion). cuentan po
 == Taberna del Cuajo Torcido ==
 El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
 Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
-Día 1 · Queso en la despensa: 12
+Día 1 · Queso en la despensa: 12 · ración 4 al día (te alcanza para 3)
 
 > ayuda
 Comandos disponibles ahora:
@@ -29,7 +29,7 @@ Comandos disponibles ahora:
   salir.         termina la partida
   demo.          las escenas de la demostración (demo(Nombre). prepara una y la deja lista para jugar)
 
-Estás en la taberna: contratos. enseña el tablón, aceptar(Contrato). acepta uno, pagar. paga los sueldos pendientes, descansar. cura (cuesta queso) e ir(Zona). viaja (cuesta un día y la ración de queso).
+Estás en la taberna: contratos. enseña el tablón, aceptar(Contrato). acepta uno, pagar. paga los sueldos pendientes, descansar. cura (cuesta queso) e ir(Zona). viaja (cuesta un día y la ración de queso). Ahorra queso: cada día come toda la Banda, así que junta los contratos de una misma zona antes de volver.
 
 > contratos
 El tablón de contratos:
@@ -200,6 +200,7 @@ Contrato aceptado: «La Despensa Real». Todos asienten con convicción; nadie h
 > ir(camino_real)
 Amanece el día 6. Alguien tiene hambre y alguien más, una cuenta pendiente. Ración: 4 quesos.
 El Camino Real está empedrado con corteza de queso viejo. Se te pega a las botas y a la conversación.
+Ojo: otro día así y te quedaría menos de un día de ración.
 
 > ir(cuevas)
 Día 7 de la Banda Chapuza. El Registro de Compañías sigue donde estaba: abajo. Ración: 4 quesos.
