@@ -18,7 +18,7 @@ Leyenda: ✅ comprobado (con el script o con la orden indicada) · ⏳ lo tiene 
 | `tests/todas` pasa con código 0 en el clon (26 suites, 1737 pruebas) | ✅ | script |
 | Ninguna excepción en partida de victoria ni de derrota (`derrota_combate`, `derrota_hambre`) | ✅ | `tests/campana.pl` (las tres partidas) y `tests/api.pl` (la campaña entera por la API) |
 | PT-3: guion ejecutado dos veces con cronómetro y tiempos anotados | ⏳ | `docs/09-guion-exposicion.md` §6 |
-| Etiqueta `v1.0-rc1` creada | 🔒 | §4 |
+| Etiqueta `v1.0-rc1` creada y subida | ✅ | §4 (sobre `6f931d6`, 20 de noviembre) |
 
 ## 2. Cierre
 
@@ -47,22 +47,21 @@ Leyenda: ✅ comprobado (con el script o con la orden indicada) · ⏳ lo tiene 
 
 ## 4. Etiquetas propuestas
 
-No hay ninguna etiqueta creada. Una etiqueta se publica con `git push`, así que **se crean solo cuando el autor lo confirma**. Propuesta (los `v0.x` marcan los puntos de control del calendario, sobre el commit que los cumplió):
+Una etiqueta se publica con `git push`, así que **se crean solo cuando el autor lo confirma**. El 20 de noviembre se crearon y subieron las cuatro primeras (los `v0.x` marcan los puntos de control del calendario, sobre el commit que los cumplió); `v1.0-entrega` queda para el 11 de diciembre:
 
 | Etiqueta | Commit | Qué marca |
 |---|---|---|
-| `v0.1-diseno` | `432e1ec` | El diseño y los módulos base (2 de noviembre) |
-| `v0.5-motor` | `77252df` | Motor, sueldos, inventario y modo explicar en árbol (semana 2) |
-| `v0.9-jugable` | `8cc4633` | La partida mínima de principio a fin (T-28) |
-| `v1.0-rc1` | el commit de T-44 | La candidata: todo hecho salvo ensayo y entrega |
-| `v1.0-entrega` | el commit final del 11 de diciembre | Lo entregado (inmutable) |
+| `v0.1-diseno` ✅ | `432e1ec` | El diseño y los módulos base (2 de noviembre) |
+| `v0.5-motor` ✅ | `77252df` | Motor, sueldos, inventario y modo explicar en árbol (semana 2) |
+| `v0.9-jugable` ✅ | `8cc4633` | La partida mínima de principio a fin (T-28) |
+| `v1.0-rc1` ✅ | `6f931d6` (el commit de T-44) | La candidata: todo hecho salvo ensayo y entrega |
+| `v1.0-entrega` 🔒 | el commit final del 11 de diciembre | Lo entregado (inmutable) |
+
+Para la etiqueta final, sobre el commit final y una vez el autor lo confirme:
 
 ```
-git tag -a v0.1-diseno 432e1ec -m "Diseno y modulos base"
-git tag -a v0.5-motor 77252df -m "Motor, sueldos, inventario y modo explicar"
-git tag -a v0.9-jugable 8cc4633 -m "Partida minima de principio a fin"
-git tag -a v1.0-rc1 -m "Candidata a entrega"
-git push origin --tags
+git tag -a v1.0-entrega -m "Entrega del 11 de diciembre"
+git push origin v1.0-entrega
 ```
 
 ## 5. Copia de seguridad
@@ -79,4 +78,4 @@ Guardar el `.zip` en la memoria USB junto con el vídeo de la demo (plan B) y co
 2. **Ensayar el guion dos veces con cronómetro** y anotar los tiempos (`docs/09-guion-exposicion.md` §6); **grabar la demo** en vídeo.
 3. Probar `chcp 65001` en la consola real y ver si las tildes salen bien (o usar la versión web).
 4. **T-38** (balance y segundo playtest con otra persona): sigue pendiente; la ruta cómoda gana con cero quesos de margen.
-5. Decir cuándo crear las etiquetas.
+5. Decir cuándo crear `v1.0-entrega` (el 11 de diciembre, sobre el commit final).
