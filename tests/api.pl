@@ -138,6 +138,52 @@ test(sin_lineas_sin_nodos) :-
 :- end_tests(los_nodos).
 
 % ---------------------------------------------------------------------------
+:- begin_tests(nombres_legibles).
+
+test(una_instancia_sale_con_su_nombre) :-
+    api:legible('dano(baldomero, e(bandido_torpe, 1), 9)', L),
+    assertion(L == 'dano(baldomero, Bandido Torpe, 9)').
+
+test(la_segunda_instancia_lleva_numero) :-
+    api:legible('x e(rata_quesera,2) y e(rata_quesera, 3)', L),
+    assertion(L == 'x Rata Quesera #2 y Rata Quesera #3').
+
+test(solo_se_cambia_e_aislada_no_el_final_de_una_palabra) :-
+    api:legible('be(a, 1) vive(a, 1) se(x, 2)', L),
+    assertion(L == 'be(a, 1) vive(a, 1) se(x, 2)').
+
+test(lo_que_no_es_una_instancia_no_se_toca) :-
+    forall(member(T, ['e(a, )', 'e(, 1)', 'e(a b, 1)', 'sin nada', '', 'e(x, 1', 'teme(baldomero, caballo)']),
+           ( api:legible(T, L), assertion(L == T) )).
+
+test(dentro_de_otro_termino) :-
+    api:legible('tipo_de(e(bandido_montado, 1), bandido_montado)', L),
+    assertion(L == 'tipo_de(Bandido Montado, bandido_montado)').
+
+test(los_nodos_del_diagnostico_traen_el_nombre_legible_y_el_texto_original) :-
+    orden('demo(combate)', _),
+    orden('por_que_no(atacar(baldomero, bandido_montado))', R),
+    item_de_tipo(R, diag, D), campo(D, nodos, Ns),
+    findall(T-L, ( member(N, Ns), campo(N, texto, T), campo(N, legible, L) ), Ps),
+    assertion(( member(T1-L1, Ps), contiene(T1, 'e(bandido_montado, 1)'), contiene(L1, 'Bandido Montado'),
+                \+ contiene(L1, 'e(bandido_montado') )),
+    campo(D, porque_legible, PL), assertion(contiene(PL, 'Bandido Montado')),
+    campo(D, porque, P), assertion(contiene(P, 'e(bandido_montado, 1)')), !.
+
+test(los_motivos_de_los_descartes_tambien) :-
+    orden('demo(ia)', _), orden(defender, _), orden(defender, _), orden(defender, _),
+    orden(explicar, R), item_de_tipo(R, decision, D), campo(D, descartes, Ds),
+    forall(member(X, Ds), ( campo(X, motivo_legible, M), assertion(atom(M)), assertion(\+ contiene(M, 'e(bandido')) )).
+
+test(un_descarte_con_instancias_en_su_motivo) :-
+    api:descarte_json(resumido, descarte(1, curarse, builtin_falso(e(bandido_torpe, 1) = e(rata_quesera, 2))), J),
+    campo(J, motivo, M), campo(J, motivo_legible, L),
+    assertion(contiene(M, 'e(bandido_torpe, 1)')),
+    assertion(L == 'Bandido Torpe=Rata Quesera #2 es falso').
+
+:- end_tests(nombres_legibles).
+
+% ---------------------------------------------------------------------------
 :- begin_tests(los_items).
 
 test(todos_los_tipos_de_item_tienen_json_y_ninguno_es_desconocido) :-

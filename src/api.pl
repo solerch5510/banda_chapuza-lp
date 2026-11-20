@@ -119,8 +119,9 @@ sin_corchetes(M, Interior) :-
     (   atom_concat('[', R, M), atom_concat(Interior, ']', R) -> true ; Interior = M ).
 
 % nodo_json(+Prof, +Estado, +Texto, +Marcas, -Json)
-nodo_json(Prof, Estado, Texto, Marcas, json([profundidad=Prof, estado=Estado, tipo=Tipo, texto=Texto,
+nodo_json(Prof, Estado, Texto, Marcas, json([profundidad=Prof, estado=Estado, tipo=Tipo, texto=Texto, legible=Legible,
                                               marca=Marca, clausula=Clausula, corte=Corte, plegados=Plegados])) :-
+    legible(Texto, Legible),
     partir_marcas(Marcas, Plegados, Otras),
     (   Otras = [Marca|_] -> true ; Marca = '' ),
     tipo_de_nodo(Estado, Texto, Marca, Tipo),
@@ -224,7 +225,7 @@ item(vista(prueba, Accion, Prueba),
     ( narrador:comentarios_de_nodo(Prueba, Nivel, 0, Notas) -> true ; Notas = [] ),
     narrador:comentario_prueba(Prueba, Nivel, 0, Comentario).
 item(vista(diag, Accion, Diag),
-     json([tipo=diag, accion=A, nivel=Nivel, nodos=Nodos, porque=Porque, narrador=Comentario])) :-
+     json([tipo=diag, accion=A, nivel=Nivel, nodos=Nodos, porque=Porque, porque_legible=PorqueL, narrador=Comentario])) :-
     nivel_actual(Nivel),
     termino_texto(Accion, A),
     explicar:diag_a_lineas(Diag, Nivel, Lineas),
@@ -233,8 +234,8 @@ item(vista(diag, Accion, Diag),
         memberchk(tipo=comentario, Campos),
         memberchk(texto=T, Campos),
         atom_concat(porque, _, T)
-    ->  mayuscula_inicial(T, Porque)
-    ;   Porque = @(null)
+    ->  mayuscula_inicial(T, Porque), legible(Porque, PorqueL)
+    ;   Porque = @(null), PorqueL = @(null)
     ),
     narrador:comentario_diag(Diag, Nivel, 0, Comentario).
 item(vista(decision, E, Prueba, Descartes),
@@ -290,13 +291,46 @@ accion_legible(Accion, Texto) :-
     ).
 
 descarte_json(Nivel, descarte(Prioridad, Nombre, Diag),
-              json([prioridad=Prioridad, nombre=Nombre, titulo=Titulo, motivo=Motivo, nodos=Nodos,
+              json([prioridad=Prioridad, nombre=Nombre, titulo=Titulo, motivo=Motivo, motivo_legible=MotivoL, nodos=Nodos,
                     comentario=Comentario])) :-
     bonito(Nombre, Titulo),
     explicar:diag_detalle_a_lineas(Diag, Lineas),
     nodos_de_lineas(Lineas, Nodos),
     motivo_corto(Nodos, Motivo),
+    legible(Motivo, MotivoL),
     narrador:comentario_diag(Diag, Nivel, 0, Comentario).
+
+% legible(+Texto, -Legible): las instancias de enemigo e(Tipo, N) como las ve el jugador. e(bandido_torpe, 1) -> "Bandido Torpe";
+% la segunda del mismo tipo, "Bandido Torpe #2". El texto original no se toca (la consola lo enseña tal cual):
+% la web usa este campo para mostrar y el otro como pista.
+legible(Texto, Legible) :-
+    atom_codes(Texto, Cs),
+    once(legibles(Cs, 32, Out)),
+    atom_codes(Legible, Out).
+
+legibles([], _, []).
+legibles(Cs, Prev, Out) :-
+    \+ char_de_nombre(Prev),
+    Cs = [0'e, 0'(|R0],
+    span(R0, char_de_nombre, TipoCs, [0',|R1]), TipoCs \== [],
+    span(R1, espacio, _, R2),
+    span(R2, es_digito, NumCs, [0')|Resto]), NumCs \== [],
+    !,
+    atom_codes(Tipo, TipoCs), number_codes(K, NumCs),
+    nombre_corto(Tipo, Nombre),
+    (   K > 1 -> format(atom(Rep), '~w #~w', [Nombre, K]) ; Rep = Nombre ),
+    atom_codes(Rep, RepCs),
+    append(RepCs, Out1, Out),
+    legibles(Resto, 41, Out1).
+legibles([C|Cs], _, [C|Out]) :-
+    legibles(Cs, C, Out).
+
+char_de_nombre(C) :- ( code_type(C, alnum) ; C == 95 ), !.
+espacio(32).
+es_digito(C) :- code_type(C, digit).
+
+span([C|R], P, [C|S], Rest) :- call(P, C), !, span(R, P, S, Rest).
+span(R, _, [], R).
 
 % motivo_corto(+Nodos, -Texto): la ultima linea del diagnostico es la mas concreta ("12*100=<12*30 es falso").
 motivo_corto(Nodos, Texto) :-

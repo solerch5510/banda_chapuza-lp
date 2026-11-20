@@ -121,6 +121,20 @@ El juego también se puede jugar desde un navegador: `src/servidor.pl` es un ser
 
 El árbol de `explicar` y `por_que_no` sale como lista plana de **nodos** con profundidad, estado (`ok`/`no`/`info`), tipo (`hecho`, `calculo`, `negacion`, `regla`, `corte`…) y pliegue, construidos a partir de las mismas líneas que enseña la consola. La consola sigue siendo la versión de referencia (y el plan B de la exposición).
 
+### La web (`web/`)
+
+Con el servidor en marcha, abre `http://localhost:8080/`. Es el diseño de interfaz del proyecto (carpeta de diseño exportada) hecho con HTML, CSS y JavaScript **sin dependencias ni compilación**, y no contiene ninguna regla del juego: todo lo que enseña (qué acciones se pueden hacer, por qué no, el árbol de cada explicación) se lo dice el servidor.
+
+| Archivo | Qué es |
+|---|---|
+| `web/index.html` | La página. |
+| `web/estilos.css` | Los estilos del diseño (tokens y componentes, temas **Pergamino** y **Cueva**). Se regenera desde el CSS del diseño. |
+| `web/app.css` | Lo que el diseño no traía por ser una presentación: pantalla completa, móvil real, capas. |
+| `web/app.js` | La aplicación: inicio, exploración, combate, panel **Explicar** (árbol en nodos, decisión del enemigo con sus reglas descartadas), contratos, mapa, menú, selectores, eventos, despensa, crónica y estados de red y carga. |
+
+Atajos: `↑`/`↓` recuperan órdenes, `/` enfoca la línea de órdenes y en los selectores valen los números, las flechas y `Esc`. En pantallas de hasta 700 px se usa el diseño móvil (la explicación sale como cajón). Los nombres de los enemigos se muestran legibles («Bandido Montado», no `e(bandido_montado, 1)`); el texto original se conserva en el JSON.
+
+
 ## Pruebas
 
 Las pruebas usan `plunit`. **Una sola orden** las corre todas (desde la raíz del repositorio, con el ejecutable por su ruta completa porque no está en el PATH):

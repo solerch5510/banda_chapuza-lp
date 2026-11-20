@@ -181,6 +181,7 @@
     if (!texto || S.ocupado) return Promise.resolve();
     S.ocupado = true; S.error = null; S.pop = null; S.menu = false;
     if (!opciones.silencioso) {
+      S.log.forEach(function (e) { if (e.t === "evento") e.viejo = true; });     // un evento ya contestado no se vuelve a elegir
       S.log.push({ t: "cmd", texto: texto.replace(/\.$/, "") });
       if (S.hist[S.hist.length - 1] !== texto) S.hist.push(texto);
       S.hpos = S.hist.length;
@@ -321,7 +322,7 @@
     else if (TIPOS_NODO[n.tipo]) etiqueta = '<span class="node-type ' + TIPOS_NODO[n.tipo][0] + '">' + TIPOS_NODO[n.tipo][1] + "</span>";
     var estadoTxt = n.estado === "info" ? "" : '<span class="node-status">[' + n.estado + "]</span>";
     var extra = n.tipo === "corte" ? "<small>Se descartaron las cláusulas siguientes</small>" : "";
-    var texto = n.tipo === "corte" ? "corte" : n.texto;
+    var texto = n.tipo === "corte" ? "corte" : (n.legible || n.texto);
     return '<div class="tree-node ' + estado + (n.tipo === "corte" ? " cut" : "") + '">' + estadoTxt + "<code>" + esc(texto) + "</code>" + etiqueta + extra + "</div>" +
       (n.plegados > 0 ? '<button class="folded" data-act="nivel:detallado">[+' + n.plegados + (n.plegados === 1 ? " nodo]" : " nodos]") + "</button>" : "");
   }
@@ -358,7 +359,7 @@
 
   function arbolConCajas(it, compacto) {
     var cajas = "";
-    if (it.porque) cajas += '<div class="reason-box"><strong>Porque…</strong><p>' + esc(it.porque) + "</p></div>";
+    if (it.porque) cajas += '<div class="reason-box"><strong>Porque…</strong><p>' + esc(it.porque_legible || it.porque) + "</p></div>";
     if (it.notas && it.notas.length) {
       cajas += '<div class="reason-box"><strong>Notas</strong>' + it.notas.map(function (t) { return "<p>" + esc(t) + "</p>"; }).join("") + "</div>";
     }
@@ -375,13 +376,13 @@
     else if (r.tipo === "escolta") resumen = "Lady Clotilde va escoltada: el primero en actuar de cada ronda se ceba con ella.";
     else if (r.tipo === "comodin") resumen = "Eligió la última regla (<strong>prioridad " + r.prioridad + " de " + r.total + "</strong>): el comodín, cuando no hay nada mejor.";
     else resumen = "Esta decisión no sigue la lista de prioridades.";
-    var raiz = it.nodos && it.nodos[0] ? it.nodos[0].texto : "";
+    var raiz = it.nodos && it.nodos[0] ? (it.nodos[0].legible || it.nodos[0].texto) : "";
     var tarjeta = '<article class="winning-rule"><div><span>REGLA GANADORA</span>' + (r.tipo === "corte" ? '<b class="node-type cut">CORTE</b>' : "") + "</div>" +
       "<h3>" + esc(it.accion ? it.accion.texto : "Decisión") + "</h3><p>" + resumen + "</p>" + (raiz ? "<code>" + esc(raiz) + "</code>" : "") + "</article>";
     var filas = it.descartes.map(function (d, i) {
       var abierta = S.abierta === i;
       return '<article class="rule-row"><button data-act="regla:' + i + '"><span class="rule-number">' + d.prioridad + "</span>" +
-        "<span><strong>" + esc(d.titulo) + "</strong><small>" + esc(d.motivo || d.comentario) + "</small></span><b>" + (abierta ? "−" : "+") + "</b></button>" +
+        "<span><strong>" + esc(d.titulo) + "</strong><small>" + esc(d.motivo_legible || d.motivo || d.comentario) + "</small></span><b>" + (abierta ? "−" : "+") + "</b></button>" +
         (abierta ? '<div class="mini-rule-tree">' + arbolHTML(d.nodos) + "</div>" : "") + "</article>";
     }).join("");
     var ganadora = "", posteriores = "";
@@ -443,13 +444,16 @@
   // El evento con opciones (EventChoice del diseno).
   function eventoHTML(e) {
     var opciones = e.opciones.map(function (o) {
+      if (e.viejo) {
+        return '<button class="disabled" disabled><kbd>' + o.numero + "</kbd><span><strong>" + esc(o.texto) + "</strong><small>" + esc(o.quien) + " · ya resuelto</small></span></button>";
+      }
       var cmd = o.disponible ? "elegir(" + o.numero + ")" : "por_que_no(elegir(" + o.numero + "))";
       return '<button class="' + (o.disponible ? "" : "disabled") + '" data-cmd="' + esc(cmd) + '"><kbd>' + o.numero + "</kbd><span><strong>" + esc(o.texto) + "</strong><small>" +
         esc(o.quien) + " · " + (o.disponible ? "Disponible" : "No disponible") + "</small>" + (o.disponible ? "" : "<u>¿por qué no?</u>") + "</span></button>";
     }).join("");
     var marcas = ""; for (var i = 0; i < e.quedan; i++) marcas += "<i></i>";
     return '<section class="event-choice"><p class="panel-kicker">EVENTO · ' + esc(String(e.zona || "").toUpperCase()) + "</p><h2>¿Qué hace la banda?</h2><p>" + esc(e.d) + "</p>" +
-      '<div class="event-options">' + opciones + '</div><div class="attempts"><span>Intentos que quedan</span><strong>' + e.quedan + "</strong>" + marcas + "</div></section>";
+      '<div class="event-options">' + opciones + "</div>" + (e.viejo ? "" : '<div class="attempts"><span>Intentos que quedan</span><strong>' + e.quedan + "</strong>" + marcas + "</div>") + "</section>";
   }
 
   // La despensa completa (PantryFull del diseno).
