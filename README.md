@@ -165,7 +165,7 @@ Cada suite corre en su propio proceso (así ninguna contagia a otra), se escribe
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/combate -g "run_tests,halt" -t "halt(1)"
 ```
 
-Suites actuales (28 suites, 1784 pruebas):
+Suites actuales (29 suites, 1810 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -185,6 +185,7 @@ Suites actuales (28 suites, 1784 pruebas):
 | `tests/todas.pl` | El agregador: corre todas las suites en procesos separados y devuelve 0 o 1. |
 | `tests/api.pl` (97) | El adaptador JSON y el servidor: el árbol como nodos (profundidad, estado, tipo, pliegue), todos los items con su JSON, `ejecutar_orden/2` (errores como la consola, nunca falla), estado y acciones habilitadas ciertos y sin tocar la partida, **lo que cuenta la web es lo que cuenta la consola**, y el servidor HTTP real (GET, POST, UTF-8, estáticos, 404, rutas fuera de `web/`, cerrojo). |
 | `tests/agregador.pl` (4) | Vigila a `tests/todas.pl`: una suite buena da verde, una que falla da código 1, **también si falla con `assertion/1`** (en 5.10.4 eso abre el depurador y el proceso sale con 0). |
+| `tests/simulador.pl` (26) | El simulador de balance (`herramientas/`): las órdenes que ofrece son las que el juego acepta, el camino más corto y el destino del jugador con plan, las rutas de referencia (la campaña de `examples/` se gana el día 7 y la de la partida perdida llega al día 6), episodios reproducibles y que cada uno acaba, que un jugador con plan **puede ganar** y uno sin plan casi nunca, y el informe. |
 | `tests/comida.pl` (22) | La previsión de comida: ración diaria, días de comida y riesgo de un gasto (`economia`), el aviso en la consola y en la API (antes de viajar y tras hacerlo con la despensa justa) y el consejo de juntar contratos. Nace de una partida real perdida por hambre sin ningún aviso. |
 | `tests/guia.pl` (15) | La ayuda al jugador nuevo: la bienvenida, el consejo de `ayuda.` según la fase (consola y JSON) y la guía rápida; **ejecuta de verdad** los comandos de la bienvenida y los «Primeros pasos» de la guía. |
 | `tests/demo.pl` (35) | La demostración reproducible: las cinco escenas (se montan, dejan el estado que dicen y dan siempre la misma pantalla), `demo.` y la escena desconocida, los guiones de `examples/` y que **lo guardado coincide carácter a carácter con lo que el juego produce ahora** (si cambia una frase hay que regenerar). |
@@ -211,6 +212,7 @@ banda_chapuza-lp/
 ├─ tests/           pruebas (plunit)
 ├─ web/             frontend web opcional (HTML, CSS y JavaScript sin dependencias)
 ├─ scripts/         verificar-entrega.ps1: la lista de verificación de la entrega, automatizada
+├─ herramientas/    simulador de balance (simulador.pl) y barrido de parámetros (barrido.ps1)
 └─ examples/        partidas y explicaciones de ejemplo
 ```
 
@@ -250,6 +252,7 @@ Documentos en `docs/`:
 | [09-guion-exposicion.md](docs/09-guion-exposicion.md) | Guion de la exposición, plan B y preguntas probables. |
 | [guia-rapida.md](docs/guia-rapida.md) | Guía rápida para jugar en cinco minutos. |
 | [10-checklist-entrega.md](docs/10-checklist-entrega.md) | Lista de verificación de la entrega y etiquetas propuestas. |
+| [11-balance.md](docs/11-balance.md) | Balance de la economía del queso medido con el simulador: qué se midió, variantes de pagos y qué sigue. |
 
 ## Contexto académico
 
