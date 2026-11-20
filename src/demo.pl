@@ -20,7 +20,7 @@
 
 escena(economia,
        'La economía: el queso madura (min. 3:00 de la exposición)',
-       'Día 12, en la taberna, con queso fresco, curado y rancio mezclados y los sueldos por pagar. Cada día que pasa los quesos envejecen: uno pasa de curado a rancio.',
+       'Día 12, en la taberna, con queso fresco, curado y rancio mezclados y los sueldos por pagar. Cada día que pasa los quesos envejecen y, al pagar, se gasta primero lo más rancio.',
        [ reiniciar,
          efectos([ avanzar_dia, avanzar_dia, avanzar_dia, avanzar_dia, avanzar_dia, avanzar_dia,
                    avanzar_dia, avanzar_dia, avanzar_dia, avanzar_dia, avanzar_dia,
