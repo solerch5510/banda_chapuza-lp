@@ -1,7 +1,9 @@
 
 === BANDA CHAPUZA ===
 Diriges una compañía de mercenarios incompetentes que cobran en queso.
-Escribe ayuda. para ver los comandos (cada comando termina con un punto).
+Objetivo: aceptar contratos, no quedarte sin queso y derrotar al Gran Roquefort.
+Para empezar: contratos.  aceptar(ratas_del_granero).  ir(aldea).  (cada comando termina con un punto)
+Escribe ayuda. para ver los comandos; explicar. y por_que_no(Accion). cuentan por qué pasa todo.
 
 
 == Taberna del Cuajo Torcido ==
@@ -26,6 +28,8 @@ Comandos disponibles ahora:
   nivel(N).      cuánto detalle tienen explicar y por_que_no: nivel(resumido). o nivel(detallado).
   salir.         termina la partida
   demo.          las escenas de la demostración (demo(Nombre). prepara una y la deja lista para jugar)
+
+Estás en la taberna: contratos. enseña el tablón, aceptar(Contrato). acepta uno, pagar. paga los sueldos pendientes, descansar. cura (cuesta queso) e ir(Zona). viaja (cuesta un día y la ración de queso).
 
 > contratos
 El tablón de contratos:

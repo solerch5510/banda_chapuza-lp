@@ -1,0 +1,70 @@
+# Guía rápida de Banda Chapuza
+
+*Una página para jugar en cinco minutos. El manual completo está en el [README](../README.md).*
+
+## Qué haces
+
+Diriges a **cuatro mercenarios incompetentes** (Sir Baldomero, Madame Pimentina, Rufino y Tuerca) que cobran en **queso**. El queso es la moneda **y** la comida, y se pone rancio con los días.
+
+**Objetivo:** aceptar contratos, sobrevivir sin quedarte sin queso y derrotar al **Gran Roquefort** en las Cuevas del Roquefort. Si te quedas sin queso o caen los cuatro, pierdes.
+
+## Cómo se juega
+
+Escribes **órdenes terminadas en punto**, por ejemplo `contratos.` o `ir(aldea).`. En la web también puedes pulsar los botones de abajo. `ayuda.` lista lo que puedes hacer ahora y te da un consejo según dónde estés.
+
+## Primeros pasos
+
+Escribe esto, en orden (cada línea es una orden):
+
+```text
+contratos.
+aceptar(ratas_del_granero).
+aceptar(gato_en_el_arbol).
+ir(aldea).
+atacar(rata_quesera).
+mirar.
+explicar.
+```
+
+Qué ha pasado:
+
+1. `contratos.` enseña el tablón: los contratos a la vista y si se pueden aceptar (`disponible`, `bloqueado`, `lejos`…).
+2. `aceptar(...)` coge un contrato (hasta tres a la vez).
+3. `ir(aldea).` viaja: **cuesta un día** (los quesos envejecen y la Banda come). Al llegar empieza el combate de las ratas.
+4. `atacar(rata_quesera).` golpea con el miembro al que le toca; los enemigos responden solos. `mirar.` repite de quién es el turno y cómo están los enemigos.
+5. `explicar.` te cuenta **por qué** pasó lo último, con el árbol de la prueba. Es la gracia del juego.
+
+Sigue con `atacar(...)`, `defender.` y `habilidad(...)` hasta ganar el combate. Después hay un evento con opciones (`elegir(1).`) y vuelves a la taberna.
+
+## Lo que importa en cada día
+
+- **Queso:** `inventario.` enseña la despensa. Cada viaje cuesta un día y cuatro raciones. Si se acaba, pierdes.
+- **Sueldos:** al volver a la taberna hay sueldos por pagar (`pagar.`). Si sales sin pagar, baja la moral, y con la moral por los suelos alguien se pone en **huelga**.
+- **Descansar** (`descansar.`, solo en la taberna) cura a todos pero cuesta queso.
+- **Contratos:** los premios se cobran en la taberna. Algunos contratos están **bloqueados** por algo de la Banda (por ejemplo, a Baldomero le dan miedo los caballos).
+
+## Cuando algo no se puede
+
+No adivines: **pregunta por qué**.
+
+- `por_que_no(aceptar(gallina_noble)).` cuenta qué regla falla y qué hecho lo impide.
+- `por_que_no(atacar(baldomero, bandido_montado)).` en un combate con un bandido a caballo.
+- `nivel(detallado).` enseña el árbol entero; `nivel(resumido).` lo pliega.
+
+## Si te atascas
+
+| Te pasa | Haz |
+|---|---|
+| No sabes qué escribir | `ayuda.` |
+| «No entiendo…» | Falta el punto final o el paréntesis; `ayuda.` enseña la forma exacta |
+| Un botón o un comando «no se puede» | `por_que_no(...)` con esa orden |
+| Quieres ver una demostración preparada | `demo.` lista las escenas |
+| Quieres empezar de cero | `salir.` y arrancar otra vez (en la web, Menú → Nueva partida) |
+
+## Arrancar
+
+```text
+swipl -q -s src/main -g main -t halt
+```
+
+(en Windows, `C:\Program Files\pl\bin\swipl.exe`). La versión web: `swipl -q -s src/servidor -g "servidor(8080)" -t halt` y abrir `http://localhost:8080/`.

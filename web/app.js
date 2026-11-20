@@ -133,7 +133,7 @@
           S.log.push({ t: "evento", d: it.descripcion, opciones: it.opciones, quedan: it.quedan, zona: resp.estado ? resp.estado.zona.nombre : "" });
           break;
         case "ayuda":
-          S.log.push({ t: "ayuda", comandos: it.comandos });
+          S.log.push({ t: "ayuda", comandos: it.comandos, consejo: it.consejo });
           break;
         case "escena":
           S.escena = { titulo: it.titulo, descripcion: it.descripcion, sugerencias: it.sugerencias };
@@ -200,6 +200,8 @@
       S.log = []; S.explic = null; S.ultimaExp = null; S.escena = null; S.drawer = false; S.menu = false; S.pop = null;
       S.tab = "Zona"; S.movilTab = "narracion"; S.ultimoDia = null; S.textoFinal = "";
       S.vista = "juego";
+      // lo primero que ve el jugador (objetivo y primeros pasos): el mismo texto que la consola, sin el titulo
+      (resp.bienvenida || []).slice(1).forEach(function (l) { S.log.push({ t: "sys", texto: l }); });
       procesar("mirar", resp, false);
       render({ bajar: true });
     }).catch(fallo);
@@ -425,7 +427,7 @@
     ["Explicar", ["explicar", "por_que_no", "nivel"]], ["Otros", ["ayuda", "salir"]]
   ];
 
-  function ayudaHTML(comandos) {
+  function ayudaHTML(comandos, consejo) {
     var grupos = GRUPOS_AYUDA.map(function (g) {
       var lista = g[1].filter(function (c) { return comandos.some(function (x) { return x.nombre === c; }); });
       if (!lista.length) return "";
@@ -436,6 +438,7 @@
       return '<div class="log-block" style="margin:0"><strong>' + g[0] + "</strong><code style=\"font-size:13px;line-height:1.55\">" + cmds + "</code></div>";
     }).join("");
     return '<section class="help-panel"><p class="panel-kicker">REFERENCIA DE COMANDOS</p><h2>¿Qué puede hacer la banda?</h2>' +
+      (consejo ? '<div class="log-block" style="margin:10px 0 0"><strong>Ahora mismo</strong><span>' + esc(consejo) + "</span></div>" : "") +
       "<p>Escribe una orden o pulsa un botón. Los paréntesis son obligatorios; el dramatismo, opcional.</p>" +
       '<div style="display:grid;gap:10px;margin-top:14px">' + grupos + "</div>" +
       '<div class="help-tip"><kbd>↑</kbd><span><strong>Historial de órdenes</strong>Recupera lo último que escribiste, incluidos tus errores más creativos.</span></div></section>';
@@ -527,7 +530,7 @@
       case "inventario": return despensaCompletaHTML(e.d);
       case "contratos": return '<div class="narration-line system"><span class="line-mark">◆</span><p>El tablón de contratos está en el panel de la derecha.</p></div>';
       case "evento": return eventoHTML(e);
-      case "ayuda": return ayudaHTML(e.comandos);
+      case "ayuda": return ayudaHTML(e.comandos, e.consejo);
       case "escenas":
         return '<div class="log-opciones">' + e.escenas.map(function (s) {
           return '<button data-cmd="demo(' + s.nombre + ')" title="' + esc(s.descripcion) + '">' + esc(s.titulo) + "</button>";
@@ -662,6 +665,7 @@
       "<span>BANDA<small>CHAPUZA</small></span></header><main class=\"start-content\"><div class=\"crest\">" + icono("crown", movil ? 42 : 58) + '<span class="crest-cheese">◌</span></div>' +
       '<p class="overline">UN RPG DE TEXTO, DEUDAS Y LÁCTEOS</p><h1>La gloria está<br>a medio curar.</h1>' +
       '<p class="start-copy">Reúne a cuatro héroes discutibles, administra el queso y sobrevive a decisiones perfectamente justificables.</p>' +
+      '<p class="start-copy" style="font-size:15px">Se juega escribiendo órdenes (<code>contratos.</code>, <code>ir(aldea).</code>) o con los botones; <code>explicar.</code> y «¿por qué no?» cuentan el porqué de todo.</p>' +
       '<button class="primary large" data-act="comenzar">Comenzar una chapuza <span>→</span></button>' +
       (hayPartida ? '<p style="margin-top:14px"><button class="text-button" data-act="continuar">Continuar · Día ' + S.estado.dia + ", " + esc(S.estado.zona.nombre) + "</button></p>" : "") +
       '</main><footer><span>Escrito en Prolog · Leche sin pasteurizar</span><button data-act="tema:' + (S.tema === "dark" ? "light" : "dark") + '">' + (S.tema === "dark" ? "Pergamino" : "Cueva") + "</button></footer></div>";

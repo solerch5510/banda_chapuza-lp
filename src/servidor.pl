@@ -81,7 +81,7 @@ orden_de_la_peticion(Peticion, Texto) :-
 
 manejar_nueva(Peticion) :-
     consumir_cuerpo(Peticion),
-    con_cerrojo(( estado:nueva_partida, api:ejecutar_orden(mirar, Json) )),
+    con_cerrojo(api:nueva_partida_json(Json)),
     sin_cache,
     responder(Json).
 

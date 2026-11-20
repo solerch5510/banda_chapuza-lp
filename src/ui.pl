@@ -24,11 +24,9 @@ iniciar :-
     prompt(_, '> ').
 
 bienvenida :-
-    escribir_lineas(['',
-                     '=== BANDA CHAPUZA ===',
-                     'Diriges una compañía de mercenarios incompetentes que cobran en queso.',
-                     'Escribe ayuda. para ver los comandos (cada comando termina con un punto).',
-                     '']).
+    narrador:bienvenida(Lineas),
+    append([[''], Lineas, ['']], Todas),
+    escribir_lineas(Todas).
 
 % leer_termino(-Termino, -Nombres): lee un termino de la entrada actual.
 % Un error de sintaxis no tumba el juego: devuelve '$error_sintaxis'.
@@ -81,7 +79,8 @@ mostrar_conocido(vista(ayuda, Comandos)) :-
            ->  format("  ~w~n", [Texto])
            ;   format("  ~w~n", [Nombre])
            )),
-    (   narrador:ayuda_de(demo, Demo) -> format("  ~w~n", [Demo]) ; true ).
+    (   narrador:ayuda_de(demo, Demo) -> format("  ~w~n", [Demo]) ; true ),
+    (   narrador:consejo_de_ayuda(Comandos, Consejo) -> format("~n~w~n", [Consejo]) ; true ).
 mostrar_conocido(vista(escena, _, Titulo, Descripcion, Sugerencias)) :-
     format("~n=== ESCENA: ~w ===~n~w~n", [Titulo, Descripcion]),
     format("Para probar:~n", []),

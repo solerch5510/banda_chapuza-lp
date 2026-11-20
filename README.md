@@ -46,6 +46,8 @@ Nota: en la 5.10.4 para Windows, una ruta relativa con extensión como último a
 
 ## Manual del jugador
 
+> **¿Primera vez?** Empieza por la [guía rápida](docs/guia-rapida.md): una página con el objetivo y los primeros pasos. En el juego, `ayuda.` te da un consejo según dónde estés.
+
 **Objetivo:** llevar a la Banda por cuatro contratos hasta derrotar al Gran Roquefort en las Cuevas del Roquefort, sin quedarte sin queso y sin que caigan los cuatro miembros.
 
 **Un día cualquiera:** viajar cuesta un día; cada día los quesos envejecen, cada miembro come una unidad y llegar a la taberna deja sueldos por pagar (`pagar.`). Salir de la taberna sin pagar baja la moral, y con la moral por los suelos alguien se declara en huelga. `descansar.` (solo en la taberna) cura, pero cuesta queso.
@@ -240,6 +242,7 @@ Documentos en `docs/`:
 | [07-playtest-1.md](docs/07-playtest-1.md) | Primer playtest completo (PT-1): resultados, ajustes y observaciones de balance. |
 | [08-informe.md](docs/08-informe.md) | Informe del proyecto. |
 | [09-guion-exposicion.md](docs/09-guion-exposicion.md) | Guion de la exposición, plan B y preguntas probables. |
+| [guia-rapida.md](docs/guia-rapida.md) | Guía rápida para jugar en cinco minutos. |
 | [10-checklist-entrega.md](docs/10-checklist-entrega.md) | Lista de verificación de la entrega y etiquetas propuestas. |
 
 ## Contexto académico

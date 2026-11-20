@@ -15,7 +15,7 @@
 % agregado, condicional, sin_clausula, limite, paso, comentario), texto, marca, clausula, corte, plegados.
 
 :- module(api, [ejecutar_orden/2, resultado_json/2, items_json/2, estado_json/1, acciones_json/1,
-                escenas_json/1, nodos_de_lineas/2, texto_de_orden/2]).
+                escenas_json/1, nodos_de_lineas/2, texto_de_orden/2, nueva_partida_json/1]).
 :- encoding(utf8).
 
 :- use_module(narrador).
@@ -191,10 +191,11 @@ item(error(Motivo), json([tipo=error, motivo=M, texto=Texto, por_que_no=Accion])
 item(salir, json([tipo=salir])).
 item(fase(F), json([tipo=fase, fase=F])).
 item(vista(zona, Datos), Json) :- zona_json(Datos, Json).
-item(vista(ayuda, Comandos), json([tipo=ayuda, comandos=Js])) :-
+item(vista(ayuda, Comandos), json([tipo=ayuda, comandos=Js, consejo=Consejo])) :-
     findall(json([nombre=N, texto=T]),
             ( member(N, Comandos), ( narrador:ayuda_de(N, T) -> true ; T = N ) ),
-            Js).
+            Js),
+    (   narrador:consejo_de_ayuda(Comandos, C) -> Consejo = C ; Consejo = @(null) ).
 item(vista(escena, Nombre, Titulo, Descripcion, Sugerencias),
      json([tipo=escena, nombre=Nombre, titulo=Titulo, descripcion=Descripcion, sugerencias=Ss])) :-
     maplist(termino_texto, Sugerencias, Ss).
@@ -519,6 +520,13 @@ escenas_json(Js) :-
 % ---------------------------------------------------------------------------
 % Ejecutar una orden escrita (como la consola, pero devolviendo JSON)
 % ---------------------------------------------------------------------------
+
+% nueva_partida_json(-Respuesta): una partida nueva, con lo mismo que ve el jugador en la consola al arrancar
+% (la bienvenida: objetivo y primeros pasos) y la descripcion de la zona. Es lo que devuelve /api/nueva.
+nueva_partida_json(json([bienvenida=Lineas|Campos])) :-
+    estado:nueva_partida,
+    ejecutar_orden(mirar, json(Campos)),
+    narrador:bienvenida(Lineas).
 
 % texto_de_orden(+Texto, -Termino): lo que el jugador escribio ("ir(aldea)." o sin punto) como termino.
 texto_de_orden(Texto, Termino) :-

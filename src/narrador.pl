@@ -16,7 +16,7 @@
 % entre ellas con Uso mod N. Si varias claves encajan, gana la mas especifica (menos variables).
 % Texto provisional: el banco con todo el humor (docs/05-comedia-y-narracion.md) crece despues.
 
-:- module(narrador, [frase/3, texto/4, texto_error/2, ayuda_de/2,
+:- module(narrador, [frase/3, texto/4, texto_error/2, ayuda_de/2, bienvenida/1, consejo_de_ayuda/2,
                      comentario/4, comentario_prueba/4, nombre_visible/2, texto_recompensa/2,
                      descripcion_evento/2, descripcion_opcion/3,
                      claves_de_diag/2, clave_de_diag/2, comentario_diag/4,
@@ -731,3 +731,22 @@ ayuda_de(compania,'compania.      muestra a los miembros, su vida, su moral y su
 ayuda_de(inventario, 'inventario.    muestra la despensa (con la edad del queso) y los objetos').
 ayuda_de(explicar, 'explicar.      la prueba de lo último que hiciste; explicar(Accion). la de esa acción').
 ayuda_de(salir, 'salir.         termina la partida').
+
+% bienvenida(-Lineas): lo primero que ve el jugador (consola y web): quien es, el objetivo y como empezar.
+bienvenida(['=== BANDA CHAPUZA ===',
+            'Diriges una compañía de mercenarios incompetentes que cobran en queso.',
+            'Objetivo: aceptar contratos, no quedarte sin queso y derrotar al Gran Roquefort.',
+            'Para empezar: contratos.  aceptar(ratas_del_granero).  ir(aldea).  (cada comando termina con un punto)',
+            'Escribe ayuda. para ver los comandos; explicar. y por_que_no(Accion). cuentan por qué pasa todo.']).
+
+% consejo_de_ayuda(+Comandos, -Texto): un consejo segun donde estas, deducido de los comandos disponibles
+% (atacar solo existe en combate, pagar solo en la taberna y mirar no existe cuando la partida ha acabado).
+consejo_de_ayuda(Comandos, Texto) :-
+    (   \+ memberchk(mirar, Comandos)
+    ->  Texto = 'La partida ha terminado: explicar. cuenta por qué pasó lo último.'
+    ;   memberchk(atacar, Comandos)
+    ->  Texto = 'Estás en combate: cada miembro actúa en su turno. atacar(Tipo). golpea (p. ej. atacar(rata_quesera).), defender. sube la defensa y habilidad. usa la de tu personaje. Con explicar. ves por qué pasó lo último.'
+    ;   memberchk(pagar, Comandos)
+    ->  Texto = 'Estás en la taberna: contratos. enseña el tablón, aceptar(Contrato). acepta uno, pagar. paga los sueldos pendientes, descansar. cura (cuesta queso) e ir(Zona). viaja (cuesta un día y la ración de queso).'
+    ;   Texto = 'Estás de viaje: mirar. te dice dónde estás y las salidas, ir(Zona). viaja y aceptar(Contrato). acepta un contrato donde te lo ofrecen. Si algo no se puede, por_que_no(Accion). cuenta por qué.'
+    ).
