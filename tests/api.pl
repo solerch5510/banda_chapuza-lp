@@ -548,6 +548,82 @@ test(las_acciones_ofrecidas_son_comandos_validos_de_verdad) :-
 :- end_tests(las_acciones).
 
 % ---------------------------------------------------------------------------
+% Las fichas de los personajes
+% ---------------------------------------------------------------------------
+:- begin_tests(las_fichas).
+
+ficha(Id, F) :-
+    api:fichas_json(J), campo(J, miembros, Ms),
+    member(F, Ms), campo(F, id, Id), !.
+
+textos(F, Campo, Ts) :- campo(F, Campo, Ts).
+
+test(son_los_cuatro_con_las_cifras_del_catalogo) :-
+    api:fichas_json(J), campo(J, miembros, Ms),
+    findall(Id, ( member(M, Ms), campo(M, id, Id) ), Ids),
+    assertion(Ids == [baldomero, pimentina, rufino, tuerca]),
+    forall(member(M, Ms),
+           (   campo(M, id, Id), mundo:personaje(Id, N, Rol, vida(V), ataque(A), defensa(D), sueldo(S)),
+               campo(M, nombre, N), campo(M, rol, Rol), campo(M, vida_max, V), campo(M, ataque, A),
+               campo(M, defensa, D), campo(M, sueldo, S), campo(M, maximos, Mx),
+               campo(Mx, ataque, 11), campo(Mx, vida, 30), campo(Mx, defensa, 3)
+           )).
+
+test(cada_habilidad_dice_su_efecto_su_coste_y_como_se_usa_con_los_datos_reales) :-
+    ficha(baldomero, B), campo(B, habilidad, HB),
+    campo(HB, efecto, EB), campo(HB, coste, CB), campo(HB, comando, KB),
+    assertion(contiene(EB, '+4')), assertion(CB == 'Gratis'), assertion(KB == 'habilidad(Tipo).'),
+    ficha(pimentina, P), campo(P, habilidad, HP),
+    campo(HP, efecto, EP), campo(HP, coste, CP),
+    assertion(contiene(EP, '8 de daño fijo')), assertion(contiene(EP, 'ignora la defensa')), assertion(CP == 'Cuesta 1 queso'),
+    ficha(rufino, R), campo(R, habilidad, HR),
+    campo(HR, efecto, ER), campo(HR, comando, KR), campo(HR, objetivo, OR),
+    assertion(contiene(ER, '+1 de moral')), assertion(KR == 'habilidad.'), assertion(contiene(OR, 'No necesita')),
+    ficha(tuerca, T), campo(T, habilidad, HT), campo(HT, efecto, ET),
+    assertion(contiene(ET, 'una vez por enemigo')), assertion(contiene(ET, '1 queso')).
+
+test(lo_fuerte_y_lo_debil_se_calcula_comparando_con_la_banda) :-
+    ficha(baldomero, B), campo(B, fuertes, FB), campo(B, debiles, DB),
+    assertion(( member(X, FB), contiene(X, 'Ataque más alto de la Banda (11)') )),
+    assertion(( member(Y, FB), contiene(Y, 'Vida más alta') )),
+    assertion(( member(Z, DB), contiene(Z, 'Teme a los caballos') )),
+    ficha(rufino, R), campo(R, debiles, DR),
+    assertion(( member(W, DR), contiene(W, 'Ataque más bajo de la Banda (4)') )),
+    ficha(pimentina, P), campo(P, debiles, DP),
+    assertion(( member(V, DP), contiene(V, 'Su habilidad gasta queso') )),
+    assertion(( member(U, DP), contiene(U, 'Defensa más baja de la Banda (1)') )),
+    ficha(tuerca, T), campo(T, debiles, DT),
+    assertion(DT == []).
+
+test(solo_el_miedo_y_los_hechizos_de_cocina_cambian_las_reglas) :-
+    ficha(baldomero, B), campo(B, rasgo_texto, TB), assertion(contiene(TB, 'no puede atacarlos')), assertion(contiene(TB, '+2 de daño')), assertion(contiene(TB, '-3')),
+    ficha(pimentina, P), campo(P, rasgo_texto, TP), assertion(contiene(TP, 'necesita queso')),
+    ficha(rufino, R), campo(R, rasgo_texto, TR), assertion(contiene(TR, 'ambientación')),
+    ficha(tuerca, T), campo(T, rasgo_texto, TT), assertion(contiene(TT, 'ambientación')).
+
+test(la_tabla_de_moral_cubre_de_0_a_10_y_coincide_con_las_reglas) :-
+    api:fichas_json(J), campo(J, moral, Tramos),
+    findall(M, between(0, 10, M), Ms),
+    forall(member(M, Ms),
+           (   compania:nivel_de_moral(M, Nivel), compania:mod_de_nivel(Nivel, Mod),
+               member(Tr, Tramos), campo(Tr, desde, D), campo(Tr, hasta, H), M >= D, M =< H, !,
+               campo(Tr, nivel, N2), campo(Tr, modificador, Mod2),
+               assertion(N2 == Nivel), assertion(Mod2 == Mod)
+           )),
+    campo(J, reglas, R), campo(R, huelga_si_moral_hasta, U),
+    mundo:parametro(moral_huelga, U).
+
+test(no_hay_niveles_y_las_cifras_base_no_cambian_en_una_campana_entera) :-
+    nueva_partida, api:fichas_json(Antes),
+    campo(Antes, progresion, P), campo(P, sube_de_nivel, SN), assertion(SN == @(false)),
+    main:leer_guion('examples/campana-comandos.txt', Terminos),
+    forall(member(T, Terminos), ( format(atom(A), '~q', [T]), orden(A, _) )),
+    api:fichas_json(Despues),
+    assertion(Antes == Despues).
+
+:- end_tests(las_fichas).
+
+% ---------------------------------------------------------------------------
 % La campana entera por la API
 % ---------------------------------------------------------------------------
 :- begin_tests(la_campana_por_la_api).
@@ -724,6 +800,11 @@ test(la_banda_y_los_enemigos_traen_la_fila_que_pinta_la_formacion) :-
                             campo(X, id, Id), assertion(contiene(Id, 'e(')) )),
     campo(C, turno, T), campo(T, id, Turno), assertion(memberchk(Turno, [baldomero, pimentina, rufino, tuerca])).
 
+test(la_ficha_del_personaje_esta_en_la_web) :-
+    leer_texto('web/app.js', J),
+    forall(member(Pieza, ['fichaHTML', 'abrirFicha', '/api/fichas', 'ficha-cerrar', 'Personajes y habilidades', 'ficha:', '¿Suben de nivel?']),
+           assertion(contiene(J, Pieza))).
+
 :- end_tests(la_web).
 
 :- begin_tests(el_servidor, [setup(arrancar), cleanup(parar_servidor)]).
@@ -796,6 +877,11 @@ test(un_post_y_otra_peticion_por_la_misma_conexion_no_dan_500) :-
     atomic_list_concat(Partes, 'HTTP/1.1 200', Resp), length(Partes, N),
     assertion(N == 3),                                   % dos respuestas 200
     assertion(\+ contiene(Resp, '500 Internal')).
+
+test(las_fichas_por_http) :-
+    obtener('/api/fichas', J), campo(J, miembros, Ms),
+    length(Ms, N), assertion(N == 4),
+    campo(J, progresion, P), campo(P, sube_de_nivel, SN), assertion(SN == @(false)).
 
 test(las_escenas_por_http) :-
     obtener('/api/escenas', J), campo(J, escenas, Es),

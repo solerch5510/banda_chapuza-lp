@@ -15,7 +15,7 @@
 % agregado, condicional, sin_clausula, limite, paso, comentario), texto, marca, clausula, corte, plegados.
 
 :- module(api, [ejecutar_orden/2, resultado_json/2, items_json/2, estado_json/1, acciones_json/1,
-                escenas_json/1, nodos_de_lineas/2, texto_de_orden/2, nueva_partida_json/1]).
+                escenas_json/1, nodos_de_lineas/2, texto_de_orden/2, nueva_partida_json/1, fichas_json/1]).
 :- encoding(utf8).
 
 :- use_module(narrador).
@@ -505,6 +505,116 @@ etiqueta_de(Cmd, Etiqueta) :-
     ->  Etiqueta = 'Habilidad'
     ;   functor(Cmd, F, _), bonito(F, Etiqueta)
     ).
+
+% ---------------------------------------------------------------------------
+% Las fichas de los personajes: que son, que hacen y que NO hay (niveles)
+% ---------------------------------------------------------------------------
+% Todo sale de los datos del juego (mundo, combate, compania): las cifras, el coste y el efecto de cada habilidad,
+% la tabla de moral y los parametros. Las comparaciones de «lo mas alto de la Banda» se calculan, no se escriben.
+
+fichas_json(json([miembros=Ms, moral=Moral, reglas=Reglas, progresion=Prog])) :-
+    findall(Id, mundo:personaje(Id, _, _, _, _, _, _), Ids),
+    findall(Id-s(V, A, D), ( member(Id, Ids), mundo:personaje(Id, _, _, vida(V), ataque(A), defensa(D), _) ), Todos),
+    maplist(ficha_json(Todos), Ids, Ms),
+    moral_json(Moral),
+    mundo:parametro(moral_huelga, Huelga), mundo:parametro(moral_victoria, Victoria),
+    mundo:parametro(bono_defender, Defender), mundo:parametro(coste_descanso, Descanso),
+    mundo:parametro(moral_impago, Impago), mundo:parametro(moral_max, MoralMax),
+    Reglas = json([moral_max=MoralMax, huelga_si_moral_hasta=Huelga, moral_por_victoria=Victoria, bono_defender=Defender,
+                   coste_descanso=Descanso, moral_perdida_por_impago=Impago]),
+    Prog = json([sube_de_nivel= @(false),
+                 texto='En esta versión los personajes no suben de nivel ni ganan experiencia: sus cifras base son fijas.',
+                 cambia=['vida', 'moral', 'equipo'],
+                 detalle='Lo que sí cambia durante la partida es la vida (se cura al descansar), la moral (sube al ganar un combate o con la balada de Rufino y baja si no se paga a la Banda o no se come) y el equipo (la venda de caballos de Baldomero).']).
+
+ficha_json(Todos, Id, json([id=Id, nombre=Nombre, rol=Rol, vida_max=V, ataque=A, defensa=D, sueldo=S, fila=Fila,
+                            alcance=Alcance, alcance_texto=AlcanceT, rasgo=Rasgo, rasgo_nombre=RasgoN, rasgo_texto=RasgoT,
+                            habilidad=Hab, fuertes=Fuertes, debiles=Debiles, maximos=json([vida=MV, ataque=MA, defensa=MD])])) :-
+    mundo:personaje(Id, Nombre, Rol, vida(V), ataque(A), defensa(D), sueldo(S)),
+    mundo:fila_preferida(Id, Fila),
+    mundo:alcance(Id, Alcance), alcance_texto(Alcance, AlcanceT),
+    mundo:rasgo(Id, Rasgo), bonito(Rasgo, RasgoN), rasgo_texto(Id, Rasgo, RasgoT),
+    mundo:habilidad_de(Id, Habilidad), habilidad_json(Id, Habilidad, Hab),
+    findall(X, member(_-s(X, _, _), Todos), Vs), max_list(Vs, MV),
+    findall(X, member(_-s(_, X, _), Todos), As), max_list(As, MA),
+    findall(X, member(_-s(_, _, X), Todos), Ds), max_list(Ds, MD),
+    extremos(Id, Todos, Alcance, Rasgo, Habilidad, Fuertes, Debiles).
+
+alcance_texto(cuerpo, 'Cuerpo a cuerpo: solo alcanza a la primera fila enemiga mientras haya alguien vivo en ella.').
+alcance_texto(distancia, 'A distancia: llega también a la retaguardia enemiga.').
+
+rasgo_texto(_, teme_caballos, Texto) :- !,
+    mundo:parametro(dano_miedo, Miedo), mundo:parametro(penal_venda, Venda),
+    format(atom(Texto), 'Teme a los caballos: no puede atacarlos y recibe +~w de daño de ellos. Con la venda de caballos se atreve, pero ataca con -~w contra ellos.', [Miedo, Venda]).
+rasgo_texto(Id, hechizos_de_cocina, Texto) :-
+    mundo:habilidad_de(Id, Hab), mundo:coste_queso(Hab, N), !,
+    ( N =:= 1 -> Q = 'queso' ; Q = 'quesos' ),
+    format(atom(Texto), 'Toda su magia necesita queso: lanzar su habilidad gasta ~w ~w (el más rancio), y sin queso en la despensa no puede lanzarla.', [N, Q]).
+rasgo_texto(_, _, 'Es de ambientación: de momento no cambia las reglas del juego.').
+
+% habilidad_json(+Id, +Habilidad, -Json): lo que hace, lo que cuesta, contra quien y como se escribe.
+habilidad_json(Id, Habilidad, json([id=Habilidad, nombre=Nombre, efecto=Efecto, coste=Coste, objetivo=Objetivo, comando=Comando])) :-
+    nombre_corto(Habilidad, Nombre),
+    combate:efecto_habilidad(Habilidad, Datos), efecto_texto(Datos, Efecto),
+    (   mundo:rasgo(Id, hechizos_de_cocina), mundo:coste_queso(Habilidad, N)
+    ->  ( N =:= 1 -> Q = 'queso' ; Q = 'quesos' ), format(atom(Coste), 'Cuesta ~w ~w', [N, Q])
+    ;   Coste = 'Gratis'
+    ),
+    combate:objetivo_de_habilidad(Habilidad, Tipo),
+    (   Tipo == ninguno
+    ->  Objetivo = 'No necesita objetivo', Comando = 'habilidad.'
+    ;   Objetivo = 'Se usa contra un enemigo', Comando = 'habilidad(Tipo).'
+    ).
+
+efecto_texto(golpe_extra(N), T) :- format(atom(T), 'Su golpe de siempre, con +~w de daño.', [N]).
+efecto_texto(dano_fijo(N), T) :- format(atom(T), '~w de daño fijo: ignora la defensa del enemigo.', [N]).
+efecto_texto(moral_grupo(N), T) :- format(atom(T), '+~w de moral a toda la Banda.', [N]).
+efecto_texto(queso_del_bolsillo(N), T) :-
+    ( N =:= 1 -> Q = 'queso' ; Q = 'quesos' ),
+    format(atom(T), 'Si el enemigo lleva queso, te llevas ~w ~w. Solo una vez por enemigo en cada combate.', [N, Q]).
+
+% extremos(+Id, +Todos, +Alcance, +Rasgo, +Habilidad, -Fuertes, -Debiles): lo que destaca, comparado con el resto de la Banda.
+extremos(Id, Todos, Alcance, Rasgo, Habilidad, Fuertes, Debiles) :-
+    findall(F, extremo(Id, Todos, alto, F), F1),
+    findall(D, extremo(Id, Todos, bajo, D), D1),
+    ( Alcance == distancia -> F2 = ['Ataca a distancia: llega a la retaguardia enemiga'] ; F2 = [] ),
+    (   combate_gratis(Id, Habilidad) -> F3 = ['Su habilidad no gasta queso'] ; F3 = [] ),
+    append([F1, F2, F3], Fuertes),
+    ( Rasgo == teme_caballos -> D2 = ['Teme a los caballos'] ; D2 = [] ),
+    (   \+ combate_gratis(Id, Habilidad) -> D3 = ['Su habilidad gasta queso'] ; D3 = [] ),
+    append([D1, D2, D3], Debiles).
+
+combate_gratis(Id, Habilidad) :- \+ ( mundo:rasgo(Id, hechizos_de_cocina), mundo:coste_queso(Habilidad, _) ).
+
+% extremo(+Id, +Todos, +Sentido, -Texto): la cifra de Id es la mas alta (alto) o la mas baja (bajo) de la Banda.
+extremo(Id, Todos, Sentido, Texto) :-
+    member(Pos-p(Alto, Bajo, Nombre), [1-p(alta, baja, 'Vida'), 2-p(alto, bajo, 'Ataque'), 3-p(alta, baja, 'Defensa')]),
+    columna(Todos, Pos, Valores),
+    valor_de(Todos, Id, Pos, Mio),
+    max_list(Valores, Max), min_list(Valores, Min), Max =\= Min,
+    (   Sentido == alto, Mio =:= Max -> Palabra = Alto
+    ;   Sentido == bajo, Mio =:= Min -> Palabra = Bajo
+    ),
+    format(atom(Texto), '~w más ~w de la Banda (~w)', [Nombre, Palabra, Mio]).
+
+columna(Todos, Pos, Valores) :-
+    findall(X, ( member(_-S, Todos), arg(Pos, S, X) ), Valores).
+valor_de(Todos, Id, Pos, X) :-
+    memberchk(Id-S, Todos), arg(Pos, S, X).
+
+% moral_json(-Tramos): la tabla de moral (nivel, de que moral a que moral, y lo que suma o resta), sacada de compania.
+moral_json(Tramos) :-
+    mundo:parametro(moral_max, Max),
+    findall(M-N-Mod, ( between(0, Max, M), compania:nivel_de_moral(M, N), compania:mod_de_nivel(N, Mod) ), L),
+    agrupar_moral(L, Tramos).
+
+agrupar_moral([], []).
+agrupar_moral([M-N-Mod|R], [json([nivel=N, desde=M, hasta=H, modificador=Mod])|Gs]) :-
+    tramo_moral(R, N, M, H, Resto),
+    agrupar_moral(Resto, Gs).
+
+tramo_moral([M-N-_|R], N, _, H, Resto) :- !, tramo_moral(R, N, M, H, Resto).
+tramo_moral(R, _, H, H, R).
 
 % ---------------------------------------------------------------------------
 % Las escenas de demostracion

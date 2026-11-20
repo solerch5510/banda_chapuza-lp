@@ -38,6 +38,7 @@ carpeta_web(Web) :-
 :- http_handler(root('api/orden'),   manejar_orden,   []).
 :- http_handler(root('api/nueva'),   manejar_nueva,   []).
 :- http_handler(root('api/escenas'), manejar_escenas, []).
+:- http_handler(root('api/fichas'),  manejar_fichas,  []).
 :- http_handler(root(.),             servir_web,      [prefix]).
 
 servidor :- servidor(8080).
@@ -92,6 +93,10 @@ consumir_cuerpo(Peticion) :-
     ->  catch(http_read_json(Peticion, _), _, true)
     ;   true
     ).
+
+manejar_fichas(_Peticion) :-
+    con_cerrojo(api:fichas_json(Json)),
+    responder(Json).
 
 manejar_escenas(_Peticion) :-
     api:escenas_json(Js),

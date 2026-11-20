@@ -32,7 +32,9 @@
     error: null,
     ultimoDia: null,
     sugs: false,
-    inferior: "despensa"     // lo que enseña el panel de abajo a la izquierda: despensa | posiciones
+    inferior: "despensa",    // lo que enseña el panel de abajo a la izquierda: despensa | posiciones
+    fichas: null,            // las fichas de los personajes (se piden una vez a /api/fichas)
+    ficha: ""                // el personaje cuya ficha esta abierta ("" = cerrada)
   };
 
   function temaInicial() {
@@ -239,7 +241,7 @@
     var critico = m.estado !== "en_pie" || m.vida / m.vida_max < 0.3;
     var clsEstado = m.estado === "huelga" ? "strike" : (m.estado === "caido" ? "fallen" : "");
     var etiquetaEstado = m.estado === "huelga" ? "En huelga" : (m.estado === "caido" ? "Caído" : "");
-    return '<article class="member-card ' + (critico ? "critical" : "") + " " + clsEstado + '">' +
+    return '<article class="member-card clicable ' + (critico ? "critical" : "") + " " + clsEstado + '" data-act="ficha:' + esc(m.id) + '" title="Ver la ficha de ' + esc(m.nombre) + '" tabindex="0">' +
       '<div class="member-top"><div class="portrait">' + esc(iniciales(m.nombre)) + "</div>" +
       '<div class="member-title"><strong>' + esc(m.nombre) + "</strong><span>" + esc(mayus(m.rol)) + "</span></div>" +
       '<span class="status-dot ' + (critico || clsEstado ? "bad" : "") + '"></span></div>' +
@@ -420,6 +422,54 @@
     }).join("");
     var cuerpo = S.tab === "Contratos" ? panelContratos() : (S.tab === "Zona" ? panelZona() : panelExplicar(true));
     return '<aside class="right-panel"><div class="tabs">' + tabs + '</div><div class="right-content">' + cuerpo + "</div></aside>";
+  }
+
+  // ---- la ficha de un personaje (modal): cifras, rasgo, habilidad, fuerte/debil, moral y progresion ----
+  function barra(valor, max, etiqueta, extra) {
+    var pct = max > 0 ? Math.round(valor / max * 100) : 0;
+    return '<div class="fila-stat"><span class="etq">' + etiqueta + '</span><span class="barra" aria-hidden="true"><i style="width:' + pct + '%"></i></span><strong>' + valor + (extra || "") + "</strong></div>";
+  }
+
+  function fichaHTML() {
+    var F = S.fichas;
+    if (!S.ficha || !F || !S.estado) return "";
+    var f = F.miembros.filter(function (m) { return m.id === S.ficha; })[0] || F.miembros[0];
+    var vivo = S.estado.banda.filter(function (m) { return m.id === f.id; })[0];
+    var tabs = F.miembros.map(function (m) {
+      return '<button class="' + (m.id === f.id ? "active" : "") + '" data-act="ficha:' + esc(m.id) + '">' + esc(String(m.nombre).replace(/^(Sir|Madame) /, "")) + "</button>";
+    }).join("");
+    var stats = barra(f.ataque, f.maximos.ataque, "Ataque") + barra(f.defensa, f.maximos.defensa, "Defensa") + barra(f.vida_max, f.maximos.vida, "Vida máx.") +
+      '<div class="fila-stat"><span class="etq">Sueldo</span><span class="barra vacia"></span><strong>' + f.sueldo + (f.sueldo === 1 ? " queso" : " quesos") + "</strong></div>";
+    var ahora = vivo ? '<p class="ahora">Ahora: vida <strong>' + vivo.vida + "/" + vivo.vida_max + "</strong> · moral <strong>" + vivo.moral + "/" + vivo.moral_max + "</strong>" +
+      (vivo.estado === "huelga" ? " · <strong>en huelga</strong>" : (vivo.estado === "caido" ? " · <strong>caído</strong>" : "")) + "</p>" : "";
+    function chips(lista, cls, vacio) {
+      return lista.length ? lista.map(function (t) { return '<li class="' + cls + '">' + esc(t) + "</li>"; }).join("") : '<li class="neutro">' + vacio + "</li>";
+    }
+    var h = f.habilidad;
+    var moral = F.moral.map(function (t) {
+      return "<li><strong>" + esc(({ critica: "Crítica", baja: "Baja", normal: "Normal", alta: "Alta" })[t.nivel] || mayus(t.nivel)) + "</strong> (" + (t.desde === t.hasta ? t.desde : t.desde + "–" + t.hasta) + "): " +
+        (t.modificador > 0 ? "+" : (t.modificador < 0 ? "−" : "")) + Math.abs(t.modificador) + " al ataque y a la iniciativa</li>";
+    }).join("");
+    return '<div class="menu-backdrop"><section class="ficha-modal" role="dialog" aria-modal="true" aria-label="Ficha de ' + esc(f.nombre) + '">' +
+      '<header><div><p class="panel-kicker">LA BANDA · FICHAS</p><h2>' + esc(f.nombre) + '</h2><p class="sub">' + esc(mayus(f.rol)) + " · " + esc(mayus(f.fila)) + ' por defecto</p></div>' +
+      '<button data-act="ficha-cerrar" aria-label="Cerrar">×</button></header>' +
+      '<div class="segmented ficha-tabs" role="tablist">' + tabs + "</div>" +
+      '<div class="ficha-cuerpo">' +
+      '<section><h3>Cifras</h3>' + stats + ahora + '<p class="nota">' + esc(f.alcance_texto) + "</p></section>" +
+      '<section><h3>Fuerte y débil</h3><ul class="chips">' + chips(f.fuertes, "fuerte", "Nada destacable") + chips(f.debiles, "debil", "Sin puntos débiles destacados") + "</ul></section>" +
+      '<section><h3>Rasgo · ' + esc(f.rasgo_nombre) + "</h3><p>" + esc(f.rasgo_texto) + "</p></section>" +
+      '<section><h3>Habilidad · ' + esc(h.nombre) + '</h3><p>' + esc(h.efecto) + '</p><p class="meta"><span class="coste">' + esc(h.coste) + "</span> " + esc(h.objetivo) +
+      '. En el juego: <code>' + esc(h.comando) + "</code></p></section>" +
+      '<section class="progresion"><h3>¿Suben de nivel?</h3><p><strong>' + (F.progresion.sube_de_nivel ? "Sí" : "No.") + "</strong> " + esc(F.progresion.texto) + "</p><p>" + esc(F.progresion.detalle) + "</p></section>" +
+      '<section><h3>La moral</h3><ul class="moral">' + moral + '</ul><p class="nota">Con moral ' + F.reglas.huelga_si_moral_hasta + " o menos, el personaje se pone en <strong>huelga</strong> y no combate. Defender suma +" + F.reglas.bono_defender +
+      " de defensa hasta tu próximo turno; descansar cuesta " + F.reglas.coste_descanso + " quesos.</p></section>" +
+      "</div></section></div>";
+  }
+
+  function abrirFicha(id) {
+    S.menu = false; S.pop = null; S.ficha = id;
+    if (S.fichas) { render(); return; }
+    api("/api/fichas").then(function (j) { S.fichas = j; render(); }).catch(function (e) { S.ficha = ""; fallo(e); });
   }
 
   // ---- el panel de abajo a la izquierda: despensa o posiciones ----
@@ -691,6 +741,7 @@
         '<div class="menu-setting"><span><strong>Nivel de explicación</strong><small>Puede cambiarse también en el árbol</small></span><div class="segmented">' +
         '<button class="' + (n === "resumido" ? "active" : "") + '" data-act="nivel:resumido">Resumido</button>' +
         '<button class="' + (n === "detallado" ? "active" : "") + '" data-act="nivel:detallado">Detallado</button></div></div>' +
+        '<button class="menu-row" data-act="ficha:baldomero">' + icono("heart") + "<span><strong>Personajes y habilidades</strong><small>Cifras, rasgos, habilidades y si suben de nivel</small></span><b>›</b></button>" +
         '<button class="menu-row" data-cmd="demo">' + icono("sword") + "<span><strong>Escenas de demostración</strong><small>Preparar una escena y comandos sugeridos</small></span><b>›</b></button>" +
         '<button class="menu-row" data-act="cronica">' + icono("scroll") + "<span><strong>Ver crónica</strong><small>Historial completo de la partida</small></span><b>›</b></button>" +
         '<button class="menu-row destructive" data-act="confirmar-nueva">' + icono("skull") + "<span><strong>Nueva partida</strong><small>Empezar desde la Taberna</small></span><b>›</b></button>";
@@ -747,7 +798,7 @@
       e.banda.filter(function (m) { return m.estado === "en_pie"; }).length + "/" + e.banda.length + " EN PIE</small></div>" +
       '<div class="party-list">' + e.banda.map(function (m) { return tarjetaMiembro(m, combate); }).join("") + "</div>" + panelInferior() + "</aside>" +
       '<main class="story-panel">' + tiraEnemigos() + narracion() + areaOrdenes() + "</main>" +
-      panelDerecho() + "</div>" + menuEmergente() + menuPrincipal() + "</div>";
+      panelDerecho() + "</div>" + menuEmergente() + menuPrincipal() + fichaHTML() + "</div>";
   }
 
   function juegoMovil() {
@@ -774,7 +825,7 @@
       bannerCombate() + cuerpo + (comandos && S.movilTab === "narracion" ? areaOrdenes() : "") +
       '<nav class="mobile-nav three-tabs"><button class="' + (S.movilTab === "banda" ? "active" : "") + '" data-act="movil:banda">' + icono("heart") + "<span>Banda</span></button>" +
       '<button class="' + (S.movilTab === "narracion" ? "active" : "") + '" data-act="movil:narracion">' + icono("scroll") + "<span>Narración</span></button>" +
-      '<button class="' + (panelActivo ? "active" : "") + '" data-act="movil:panel">' + icono("tree") + "<span>Contratos · Zona · Explicar</span></button></nav>" + menuEmergente() + menuPrincipal() + "</div>";
+      '<button class="' + (panelActivo ? "active" : "") + '" data-act="movil:panel">' + icono("tree") + "<span>Contratos · Zona · Explicar</span></button></nav>" + menuEmergente() + menuPrincipal() + fichaHTML() + "</div>";
   }
 
   // ---------------------------------------------------------------------------------------------------------
@@ -820,7 +871,7 @@
     var b = ev.target.closest("[data-cmd],[data-act]");
     if (!b) {
       // un clic fuera del menu o del selector los cierra; dentro, no
-      if ((S.pop || S.menu) && !ev.target.closest(".game-menu, .choice-menu")) { S.pop = null; S.menu = false; render(); }
+      if ((S.pop || S.menu || S.ficha) && !ev.target.closest(".game-menu, .choice-menu, .ficha-modal")) { S.pop = null; S.menu = false; S.ficha = ""; render(); }
       return;
     }
     var cmd = b.getAttribute("data-cmd"), act = b.getAttribute("data-act");
@@ -843,6 +894,8 @@
       case "tab": S.tab = arg; S.pop = null; render(); break;
       case "movil": S.movilTab = arg; S.drawer = false; S.pop = null; render(); break;
       case "sugs": S.sugs = !S.sugs; render(); break;
+      case "ficha": abrirFicha(arg); break;
+      case "ficha-cerrar": S.ficha = ""; render({ enfocar: true }); break;
       case "inf": S.inferior = arg === "posiciones" ? "posiciones" : "despensa"; render(); break;
       case "cerrar-drawer": S.drawer = false; render({ enfocar: false }); break;
       case "menu": S.menu = S.menu ? false : true; S.pop = null; render(); break;
@@ -872,8 +925,8 @@
   });
 
   document.addEventListener("keydown", function (ev) {
-    if (S.pop || S.menu) {
-      if (ev.key === "Escape") { S.pop = null; S.menu = false; render({ enfocar: true }); return; }
+    if (S.pop || S.menu || S.ficha) {
+      if (ev.key === "Escape") { S.pop = null; S.menu = false; S.ficha = ""; render({ enfocar: true }); return; }
       if (S.pop) {
         var opciones = [].slice.call(document.querySelectorAll(".choice-menu > div > button"));
         if (/^[1-9]$/.test(ev.key) && opciones[Number(ev.key) - 1]) { opciones[Number(ev.key) - 1].click(); ev.preventDefault(); return; }
