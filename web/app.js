@@ -31,7 +31,8 @@
     ocupado: false,
     error: null,
     ultimoDia: null,
-    sugs: false
+    sugs: false,
+    inferior: "despensa"     // lo que enseña el panel de abajo a la izquierda: despensa | posiciones
   };
 
   function temaInicial() {
@@ -159,6 +160,7 @@
       if (esMovil()) S.drawer = true;
     }
     if (resp.estado) {
+      if (resp.estado.combate && !(S.estado && S.estado.combate)) S.inferior = "posiciones";
       S.estado = resp.estado;
       if (resp.estado.fin) {
         S.textoFinal = textosFinal.join("\n");
@@ -247,13 +249,13 @@
       (etiquetaEstado ? '<span class="member-state">' + etiquetaEstado + "</span>" : "") + "</div></article>";
   }
 
-  function despensa() {
+  function despensa(sinTitulo) {
     var d = S.estado.despensa, c = d.categorias;
     var objetos = d.objetos.map(function (o) { return esc(o.nombre) + (o.cantidad > 1 ? " ×" + o.cantidad : ""); }).join(" · ");
     function cesta(n, txt, mudo) {
       return '<div class="' + (mudo ? "muted" : "") + '">' + icono("cheese", 22) + "<strong>" + n + "</strong><span>" + txt + "</span></div>";
     }
-    return '<section class="pantry"><div class="section-heading"><span>Despensa</span>' +
+    return '<section class="pantry"><div class="section-heading"><span>' + (sinTitulo ? "" : "Despensa") + "</span>" +
       '<button data-cmd="inventario" aria-label="Ver despensa completa">Ver todo</button></div>' +
       '<div class="cheese-counts">' + cesta(c.fresco, "fresco", false) + cesta(c.curado, "curado", false) +
       cesta(c.rancio, "rancio", c.rancio === 0) + "</div>" +
@@ -418,6 +420,52 @@
     }).join("");
     var cuerpo = S.tab === "Contratos" ? panelContratos() : (S.tab === "Zona" ? panelZona() : panelExplicar(true));
     return '<aside class="right-panel"><div class="tabs">' + tabs + '</div><div class="right-content">' + cuerpo + "</div></aside>";
+  }
+
+  // ---- el panel de abajo a la izquierda: despensa o posiciones ----
+  // La formacion es una malla de fichas con las iniciales. Fuera de combate: la Banda en retaguardia y frente.
+  // En combate: la Banda a un lado y los enemigos al otro, cada uno con su frente y su retaguardia. La ficha de
+  // un enemigo es un atajo para atacarlo; una ficha con anillo es a quien le toca.
+  function fichaHeroe(m, turno, conNombre) {
+    var cls = "ficha heroe" + (m.id === turno ? " turno" : "") + (m.estado === "caido" ? " caido" : "") + (m.estado === "huelga" ? " huelga" : "");
+    var nombre = String(m.nombre).replace(/^(Sir|Madame) /, "");
+    return '<span class="celda-ficha"><span class="' + cls + '" title="' + esc(m.nombre + " · vida " + m.vida + "/" + m.vida_max +
+      (m.estado === "huelga" ? " · en huelga" : "") + (m.estado === "caido" ? " · caído" : "")) + '">' + esc(iniciales(m.nombre)) + "</span>" +
+      (conNombre ? "<small>" + esc(nombre) + "</small>" : "") + "</span>";
+  }
+
+  function fichaEnemigo(e, repetidos) {
+    var n = (String(e.id).match(/(\d+)\)?$/) || [])[1];
+    var etiqueta = iniciales(e.nombre) + (repetidos[e.tipo_enemigo] > 1 && n ? n : "");
+    var cls = "ficha enemigo" + (e.caido ? " caido" : "");
+    var titulo = e.nombre + " · vida " + e.vida + "/" + e.vida_max + (e.caido ? " · caído" : " · pulsa para atacarlo");
+    var accion = e.caido ? "" : ' data-cmd="atacar(' + esc(e.id) + ')"';
+    return '<span class="celda-ficha"><button class="' + cls + '"' + accion + (e.caido ? " disabled" : "") + ' title="' + esc(titulo) + '">' + esc(etiqueta) + "</button></span>";
+  }
+
+  function formacionHTML() {
+    var e = S.estado, c = e.combate, turno = c ? c.turno.id : null;
+    function celda(cab, fichas) { return '<div class="celda"><span class="cab">' + cab + '</span><div class="fichas">' + (fichas || '<span class="vacia">—</span>') + "</div></div>"; }
+    var ret = e.banda.filter(function (m) { return m.fila === "retaguardia"; }).map(function (m) { return fichaHeroe(m, turno, !c); }).join("");
+    var fre = e.banda.filter(function (m) { return m.fila === "frente"; }).map(function (m) { return fichaHeroe(m, turno, !c); }).join("");
+    var nota = '<p class="nota-formacion">Los de retaguardia solo reciben golpes cuando cae el frente.</p>';
+    if (!c) {
+      return '<section class="formacion"><p class="panel-kicker">FORMACIÓN DE LA BANDA</p><div class="malla fuera">' + celda("Retaguardia", ret) + celda("Frente", fre) + "</div>" + nota + "</section>";
+    }
+    var repetidos = {};
+    c.enemigos.forEach(function (x) { repetidos[x.tipo_enemigo] = (repetidos[x.tipo_enemigo] || 0) + 1; });
+    var eFre = c.enemigos.filter(function (x) { return x.fila === "frente"; }).map(function (x) { return fichaEnemigo(x, repetidos); }).join("");
+    var eRet = c.enemigos.filter(function (x) { return x.fila !== "frente"; }).map(function (x) { return fichaEnemigo(x, repetidos); }).join("");
+    return '<section class="formacion"><p class="panel-kicker">EN COMBATE · RONDA ' + c.ronda + '</p><div class="malla combate">' +
+      celda("Ret.", ret) + celda("Fte.", fre) + '<div class="vs" aria-hidden="true">' + icono("sword", 16) + "</div>" + celda("Fte.", eFre) + celda("Ret.", eRet) + "</div>" + nota + "</section>";
+  }
+
+  function panelInferior() {
+    var pos = S.inferior === "posiciones";
+    return '<div class="panel-inferior"><div class="segmented" role="tablist">' +
+      '<button role="tab" aria-selected="' + !pos + '" class="' + (pos ? "" : "active") + '" data-act="inf:despensa">Despensa</button>' +
+      '<button role="tab" aria-selected="' + pos + '" class="' + (pos ? "active" : "") + '" data-act="inf:posiciones">Posiciones</button></div>' +
+      (pos ? formacionHTML() : despensa(true)) + "</div>";
   }
 
   // ---- la narracion ----
@@ -697,7 +745,7 @@
       cabecera() + bannerCombate() + bannerEscena() +
       '<div class="game-layout"><aside class="party-panel"><div class="section-heading"><span>La Banda</span><small>' +
       e.banda.filter(function (m) { return m.estado === "en_pie"; }).length + "/" + e.banda.length + " EN PIE</small></div>" +
-      '<div class="party-list">' + e.banda.map(function (m) { return tarjetaMiembro(m, combate); }).join("") + "</div>" + despensa() + "</aside>" +
+      '<div class="party-list">' + e.banda.map(function (m) { return tarjetaMiembro(m, combate); }).join("") + "</div>" + panelInferior() + "</aside>" +
       '<main class="story-panel">' + tiraEnemigos() + narracion() + areaOrdenes() + "</main>" +
       panelDerecho() + "</div>" + menuEmergente() + menuPrincipal() + "</div>";
   }
@@ -710,7 +758,7 @@
       comandos = false;
     } else if (S.movilTab === "banda") {
       cuerpo = '<main class="mobile-main"><section class="mobile-party"><p class="panel-kicker">COMPAÑÍA ACTIVA</p><h2>La Banda</h2><div class="party-list">' +
-        e.banda.map(function (m) { return tarjetaMiembro(m, false); }).join("") + "</div>" + despensa() + "</section></main>";
+        e.banda.map(function (m) { return tarjetaMiembro(m, false); }).join("") + "</div>" + panelInferior() + "</section></main>";
     } else if (S.movilTab === "panel") {
       var tabs = ["Contratos", "Zona", "Explicar"].map(function (t) {
         return '<button data-act="tab:' + t + '" class="' + (S.tab === t ? "active" : "") + '">' + t + (t === "Explicar" && S.explic ? '<span class="tab-dot"></span>' : "") + "</button>";
@@ -795,6 +843,7 @@
       case "tab": S.tab = arg; S.pop = null; render(); break;
       case "movil": S.movilTab = arg; S.drawer = false; S.pop = null; render(); break;
       case "sugs": S.sugs = !S.sugs; render(); break;
+      case "inf": S.inferior = arg === "posiciones" ? "posiciones" : "despensa"; render(); break;
       case "cerrar-drawer": S.drawer = false; render({ enfocar: false }); break;
       case "menu": S.menu = S.menu ? false : true; S.pop = null; render(); break;
       case "pop": S.pop = S.pop === arg ? null : arg; S.menu = false; render(); break;

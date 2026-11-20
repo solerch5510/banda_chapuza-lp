@@ -709,6 +709,21 @@ test(el_javascript_tiene_los_paneles_del_diseno) :-
                           'pantallaInicio', 'pantallaFinal', 'accionesRapidas']),
            assertion(contiene(J, Pieza))).
 
+test(el_panel_inferior_alterna_despensa_y_posiciones) :-
+    leer_texto('web/app.js', J),
+    forall(member(Pieza, ['panelInferior', 'formacionHTML', 'fichaHeroe', 'fichaEnemigo', 'inf:despensa', 'inf:posiciones', 'Posiciones']),
+           assertion(contiene(J, Pieza))).
+
+test(la_banda_y_los_enemigos_traen_la_fila_que_pinta_la_formacion) :-
+    nueva_partida, estado_json(E0),
+    campo(E0, banda, B),
+    forall(member(M, B), ( campo(M, fila, F), assertion(memberchk(F, [frente, retaguardia])) )),
+    orden('demo(combate)', R), estado_de(R, E1),
+    campo(E1, combate, C), campo(C, enemigos, Es),
+    forall(member(X, Es), ( campo(X, fila, Fx), assertion(memberchk(Fx, [frente, retaguardia])),
+                            campo(X, id, Id), assertion(contiene(Id, 'e(')) )),
+    campo(C, turno, T), campo(T, id, Turno), assertion(memberchk(Turno, [baldomero, pimentina, rufino, tuerca])).
+
 :- end_tests(la_web).
 
 :- begin_tests(el_servidor, [setup(arrancar), cleanup(parar_servidor)]).

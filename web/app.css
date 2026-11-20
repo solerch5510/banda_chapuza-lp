@@ -82,6 +82,29 @@ body[data-tema="light"] { background: #f8edcd; }
 .game-frame .quick-actions .disabled-action small { position: static; display: block; font-size: 12px; }
 .game-frame .quick-actions button { line-height: 1.25; }
 
+/* El panel de abajo a la izquierda: despensa o posiciones */
+.panel-inferior { display: grid; gap: 8px; }
+.panel-inferior > .segmented { justify-self: stretch; }
+.panel-inferior > .segmented button { flex: 1; }
+.formacion .panel-kicker { margin: 2px 0 6px; }
+.malla { display: grid; gap: 6px; align-items: stretch; }
+.malla.fuera { grid-template-columns: 1fr 1fr; }
+.malla.combate { grid-template-columns: 1fr 1fr auto 1fr 1fr; align-items: stretch; }
+.celda { display: grid; align-content: start; gap: 4px; padding: 6px 4px; border: 1px dashed var(--line); border-radius: 8px; background: color-mix(in srgb, var(--surface2) 50%, transparent); min-width: 0; }
+.celda .cab { font: 700 12px/1 Inter, system-ui, sans-serif; letter-spacing: 0.04em; color: var(--muted); text-transform: uppercase; text-align: center; }
+.celda .fichas { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; min-height: 34px; }
+.celda .vacia { color: var(--muted); align-self: center; }
+.celda-ficha { display: grid; justify-items: center; gap: 2px; }
+.celda-ficha small { font-size: 12px; color: var(--muted); }
+.ficha { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font: 700 12px Georgia, serif; border: 2px solid var(--line); background: var(--surface2); color: var(--ink); padding: 0; }
+.ficha.enemigo { border-color: var(--no); color: var(--no); background: color-mix(in srgb, var(--no) 10%, var(--surface)); }
+.ficha.enemigo:not(:disabled):hover { background: color-mix(in srgb, var(--no) 22%, var(--surface)); }
+.ficha.turno { box-shadow: 0 0 0 3px var(--cheddar); border-color: var(--cheddar); }
+.ficha.huelga { border-style: dashed; }
+.ficha.caido { opacity: 0.4; text-decoration: line-through; }
+.vs { display: grid; place-items: center; color: var(--muted); }
+.nota-formacion { font-size: 12px; color: var(--muted); line-height: 1.35; }
+
 /* Con el panel Explicar abierto la columna central es estrecha: tarjetas de enemigo en columna y sin solapes */
 .desktop-game.explain-open .enemy-strip { grid-template-columns: 1fr; }
 .enemy-card > div:nth-child(2) { min-width: 0; }

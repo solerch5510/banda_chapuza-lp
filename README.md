@@ -144,6 +144,8 @@ Con el servidor en marcha, abre `http://localhost:8080/`. Es el diseño de inter
 | `web/app.css` | Lo que el diseño no traía por ser una presentación: pantalla completa, móvil real, capas. |
 | `web/app.js` | La aplicación: inicio, exploración, combate, panel **Explicar** (árbol en nodos, decisión del enemigo con sus reglas descartadas), contratos, mapa, menú, selectores, eventos, despensa, crónica y estados de red y carga. |
 
+El panel de abajo a la izquierda alterna entre **Despensa** y **Posiciones**: la formación de la Banda (frente y retaguardia) y, en combate, también la de los enemigos, con fichas de iniciales (el anillo marca a quién le toca; pulsar la ficha de un enemigo lo ataca).
+
 Atajos: `↑`/`↓` recuperan órdenes, `/` enfoca la línea de órdenes y en los selectores valen los números, las flechas y `Esc`. En pantallas de hasta 700 px se usa el diseño móvil (la explicación sale como cajón). Los nombres de los enemigos se muestran legibles («Bandido Montado», no `e(bandido_montado, 1)`); el texto original se conserva en el JSON.
 
 
@@ -161,7 +163,7 @@ Cada suite corre en su propio proceso (así ninguna contagia a otra), se escribe
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/combate -g "run_tests,halt" -t "halt(1)"
 ```
 
-Suites actuales (27 suites, 1752 pruebas):
+Suites actuales (27 suites, 1754 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -179,7 +181,7 @@ Suites actuales (27 suites, 1752 pruebas):
 | `tests/campana.pl` (39) | La partida mínima de principio a fin: los finales (`chapuza`, `derrota_combate`, `derrota_hambre`), la fase final, partidas completas escritas como una lista de comandos (se gana en 7 días y es reproducible) y que `pelear` ya no existe. |
 | `tests/equivalencia.pl` (42) | **La prueba de equivalencia del meta-intérprete**: más de 20 objetivos del juego (compañía, economía, combate, contratos, fase, negación, `->`, aritmética, `findall`, `forall`) × 8 escenarios (inicio, hambre, huelga, combate con rasgos, con venda, el jefe, contratos en marcha, partida acabada): ejecutarlos directamente y con `solve/2` da las **mismas soluciones en el mismo orden**; el oráculo del corte (IA con corte = IA sin corte), la prueba de modo, los casos de error y que demostrar no cambia el estado. |
 | `tests/todas.pl` | El agregador: corre todas las suites en procesos separados y devuelve 0 o 1. |
-| `tests/api.pl` (87) | El adaptador JSON y el servidor: el árbol como nodos (profundidad, estado, tipo, pliegue), todos los items con su JSON, `ejecutar_orden/2` (errores como la consola, nunca falla), estado y acciones habilitadas ciertos y sin tocar la partida, **lo que cuenta la web es lo que cuenta la consola**, y el servidor HTTP real (GET, POST, UTF-8, estáticos, 404, rutas fuera de `web/`, cerrojo). |
+| `tests/api.pl` (89) | El adaptador JSON y el servidor: el árbol como nodos (profundidad, estado, tipo, pliegue), todos los items con su JSON, `ejecutar_orden/2` (errores como la consola, nunca falla), estado y acciones habilitadas ciertos y sin tocar la partida, **lo que cuenta la web es lo que cuenta la consola**, y el servidor HTTP real (GET, POST, UTF-8, estáticos, 404, rutas fuera de `web/`, cerrojo). |
 | `tests/agregador.pl` (4) | Vigila a `tests/todas.pl`: una suite buena da verde, una que falla da código 1, **también si falla con `assertion/1`** (en 5.10.4 eso abre el depurador y el proceso sale con 0). |
 | `tests/guia.pl` (15) | La ayuda al jugador nuevo: la bienvenida, el consejo de `ayuda.` según la fase (consola y JSON) y la guía rápida; **ejecuta de verdad** los comandos de la bienvenida y los «Primeros pasos» de la guía. |
 | `tests/demo.pl` (35) | La demostración reproducible: las cinco escenas (se montan, dejan el estado que dicen y dan siempre la misma pantalla), `demo.` y la escena desconocida, los guiones de `examples/` y que **lo guardado coincide carácter a carácter con lo que el juego produce ahora** (si cambia una frase hay que regenerar). |

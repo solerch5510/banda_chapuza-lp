@@ -149,7 +149,7 @@ En la segunda pestaña lanzo las pruebas (unos 20 segundos):
 swipl -q -s tests/todas -g "run_tests,halt" -t "halt(1)"
 ```
 
-Se ve: «27 suites en verde, 0 con fallos; 1752 pruebas declaradas» y «TODO EN VERDE».
+Se ve: «27 suites en verde, 0 con fallos; 1754 pruebas declaradas» y «TODO EN VERDE».
 
 > Para terminar: la verificación fue tan importante como el código. Veintisiete suites, más de mil setecientas pruebas, pruebas de mutación —rompo el código a propósito y compruebo que alguna prueba falla— y la prueba de equivalencia del meta-intérprete que les contaba.
 >
