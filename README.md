@@ -161,7 +161,7 @@ Cada suite corre en su propio proceso (así ninguna contagia a otra), se escribe
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/combate -g "run_tests,halt" -t "halt(1)"
 ```
 
-Suites actuales (26 suites, 1737 pruebas):
+Suites actuales (27 suites, 1752 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -181,6 +181,7 @@ Suites actuales (26 suites, 1737 pruebas):
 | `tests/todas.pl` | El agregador: corre todas las suites en procesos separados y devuelve 0 o 1. |
 | `tests/api.pl` (87) | El adaptador JSON y el servidor: el árbol como nodos (profundidad, estado, tipo, pliegue), todos los items con su JSON, `ejecutar_orden/2` (errores como la consola, nunca falla), estado y acciones habilitadas ciertos y sin tocar la partida, **lo que cuenta la web es lo que cuenta la consola**, y el servidor HTTP real (GET, POST, UTF-8, estáticos, 404, rutas fuera de `web/`, cerrojo). |
 | `tests/agregador.pl` (4) | Vigila a `tests/todas.pl`: una suite buena da verde, una que falla da código 1, **también si falla con `assertion/1`** (en 5.10.4 eso abre el depurador y el proceso sale con 0). |
+| `tests/guia.pl` (15) | La ayuda al jugador nuevo: la bienvenida, el consejo de `ayuda.` según la fase (consola y JSON) y la guía rápida; **ejecuta de verdad** los comandos de la bienvenida y los «Primeros pasos» de la guía. |
 | `tests/demo.pl` (35) | La demostración reproducible: las cinco escenas (se montan, dejan el estado que dicen y dan siempre la misma pantalla), `demo.` y la escena desconocida, los guiones de `examples/` y que **lo guardado coincide carácter a carácter con lo que el juego produce ahora** (si cambia una frase hay que regenerar). |
 | `tests/playtest.pl` (45) | El primer playtest guiado convertido en pruebas: la partida completa por la vía cómoda (se gana, en pocos días y comandos, sin pantallas crudas ni errores y reproducible), las tres rutas degeneradas (no pagar, ignorar la comida, contratos sin condiciones) y los ajustes que salieron de él: el estado del combate tras cada orden, el día y la ración, las variantes que rotan de verdad y las pistas de `por_que_no`. |
 | `tests/banco.pl` (56) | El banco de frases del narrador, sano como conjunto: tamaño, marcas `~w` y argumentos, textos sin repetir, claves con identificadores que existen (detecta erratas), cobertura de las reglas explicables y de los casos reales de `por_que_no` (con frase propia, no la genérica), rotación de las frases frecuentes, comentarios de nodo del nivel detallado y el chiste de cada contrato. |

@@ -55,6 +55,10 @@ $r = Ejecutar @("-q", "-s", "tests/todas", "-g", "run_tests,halt", "-t", "halt(1
 $resumen = ($r.Texto -split "`n" | Where-Object { $_ -match "suites en verde" } | Select-Object -First 1)
 Comprobar "tests/todas termina con codigo 0 y TODO EN VERDE" ($r.Codigo -eq 0 -and $r.Texto -match "TODO EN VERDE") ("codigo " + $r.Codigo)
 Write-Host ("  " + $resumen)
+$real = [regex]::Match($r.Texto, '(\d+) suites en verde, \d+ con fallos; (\d+) pruebas declaradas')
+$doc = [regex]::Match((Get-Content (Join-Path $tmp "README.md") -Raw), '\((\d+) suites, (\d+) pruebas\)')
+$coinciden = $real.Success -and $doc.Success -and ($real.Groups[1].Value -eq $doc.Groups[1].Value) -and ($real.Groups[2].Value -eq $doc.Groups[2].Value)
+Comprobar "las cifras del README (suites y pruebas) coinciden con las reales" $coinciden ("README: " + $doc.Value + " / real: " + $real.Value)
 
 Write-Host "`n== Reglas de codigo"
 $fuentes = Get-ChildItem -Path (Join-Path $tmp "src") -Filter *.pl
