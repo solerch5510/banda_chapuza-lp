@@ -1,11 +1,13 @@
 % explicar.pl
-% Meta-interprete y modo explicar (explicar/1, por_que_no/1, arbol/1).
+% Los dos meta-interpretes del juego y su traduccion a texto: solve/2 (la prueba de por que algo es cierto) y
+% por_que_no/2 (por que no lo es). Los comandos del jugador explicar, por_que_no y nivel los ejecuta juego.pl;
+% aqui no hay predicados explicar/1 ni arbol/1.
 %
 % solve/2,3 (docs/02-arquitectura-codigo.md, 6.4 y 6.5) construye la prueba de un objetivo
 % y trata el corte de forma real; prueba_a_lineas/2 (6.11) la convierte en un arbol de texto
 % ASCII que ui escribe. por_que_no/2 (6.9) es el segundo meta-interprete: explica por que una meta
 % NO tiene solucion, y diag_a_lineas/2 convierte ese diagnostico en texto. Los niveles
-% resumido/detallado llegan mas adelante.
+% resumido/detallado se aplican en lineas_de_prueba/3 y diag_a_lineas/3.
 
 :- module(explicar, [solve/2, solve/3, prueba_a_lineas/2, meta_de_prueba/2,
                      por_que_no/2, diag_a_lineas/2, diag_a_lineas/3, diag_detalle_a_lineas/2,

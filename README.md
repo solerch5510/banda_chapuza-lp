@@ -2,23 +2,25 @@
 
 **Banda Chapuza** es un RPG ligero de texto en el que diriges una compañía de mercenarios de saldo: contratas misiones absurdas, gestionas quesos (la moneda y la comida a la vez), sueldos y moral, y peleas por turnos. Está escrito íntegramente en **Prolog** como proyecto final de Programación Declarativa: el estado del mundo son hechos, las reglas del juego son cláusulas y un meta-intérprete permite preguntar `explicar` o `por_que_no` para ver, con la voz de un narrador sarcástico, el árbol de derivación detrás de cada acción.
 
-> Estado: en desarrollo. El diseño (canon) está en [docs/DISENO.md](docs/DISENO.md), revisado el 2 de noviembre de 2026.
+> **Versión 1.0** · SWI-Prolog 5.10.4 · entrega: 11 de diciembre de 2026. El diseño de referencia está en [docs/DISENO.md](docs/DISENO.md).
 
-## Características previstas
+## Qué incluye
 
-- Compañía de mercenarios con rasgos que modifican las reglas del juego.
-- Economía del queso: es la única moneda; maduración, ración diaria, sueldos (`pagar`) y moral.
-- Contratos con recompensa y consecuencias.
-- Combate por turnos con filas (frente y retaguardia) y enemigos con IA por reglas.
-- **Modo explicar:** `explicar(Accion)` y `por_que_no(Accion)` muestran la prueba SLD de cada acción (`arbol(Accion)` en el nivel objetivo).
+- **Compañía de mercenarios** (Sir Baldomero, Madame Pimentina, Rufino y Tuerca) con rasgos que modifican las reglas: Baldomero teme a los caballos, Rufino cobra por callar...
+- **Economía del queso:** es la única moneda y también la comida. Madura (fresco, curado, rancio), hay ración diaria, sueldos (`pagar`) y moral; con la moral baja, un miembro se pone en huelga.
+- **Contratos** con recompensa y consecuencias, y **eventos** con opciones.
+- **Combate por turnos** con filas (frente y retaguardia), habilidades y enemigos con IA por reglas (con prioridad y corte).
+- **Modo explicar:** `explicar` y `por_que_no` enseñan la prueba lógica (el árbol de derivación) de lo que pasó o de por qué no se pudo, con la voz de un narrador sarcástico, en dos niveles (`resumido` y `detallado`). Es el corazón del proyecto: dos meta-intérpretes de Prolog sobre las propias reglas del juego.
+- **Demostración reproducible** (`demo`, escenas y guiones en `examples/`) y un **frontend web** opcional.
 
 ## Alcance
 
-| Nivel | Contenido |
-|---|---|
-| **Mínima** (compromiso de entrega) | 4 contratos, 5 enemigos, unas 70 frases del narrador, 16 comandos y 3 finales. Incluye las demostraciones centrales: `por_que_no(atacar(baldomero, bandido_montado))`, `por_que_no(aceptar(gallina_noble))` y `explicar` sobre un turno enemigo con corte. |
-| **Objetivo** (si hay tiempo) | 6 contratos, 7 enemigos, unas 120 frases, comandos `nivel`, `arbol`, `usar`, `huir`, `comer` y `demo`, y 5 finales. |
-| **Extra** (ampliación futura) | Resto de contratos y enemigos, tienda de objetos, `guardar`/`cargar`, reclutas y comandos en palabras. No forma parte de la entrega. |
+| Nivel | Contenido | Estado |
+|---|---|---|
+| **Mínima** (compromiso de entrega) | 4 contratos, 5 enemigos, unas 70 frases del narrador, 16 comandos y 3 finales; demostraciones centrales (`por_que_no(atacar(baldomero, bandido_montado))`, `por_que_no(aceptar(gallina_noble))` y `explicar` sobre un turno enemigo con corte). | **Hecho** (17 comandos y unas 130 frases; 3 finales: `chapuza`, derrota por combate y derrota por hambre). |
+| **Objetivo** (si hay tiempo) | Comandos `nivel` y `demo`, más frases; `arbol`, `usar`, `huir`, `comer`, más contratos y enemigos. | **Parcial**: `nivel` y `demo` (más las unas 130 frases) sí; `arbol` lo cubre `nivel(detallado)`; `usar`, `huir`, `comer` y los contratos y enemigos extra, no. |
+| **Extra** (ampliación futura) | Tienda de objetos, `guardar`/`cargar`, reclutas y comandos en palabras. | No incluido. |
+| **No previsto** | Frontend web (`web/`) sobre el mismo motor, sin cambiarlo. | **Hecho**, opcional. |
 
 ## Requisitos
 
@@ -42,9 +44,17 @@ En Windows, SWI-Prolog 5.10.4 suele instalarse en `C:\Program Files\pl\bin`, que
 
 Nota: en la 5.10.4 para Windows, una ruta relativa con extensión como último argumento (`swipl -q -s src/main.pl`) falla con "script_file does not exist". Funcionan `src/main` (sin extensión), la ruta absoluta o poner otra opción después, por ejemplo `-s src/main.pl -g halt`.
 
-### Estado del juego
+## Manual del jugador
 
-Se puede **recorrer el mapa, gestionar la compañía y pedir explicaciones**. Cada comando se escribe como un término de Prolog **terminado en punto**:
+**Objetivo:** llevar a la Banda por cuatro contratos hasta derrotar al Gran Roquefort en las Cuevas del Roquefort, sin quedarte sin queso y sin que caigan los cuatro miembros.
+
+**Un día cualquiera:** viajar cuesta un día; cada día los quesos envejecen, cada miembro come una unidad y llegar a la taberna deja sueldos por pagar (`pagar.`). Salir de la taberna sin pagar baja la moral, y con la moral por los suelos alguien se declara en huelga. `descansar.` (solo en la taberna) cura, pero cuesta queso.
+
+**Contratos:** `contratos.` enseña el tablón. Un contrato puede estar `disponible`, `bloqueado` (algo lo impide, por ejemplo un rasgo), `lejos`, `activo`, `por_cobrar` o `cumplido`; se aceptan con `aceptar(Contrato).` y sus premios se cobran en la taberna. Algunos abren un **evento** con opciones (`elegir(Opcion).`) o un combate.
+
+**Preguntar por qué:** `explicar.` cuenta por qué pasó lo último; `por_que_no(Accion).` cuenta por qué una acción **no** se puede (la regla que falla y lo que la impide). `nivel(detallado).` da el árbol entero. Son **comandos del juego** (los ejecuta `juego:ejecutar/2`), no predicados que se llamen desde el intérprete de Prolog; los predicados de los meta-intérpretes son `explicar:solve/2` y `explicar:por_que_no/2`.
+
+Cada comando se escribe como un término de Prolog **terminado en punto**:
 
 | Comando | Qué hace |
 |---|---|
@@ -67,7 +77,7 @@ Se puede **recorrer el mapa, gestionar la compañía y pedir explicaciones**. Ca
 | `nivel(resumido).` / `nivel(detallado).` | Cuánto detalle tienen `explicar` y `por_que_no`. **Resumido** (el de partida): el árbol plegado a lo esencial (`[+N nodos]`; un ataque cabe en 15 líneas) y solo la cláusula más cercana. **Detallado**: el árbol entero, todas las cláusulas aplicables y, si falla una negación, la prueba de por qué es cierto lo que niega (de dónde sale el miedo de Baldomero), más hasta tres notas del narrador sobre nodos del árbol (`  · …`). |
 | `salir.` | Termina la partida. |
 
-**La partida mínima ya se puede jugar de principio a fin.** Si la despensa se queda vacía y no hay nada por cobrar, la partida termina por hambre; si caen los cuatro miembros en un combate, termina en derrota; y si se derrota al Gran Roquefort, se gana con el final `chapuza`.
+**La partida se juega de principio a fin.** Si la despensa se queda vacía y no hay nada por cobrar, la partida termina por hambre; si caen los cuatro miembros en un combate, termina en derrota; y si se derrota al Gran Roquefort, se gana con el final `chapuza`.
 
 **Una ruta posible (unos 7 días):**
 
@@ -82,7 +92,7 @@ ir(castillo).  aceptar(despensa_real).
 ir(camino_real).  ir(cuevas). % el Gran Roquefort
 ```
 
-En combate manda cada miembro en su turno (tras cada orden se ve de quién es el siguiente turno y cuánta vida tiene cada enemigo; `mirar.` lo repite); los enemigos actúan solos, al ganar hay botín y moral, y los caídos se levantan con 1 de vida. `explicar.` justifica lo último que pasó, también las decisiones de los enemigos. **La escolta de Lady Clotilde:** al aceptar `gallina_noble` en el Camino Real, en cada ronda del combate el primer enemigo que actúa se ceba con ella (anota un golpe y no ataca a la Banda). Con 2 golpes o menos, éxito (14 quesos y un brie); con 3 o 4, a medias (la mitad); con 5 o más, fracaso (−3 quesos y −2 de moral; se puede reintentar). Cuanto antes acabes el combate, menos plumas pierde. Todavía no están implementados el narrador completo ni los finales de nivel Objetivo.
+En combate manda cada miembro en su turno (tras cada orden se ve de quién es el siguiente turno y cuánta vida tiene cada enemigo; `mirar.` lo repite); los enemigos actúan solos, al ganar hay botín y moral, y los caídos se levantan con 1 de vida. `explicar.` justifica lo último que pasó, también las decisiones de los enemigos. **La escolta de Lady Clotilde:** al aceptar `gallina_noble` en el Camino Real, en cada ronda del combate el primer enemigo que actúa se ceba con ella (anota un golpe y no ataca a la Banda). Con 2 golpes o menos, éxito (14 quesos y un brie); con 3 o 4, a medias (la mitad); con 5 o más, fracaso (−3 quesos y −2 de moral; se puede reintentar). Cuanto antes acabes el combate, menos plumas pierde.
 
 ## Demostración
 
@@ -149,7 +159,7 @@ Cada suite corre en su propio proceso (así ninguna contagia a otra), se escribe
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/combate -g "run_tests,halt" -t "halt(1)"
 ```
 
-Suites actuales (1720 pruebas):
+Suites actuales (26 suites, 1737 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -167,7 +177,7 @@ Suites actuales (1720 pruebas):
 | `tests/campana.pl` (39) | La partida mínima de principio a fin: los finales (`chapuza`, `derrota_combate`, `derrota_hambre`), la fase final, partidas completas escritas como una lista de comandos (se gana en 7 días y es reproducible) y que `pelear` ya no existe. |
 | `tests/equivalencia.pl` (42) | **La prueba de equivalencia del meta-intérprete**: más de 20 objetivos del juego (compañía, economía, combate, contratos, fase, negación, `->`, aritmética, `findall`, `forall`) × 8 escenarios (inicio, hambre, huelga, combate con rasgos, con venda, el jefe, contratos en marcha, partida acabada): ejecutarlos directamente y con `solve/2` da las **mismas soluciones en el mismo orden**; el oráculo del corte (IA con corte = IA sin corte), la prueba de modo, los casos de error y que demostrar no cambia el estado. |
 | `tests/todas.pl` | El agregador: corre todas las suites en procesos separados y devuelve 0 o 1. |
-| `tests/api.pl` (70) | El adaptador JSON y el servidor: el árbol como nodos (profundidad, estado, tipo, pliegue), todos los items con su JSON, `ejecutar_orden/2` (errores como la consola, nunca falla), estado y acciones habilitadas ciertos y sin tocar la partida, **lo que cuenta la web es lo que cuenta la consola**, y el servidor HTTP real (GET, POST, UTF-8, estáticos, 404, rutas fuera de `web/`, cerrojo). |
+| `tests/api.pl` (87) | El adaptador JSON y el servidor: el árbol como nodos (profundidad, estado, tipo, pliegue), todos los items con su JSON, `ejecutar_orden/2` (errores como la consola, nunca falla), estado y acciones habilitadas ciertos y sin tocar la partida, **lo que cuenta la web es lo que cuenta la consola**, y el servidor HTTP real (GET, POST, UTF-8, estáticos, 404, rutas fuera de `web/`, cerrojo). |
 | `tests/agregador.pl` (4) | Vigila a `tests/todas.pl`: una suite buena da verde, una que falla da código 1, **también si falla con `assertion/1`** (en 5.10.4 eso abre el depurador y el proceso sale con 0). |
 | `tests/demo.pl` (35) | La demostración reproducible: las cinco escenas (se montan, dejan el estado que dicen y dan siempre la misma pantalla), `demo.` y la escena desconocida, los guiones de `examples/` y que **lo guardado coincide carácter a carácter con lo que el juego produce ahora** (si cambia una frase hay que regenerar). |
 | `tests/playtest.pl` (45) | El primer playtest guiado convertido en pruebas: la partida completa por la vía cómoda (se gana, en pocos días y comandos, sin pantallas crudas ni errores y reproducible), las tres rutas degeneradas (no pagar, ignorar la comida, contratos sin condiciones) y los ajustes que salieron de él: el estado del combate tras cada orden, el día y la ración, las variantes que rotan de verdad y las pistas de `por_que_no`. |

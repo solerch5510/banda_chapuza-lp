@@ -2,7 +2,7 @@
 
 > Repositorio: `banda_chapuza-lp` · Lenguaje: Prolog (**SWI-Prolog 5.10.4**, la versión del curso) · Proyecto final de Programación Declarativa
 >
-> Estado: **borrador v0.2** — es el diseño previo a la implementación; puede cambiar durante el desarrollo.
+> Estado: **versión 1.0 (implementada)** — es el diseño de referencia; donde lo construido se aparta de él se anota como **Implementación**. Lo que no se llegó a hacer está en el README (Alcance).
 >
 > **Revisado el 2 de noviembre de 2026 tras `docs/06-revision-y-decisiones.md`.** Este documento es el canon: incorpora las decisiones aceptadas por el autor (D-01 a D-33) y deja abiertas solo las preguntas a la profesora (D-34 a D-38). Los cambios concretos están en el "Registro de cambios de la revisión" del final. Los documentos de detalle son `01` (lore), `02` (arquitectura del código), `03` (funcionalidades y etapas), `04` (guion y contratos), `05` (comedia y narración) y `06` (revisión y decisiones), todos en `docs/`.
 
@@ -25,7 +25,7 @@ La inspiración de la estructura es la de los juegos de gestión de compañías 
 
 ### Fuera de alcance (versión 1)
 
-- Interfaz gráfica o web.
+- Interfaz gráfica o web. (Implementación: después se añadió un **frontend web opcional**, `web/`, sobre `api.pl` y `servidor.pl`, sin cambiar el motor; la consola sigue siendo la versión de referencia.)
 - Mapa en cuadrícula con movimiento táctico (el combate es por filas).
 - Multijugador, sonido, animaciones.
 - Generación procedural del mundo.
@@ -286,14 +286,14 @@ Una **hoja** del árbol es todo predicado que no pertenezca a los módulos del j
 
 ### 11.2 Comandos
 
-Los comandos son términos Prolog. `explicar` y `por_que_no` reciben una acción y la traducen a un objetivo con `objetivo_de_accion/2`.
+Los comandos son términos Prolog. `explicar` y `por_que_no` reciben una acción y la traducen a un objetivo con `objetivo_de_accion/2`. **Implementación:** son comandos que interpreta `juego:ejecutar/2`, no predicados exportados; los predicados de los meta-intérpretes son `explicar:solve/2` y `explicar:por_que_no/2`. `explicar.` (sin argumento) explica lo último que pasó, incluida la decisión de un enemigo.
 
 | Comando | Qué hace | Nivel |
 |---|---|---|
 | `explicar(Accion)` | Muestra la prueba de por qué la acción funcionó (o, de forma hipotética, funcionaría), con los valores de las variables. Se apoya en `ultima_prueba/2` para explicar lo que acaba de ocurrir, como un turno enemigo. | mínima |
 | `por_que_no(Accion)` | Muestra el primer subobjetivo que falló, y si fue por una negación, qué hecho la impidió. | mínima |
-| `arbol(Accion)` | Muestra el árbol de derivación en texto, con unificadores. La exportación a Graphviz `.dot` es extra. | objetivo |
-| `nivel(resumido)` / `nivel(detallado)` | Controla cuánto se expande el árbol. | objetivo |
+| `arbol(Accion)` | Muestra el árbol de derivación en texto, con unificadores. La exportación a Graphviz `.dot` es extra. | objetivo — **no implementado**: lo cubre `nivel(detallado)` |
+| `nivel(resumido)` / `nivel(detallado)` | Controla cuánto se expande el árbol. | objetivo — **hecho** |
 
 **Demostraciones centrales de la exposición** (se mantienen en la versión mínima):
 
@@ -329,7 +329,7 @@ Narrador: "Sir Baldomero ve el caballo, recuerda su infancia, y decide revisar s
 ```
 
 ```
-> explicar(turno_enemigo(bandido_torpe))
+> explicar          % tras el turno del enemigo (en la implementación no lleva argumento)
 [ok] accion_enemigo(bandido_torpe, atacar(pimentina))      [regla 2 de 3]
   |- [no] regla 1 (curarse): vida_baja(bandido_torpe) falla
   |- objetivo_mas_debil(bandido_torpe, pimentina)           [regla]
