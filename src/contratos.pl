@@ -17,7 +17,8 @@
                       objetivo_pendiente/3, efectos_inicio_objetivo/2,
                       efectos_resolucion/3, efectos_cobro/1, efectos_cobro_de/3,
                       escolta_en_curso/0, golpes_dados/1, golpea_a_clotilde/1, efectos_golpe_a_clotilde/2,
-                      orden_finales/1, final/2, final_de_la_partida/1]).
+                      orden_finales/1, final/2, final_de_la_partida/1,
+                      contrato_final/1, a_la_vista/1, faltas_de/2, objetivo_actual/2]).
 :- use_module(mundo).
 :- use_module(estado).
 :- use_module(compania).
@@ -190,6 +191,70 @@ ficha(C, contrato(C, Zona, Dificultad, Recompensa, Estado)) :-
     estado_de_contrato(C, Estado),
     contrato(C, Zona, _, recompensa(Recompensa), _),
     dificultad(C, Dificultad).
+
+% ---------------------------------------------------------------------------
+% El objetivo actual: que conviene hacer ahora. Son reglas puras sobre lo que ya sabe el juego (los mismos
+% hechos y condiciones que explican `aceptar`), asi que el jugador no se pierde en los detalles.
+% ---------------------------------------------------------------------------
+% contrato_final(?C): el contrato cuyo exito gana la partida.
+contrato_final(C) :-
+    consecuencia(C, exito, Efectos),
+    memberchk(victoria, Efectos).
+
+% a_la_vista(-Cs): los contratos que ya aparecen en el tablon (para avisar de los que aparecen de pronto).
+a_la_vista(Cs) :-
+    findall(C, visible(C), Cs0),
+    sort(Cs0, Cs).
+
+% faltas_de(+C, -Faltas): lo que aun impide ver o aceptar C (condiciones de aparicion y de aceptacion sin
+% cumplir), sin repetir. [] = no falta nada.
+faltas_de(C, Faltas) :-
+    aparece(C, Visibilidad),
+    contrato(C, _, _, _, Condiciones),
+    append(Visibilidad, Condiciones, Todas),
+    findall(F, ( member(requiere(X), Todas), \+ condicion_cumple(X), falta_de(X, F) ), Fs),
+    list_to_set(Fs, Faltas).
+
+falta_de(contratos_cumplidos_min(N), contratos(K)) :- contratos_cumplidos(C), K is N - C.
+falta_de(moral_media_min(N),         moral(N)).
+falta_de(miembros_en_pie_min(N),     en_pie(N)).
+falta_de(visita(Z),                  visita(Z)).
+falta_de(rasgo_no(R),                rasgo(R)).
+
+% objetivo_actual(-Paso, -Faltas): el paso que toca y, aparte, lo que falta para el contrato final.
+objetivo_actual(Paso, Faltas) :-
+    paso_actual(Paso),
+    faltas_del_final(Faltas).
+
+paso_actual(cobrar) :-
+    estado:contrato_por_cobrar(_, _), !.
+paso_actual(cumplir(C, Zona)) :-
+    estado:contrato_activo(C), contrato(C, Zona, _, _, _), !.
+paso_actual(aceptar_final(F, Zona)) :-
+    contrato_final(F), por_aceptar(F), contrato(F, Zona, _, _, _), !.
+paso_actual(aceptar) :-
+    contrato(C, _, _, _, _), \+ contrato_final(C), por_aceptar(C), !.
+paso_actual(explorar(Zona)) :-
+    contrato_final(F), \+ visible(F),
+    aparece(F, Visibilidad), member(requiere(visita(Zona)), Visibilidad), \+ estado:visitada(Zona), !.
+paso_actual(preparar_final(F)) :-
+    contrato_final(F).
+
+% por_aceptar(+C): se ve, no esta aceptado ni cumplido y no le falta nada (esta o no la Banda donde se acepta).
+por_aceptar(C) :-
+    visible(C),
+    \+ estado:contrato_activo(C),
+    \+ contrato_cumplido(C),
+    faltas_de(C, []).
+
+% Lo que falta para el contrato final, solo si ya se conoce (si aun no aparece, no se adelanta nada).
+faltas_del_final(Faltas) :-
+    (   contrato_final(F), visible(F),
+        \+ estado:contrato_activo(F), \+ contrato_cumplido(F),
+        faltas_de(F, Fs)
+    ->  Faltas = Fs
+    ;   Faltas = []
+    ).
 
 dificultad(ratas_del_granero, 1).
 dificultad(gato_en_el_arbol,  1).

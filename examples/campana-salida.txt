@@ -10,6 +10,7 @@ Escribe ayuda. para ver los comandos; explicar. y por_que_no(Accion). cuentan po
 El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
 Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
 Día 1 · Queso en la despensa: 12 · ración 4 al día (te alcanza para 3)
+Objetivo: acepta un contrato en el tablón de la taberna.
 
 > ayuda
 Comandos disponibles ahora:
@@ -42,6 +43,7 @@ El tablón de contratos:
 
 > aceptar(ratas_del_granero)
 Contrato aceptado: «Ratas del Granero». Todos asienten con convicción; nadie ha leído la letra pequeña.
+Objetivo: cumple «Ratas del Granero» en la Aldea Requesón.
 
 > aceptar(gato_en_el_arbol)
 Contrato aceptado: «El Gato en el Árbol». Todos asienten con convicción; nadie ha leído la letra pequeña.
@@ -76,6 +78,7 @@ El Gato en el Árbol: Su Excelencia Bigotes no piensa bajar solo.
   3. sacudir_arbol: Sir Baldomero sacude el árbol con todo su honor (Sir Baldomero)
   4. cantar: Rufino le canta una balada (gasta un intento) (Rufino)
 Intentos que quedan: 3. Elige con elegir(Opcion). (el número o el nombre).
+Objetivo: vuelve a la taberna a cobrar lo que has resuelto.
 
 > elegir(trepar)
 Tuerca trepa sin ruido, saluda al gato con una reverencia y baja con él bajo el brazo. Las alturas le sientan bien.
@@ -86,6 +89,7 @@ Amanece el día 3. Alguien tiene hambre y alguien más, una cuenta pendiente. Ra
 Llegas al Cuajo Torcido. Huele a sopa de ayer y a una promesa de pago que nadie ha visto cumplida.
 Cobráis por «Ratas del Granero». Los quesos entran en la despensa y los sueldos, como siempre, esperan su turno.
 Cobráis por «El Gato en el Árbol». Los quesos entran en la despensa y los sueldos, como siempre, esperan su turno.
+Objetivo: acepta un contrato en el tablón de la taberna.
 
 > inventario
 Despensa (día 3): 19 quesos (valor informativo: 38)
@@ -189,10 +193,12 @@ El Bandido Torpe huye gritando «¡Esto no ha pasado!». Ha pasado, y con testig
 Victoria. Se recoge el botín, se cuenta el queso y se niega todo lo que haya salido mal.
 Botín: 3 quesos frescos. Los guardaban «para emergencias». Esto lo era.
 Contrato resuelto con éxito: «Lady Clotilde Plumífera». La recompensa os espera en la taberna, en cuanto Doña Mantecosa deje de contarla.
+Objetivo: vuelve a la taberna a cobrar lo que has resuelto.
 
 > ir(castillo)
 Día 5. Los quesos maduran y las deudas también. La ración de hoy: 4 quesos.
 El Castillo Camembert se hunde un poquito cada año, pero los guardias saludan con una rigidez ejemplar.
+Corre la voz: el rey Brieto busca a los peores contra el Gran Roquefort. Nuevo contrato final en el tablón: «La Despensa Real».
 
 > aceptar(despensa_real)
 Contrato aceptado: «La Despensa Real». Todos asienten con convicción; nadie ha leído la letra pequeña.

@@ -80,7 +80,14 @@ mostrar_conocido(vista(zona, Datos)) :-
     (   memberchk(riesgo(Riesgo), Datos), narrador:texto_riesgo(Riesgo, Aviso)
     ->  format("~w~n", [Aviso])
     ;   true
+    ),
+    (   memberchk(objetivo(Paso, Faltas), Datos), narrador:texto_objetivo(Paso, Faltas, Objetivo)
+    ->  format("~w~n", [Objetivo])
+    ;   true
     ).
+mostrar_conocido(vista(objetivo, Paso, Faltas)) :-
+    narrador:texto_objetivo(Paso, Faltas, Texto),
+    format("~w~n", [Texto]).
 mostrar_conocido(vista(comida, Riesgo)) :-
     narrador:texto_riesgo(Riesgo, Texto),
     format("~w~n", [Texto]).

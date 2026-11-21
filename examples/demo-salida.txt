@@ -10,6 +10,7 @@ Escribe ayuda. para ver los comandos; explicar. y por_que_no(Accion). cuentan po
 El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
 Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
 Día 1 · Queso en la despensa: 12 · ración 4 al día (te alcanza para 3)
+Objetivo: acepta un contrato en el tablón de la taberna.
 
 > demo(economia)
 
@@ -27,6 +28,7 @@ Para probar:
 El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
 Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
 Día 12 · Queso en la despensa: 15 · ración 4 al día (te alcanza para 3)
+Objetivo: acepta un contrato en el tablón de la taberna.
 
 > mirar
 
@@ -34,6 +36,7 @@ Día 12 · Queso en la despensa: 15 · ración 4 al día (te alcanza para 3)
 El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
 Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
 Día 12 · Queso en la despensa: 15 · ración 4 al día (te alcanza para 3)
+Objetivo: acepta un contrato en el tablón de la taberna.
 
 > inventario
 Despensa (día 12): 15 quesos (valor informativo: 33)
@@ -206,6 +209,7 @@ Para probar:
 Un camino empedrado con corteza de queso viejo que se pega a las botas, con un peaje cada cien pasos. Lo recorren carretas, gansos con permiso de cobro y bandidos con más ambición que puntería.
 Salidas: bosque (Bosque del Moho), castillo (Castillo Camembert), cuevas (Cuevas del Roquefort), taberna (Taberna del Cuajo Torcido)
 Día 1 · Queso en la despensa: 12 · ración 4 al día (te alcanza para 3)
+Objetivo: acepta un contrato en el tablón de la taberna.
 
 > contratos
 El tablón de contratos:
@@ -274,6 +278,7 @@ Para probar:
 Un camino empedrado con corteza de queso viejo que se pega a las botas, con un peaje cada cien pasos. Lo recorren carretas, gansos con permiso de cobro y bandidos con más ambición que puntería.
 Salidas: bosque (Bosque del Moho), castillo (Castillo Camembert), cuevas (Cuevas del Roquefort), taberna (Taberna del Cuajo Torcido)
 Día 1 · Queso en la despensa: 12 · ración 4 al día (te alcanza para 3)
+Objetivo: acepta un contrato en el tablón de la taberna.
 
 > por_que_no(aceptar(gallina_noble))
 No falla nada: la acción es perfectamente posible. Prueba con explicar(...) y verás por qué. (aceptar(gallina_noble))

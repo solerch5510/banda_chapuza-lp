@@ -193,6 +193,10 @@ item(fase(F), json([tipo=fase, fase=F])).
 item(vista(zona, Datos), Json) :- zona_json(Datos, Json).
 item(vista(comida, Riesgo), json([tipo=aviso_comida, riesgo=Riesgo, texto=Texto])) :-
     narrador:texto_riesgo(Riesgo, Texto).
+item(vista(objetivo, Paso, Faltas), json([tipo=objetivo, paso=P, faltas=Fs, texto=Texto])) :-
+    narrador:texto_objetivo(Paso, Faltas, Texto),
+    termino_texto(Paso, P),
+    maplist(termino_texto, Faltas, Fs).
 item(vista(ayuda, Comandos), json([tipo=ayuda, comandos=Js, consejo=Consejo])) :-
     findall(json([nombre=N, texto=T]),
             ( member(N, Comandos), ( narrador:ayuda_de(N, T) -> true ; T = N ) ),
@@ -407,7 +411,7 @@ combate_json(combate(Ronda, Turno, Enemigos),
 % ---------------------------------------------------------------------------
 
 estado_json(json([fase=Fase, dia=Dia, nivel=Nivel, zona=Zona, mapa=Mapa, banda=Banda, despensa=Despensa, comida=Comida,
-                  contratos=Contratos, combate=Combate, fin=Fin, acciones=Acciones])) :-
+                  objetivo=Objetivo, contratos=Contratos, combate=Combate, fin=Fin, acciones=Acciones])) :-
     ( once(estado:fase(Fase)) -> true ; Fase = desconocida ),
     ( once(estado:dia(Dia)) -> true ; Dia = 0 ),
     nivel_actual(Nivel),
@@ -419,6 +423,7 @@ estado_json(json([fase=Fase, dia=Dia, nivel=Nivel, zona=Zona, mapa=Mapa, banda=B
     economia:inventario(DI),
     despensa_json(DI, Despensa),
     comida_json(Comida),
+    objetivo_json(DZ, Objetivo),
     findall(F, ( contratos:contrato(C, _, _, _, _), contratos:ficha(C, F) ), Fichas),
     maplist(contrato_json, Fichas, Contratos),
     (   estado:en_combate(_), juego:datos_de_combate(DC)
@@ -427,6 +432,16 @@ estado_json(json([fase=Fase, dia=Dia, nivel=Nivel, zona=Zona, mapa=Mapa, banda=B
     ),
     (   estado:fin_partida(Motivo) -> termino_texto(Motivo, MT), Fin = json([motivo=MT]) ; Fin = @(null) ),
     acciones_json(Acciones).
+
+% objetivo_json(+DatosDeZona, -Json): el objetivo actual en texto, con el paso y lo que falta para el contrato final.
+objetivo_json(DZ, Json) :-
+    (   memberchk(objetivo(Paso, Faltas), DZ)
+    ->  narrador:texto_objetivo(Paso, Faltas, Texto),
+        termino_texto(Paso, P),
+        maplist(termino_texto, Faltas, Fs),
+        Json = json([texto=Texto, paso=P, faltas=Fs])
+    ;   Json = @(null)
+    ).
 
 % comida_json(-Json): cuanto queso hay, lo que come la Banda al dia, para cuantos dias llega y el aviso si esta justa.
 comida_json(json([queso=Queso, racion=Racion, dias=Dias, riesgo=Riesgo, aviso=Aviso])) :-

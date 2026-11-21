@@ -10,6 +10,7 @@ Escribe ayuda. para ver los comandos; explicar. y por_que_no(Accion). cuentan po
 El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
 Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
 Día 1 · Queso en la despensa: 12 · ración 4 al día (te alcanza para 3)
+Objetivo: acepta un contrato en el tablón de la taberna.
 
 > demo(ia)
 

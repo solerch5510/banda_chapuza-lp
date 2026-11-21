@@ -169,7 +169,7 @@ functor_valido(F) :-
     member(F, [suceso, generica, falla, impide,
                % mensajes
                llegada, descanso, sin_comida, come_rancio, pago, impago, fin_hambre, final, golpe, cae,
-               evento_abre, evento_elige, intento_fallido, objetivo, contrato_resuelto, cobra, acepta, aparece,
+               evento_abre, evento_elige, intento_fallido, objetivo, contrato_resuelto, cobra, acepta, contrato_nuevo, aparece,
                victoria, botin, derrota_combate, aturdido, pasa, se_cura, invoca_moho, roba_queso, embiste,
                defiende, carga_heroica, fondue, balada, rebuscar, nivel, golpea_a_clotilde, dia_nuevo,
                % reglas

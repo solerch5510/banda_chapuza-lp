@@ -16,7 +16,7 @@
 % entre ellas con Uso mod N. Si varias claves encajan, gana la mas especifica (menos variables).
 % Texto provisional: el banco con todo el humor (docs/05-comedia-y-narracion.md) crece despues.
 
-:- module(narrador, [frase/3, texto/4, texto_error/2, ayuda_de/2, bienvenida/1, consejo_de_ayuda/2, texto_riesgo/2,
+:- module(narrador, [frase/3, texto/4, texto_error/2, ayuda_de/2, bienvenida/1, consejo_de_ayuda/2, texto_riesgo/2, texto_objetivo/3,
                      comentario/4, comentario_prueba/4, nombre_visible/2, texto_recompensa/2,
                      descripcion_evento/2, descripcion_opcion/3,
                      claves_de_diag/2, clave_de_diag/2, comentario_diag/4,
@@ -99,6 +99,11 @@ frase(suceso(contrato_resuelto(C, fracaso)), ambos,
       'Contrato fracasado: «~w». Se queda en el tablón, por si a alguien le queda dignidad para otro intento.'-[C]).
 frase(suceso(cobra(C)), ambos,
       'Cobráis por «~w». Los quesos entran en la despensa y los sueldos, como siempre, esperan su turno.'-[C]).
+% Un contrato que aparece de pronto en el tablon (por ejemplo, al visitar el castillo): hay que avisarlo.
+frase(suceso(contrato_nuevo(despensa_real)), ambos,
+      'Corre la voz: el rey Brieto busca a los peores contra el Gran Roquefort. Nuevo contrato final en el tablón: «La Despensa Real».').
+frase(suceso(contrato_nuevo(C)), ambos,
+      'Hay un contrato nuevo en el tablón: «~w».'-[C]).
 frase(suceso(acepta(C)), ambos,
       'Contrato aceptado: «~w». Todos asienten con convicción; nadie ha leído la letra pequeña.'-[C]).
 frase(suceso(aparece(T)), ambos,
@@ -731,6 +736,41 @@ ayuda_de(compania,'compania.      muestra a los miembros, su vida, su moral y su
 ayuda_de(inventario, 'inventario.    muestra la despensa (con la edad del queso) y los objetos').
 ayuda_de(explicar, 'explicar.      la prueba de lo último que hiciste; explicar(Accion). la de esa acción').
 ayuda_de(salir, 'salir.         termina la partida').
+
+% texto_objetivo(+Paso, +Faltas, -Texto): el objetivo actual (contratos:objetivo_actual/2) en una o dos frases.
+% Paso dice que toca ahora; Faltas, lo que aun falta para el contrato final (puede ser []).
+texto_objetivo(Paso, Faltas, Texto) :-
+    texto_paso(Paso, Faltas, Frase),
+    (   Paso = preparar_final(_) -> Prefijo = ' Te falta: ' ; Prefijo = ' Para el contrato final te falta: ' ),
+    (   Faltas == []
+    ->  Crudo = Frase
+    ;   maplist(texto_falta, Faltas, Textos),
+        atomic_list_concat(Textos, '; ', Lista),
+        atomic_list_concat([Frase, Prefijo, Lista, '.'], Crudo)
+    ),
+    contraer(Crudo, Texto).
+
+texto_paso(cobrar, _, 'Objetivo: vuelve a la taberna a cobrar lo que has resuelto.').
+texto_paso(cumplir(C, Zona), _, Texto) :-
+    nombre_visible(C, N), nombre_visible(Zona, Z),
+    format(atom(Texto), 'Objetivo: cumple «~w» en ~w.', [N, Z]).
+texto_paso(aceptar_final(F, Zona), _, Texto) :-
+    nombre_visible(F, N), nombre_visible(Zona, Z),
+    format(atom(Texto), 'Objetivo: acepta «~w» y ve a ~w: es el contrato final.', [N, Z]).
+texto_paso(aceptar, _, 'Objetivo: acepta un contrato en el tablón de la taberna.').
+texto_paso(explorar(Zona), _, Texto) :-
+    nombre_visible(Zona, Z),
+    format(atom(Texto), 'Objetivo: explora; en ~w se oye hablar de un contrato mayor.', [Z]).
+texto_paso(preparar_final(F), _, Texto) :-
+    nombre_visible(F, N),
+    format(atom(Texto), 'Objetivo: prepárate para «~w», el contrato final.', [N]).
+
+texto_falta(contratos(1), 'un contrato más cumplido') :- !.
+texto_falta(contratos(K), Texto) :- format(atom(Texto), '~w contratos más cumplidos', [K]).
+texto_falta(moral(N), Texto) :- format(atom(Texto), 'subir la moral media a ~w', [N]).
+texto_falta(en_pie(N), Texto) :- format(atom(Texto), 'tener ~w miembros en pie', [N]).
+texto_falta(visita(Z), Texto) :- nombre_visible(Z, N), format(atom(Texto), 'visitar ~w', [N]).
+texto_falta(rasgo(_), 'resolver un impedimento de la compañía').
 
 % texto_riesgo(+Riesgo, -Texto): el aviso de comida (economia:riesgo_de_gasto/2). ninguno no tiene texto.
 texto_riesgo(hambre_mortal, '¡Peligro! Otro día así y la despensa se queda a cero sin nada por cobrar: perderías por hambre.').

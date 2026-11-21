@@ -160,10 +160,12 @@ ejecutar_(Cmd, resultado(Items)) :-
     ->  (   ground(Cmd)
         ->  once(estado:fase(Fase)),
             (   permitido(Fase, Nombre)
-            ->  % Sin "estado:" delante: con_transaccion/1 es un meta-predicado y debe
+            ->  contratos:a_la_vista(Vistos), objetivo_ahora(Obj),
+                % Sin "estado:" delante: con_transaccion/1 es un meta-predicado y debe
                 % resolver ejecutar_en_fase/3 en ESTE modulo, no en estado.
                 con_transaccion(ejecutar_en_fase(Cmd, Fase, Items0)),
-                avisos_de_comida(Cmd, Items0, Items)
+                avisos_de_contratos(antes(Vistos, Obj), Items0, Items1),
+                avisos_de_comida(Cmd, Items1, Items)
             ;   Items = [error(fuera_de_fase(Cmd, Fase))]
             )
         ;   % ir(X) con X sin ligar no es un comando: ejecutarlo elegiria una zona cualquiera.
@@ -171,6 +173,37 @@ ejecutar_(Cmd, resultado(Items)) :-
         )
     ;   Items = [error(no_entiendo(Cmd))]
     ).
+
+% avisos_de_contratos(+Antes, +Items0, -Items): tras una orden que ha salido bien se avisa de dos cosas que el
+% jugador no tiene por que adivinar: (1) un contrato que aparece de pronto en el tablon (visitar el castillo,
+% por ejemplo) y (2) que el objetivo ha cambiado. Si la orden fallo, no ha cambiado nada; en combate o con la
+% partida acabada no se interrumpe.
+avisos_de_contratos(antes(Vistos, Obj0), Items0, Items) :-
+    \+ memberchk(error(_), Items0),
+    contratos:a_la_vista(Ahora),
+    findall(msg(contrato_nuevo, [C], 0), ( member(C, Ahora), \+ memberchk(C, Vistos) ), Nuevos),
+    cambio_de_objetivo(Obj0, Cambio),
+    append(Nuevos, Cambio, Avisos),
+    Avisos \== [],
+    !,
+    append(Items0, Avisos, Items).
+avisos_de_contratos(_, Items, Items).
+
+% cambio_de_objetivo(+Antes, -Items): [vista(objetivo, Paso, Faltas)] si el objetivo ya no es el de Antes
+% (y no se esta en combate ni la partida ha acabado); si no, [].
+cambio_de_objetivo(Antes, Items) :-
+    (   estado:fin_partida(_)  -> Items = []
+    ;   estado:en_combate(_)   -> Items = []
+    ;   objetivo_ahora(Ahora),
+        (   Ahora = o(Paso, Faltas), \+ Antes = Ahora
+        ->  Items = [vista(objetivo, Paso, Faltas)]
+        ;   Items = []
+        )
+    ).
+
+% objetivo_ahora(-Obj): o(Paso, Faltas), el objetivo de contratos:objetivo_actual/2, o `ninguno`.
+objetivo_ahora(Obj) :-
+    (   contratos:objetivo_actual(Paso, Faltas) -> Obj = o(Paso, Faltas) ; Obj = ninguno ).
 
 % avisos_de_comida(+Cmd, +Items0, -Items): tras viajar, descansar o pagar, si la despensa esta justa se avisa
 % (vista(comida, Riesgo)); en combate o con la partida acabada no.
@@ -541,7 +574,7 @@ datos_de_combate(combate(Ronda, Turno, Enemigos)) :-
 % mirar: los datos de la zona donde estas.
 % ---------------------------------------------------------------------------
 datos_de_zona([nombre(Nombre), descripcion(Texto), salidas(Salidas), dia(Dia), queso(Queso),
-               racion(Racion), dias(Dias), riesgo(Riesgo)]) :-
+               racion(Racion), dias(Dias), riesgo(Riesgo), objetivo(Paso, Faltas)]) :-
     once(estado:en_zona(Zona)),
     mundo:zona(Zona, Nombre),
     mundo:descripcion_zona(Zona, Texto),
@@ -553,7 +586,8 @@ datos_de_zona([nombre(Nombre), descripcion(Texto), salidas(Salidas), dia(Dia), q
     economia:queso_total(Queso),
     economia:racion_diaria(Racion),
     economia:dias_de_comida(Dias),
-    economia:riesgo_de_gasto(0, Riesgo).
+    economia:riesgo_de_gasto(0, Riesgo),
+    (   contratos:objetivo_actual(Paso0, Faltas0) -> Paso = Paso0, Faltas = Faltas0 ; Paso = ninguno, Faltas = [] ).
 
 % ---------------------------------------------------------------------------
 % Salir de la taberna sin haber pagado los sueldos: cada miembro activo pierde moral.

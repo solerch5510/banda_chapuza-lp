@@ -115,8 +115,12 @@
           break;
         case "msg":
           if (silencioso) break;
-          S.log.push({ t: CLAVES_SISTEMA.test(it.clave) ? "sys" : (combate ? "imp" : "msg"), texto: it.texto });
+          S.log.push({ t: it.clave === "contrato_nuevo" ? "nuevo" : CLAVES_SISTEMA.test(it.clave) ? "sys" : (combate ? "imp" : "msg"), texto: it.texto });
           if (it.texto.indexOf("Fin de la partida") < 0) textosFinal.push(it.texto);
+          break;
+        case "objetivo":
+          if (silencioso) break;
+          S.log.push({ t: "objetivo", texto: it.texto });
           break;
         case "aviso_comida":
           S.log.push({ t: "aviso", texto: it.texto });
@@ -305,16 +309,22 @@
       '<path vector-effect="non-scaling-stroke" d="' + lineas + '"/></svg>' + nodos + "</div>";
   }
 
+  // El objetivo actual (lo calcula el servidor con las reglas del juego). Tolera un servidor viejo sin `objetivo`.
+  function bloqueObjetivo() {
+    var o = S.estado && S.estado.objetivo;
+    return o && o.texto ? '<p class="objetivo-actual"><b>➤</b> ' + esc(o.texto) + "</p>" : "";
+  }
+
   function panelContratos() {
     var cs = S.estado.contratos;
-    return '<p class="panel-kicker">TABLÓN DE CONTRATOS</p><h3>Asuntos pendientes</h3>' +
+    return '<p class="panel-kicker">TABLÓN DE CONTRATOS</p><h3>Asuntos pendientes</h3>' + bloqueObjetivo() +
       (cs.length ? cs.map(filaContrato).join("") : '<p class="tree-vacio">No hay contratos a la vista.</p>');
   }
 
   function panelZona() {
     var e = S.estado;
     return '<p class="panel-kicker">UBICACIÓN ACTUAL</p><h3>' + esc(e.zona.nombre) + "</h3>" + grafoZonas() +
-      '<dl class="zone-facts"><div><dt>Jornada</dt><dd>Día ' + e.dia + "</dd></div>" +
+      bloqueObjetivo() + '<dl class="zone-facts"><div><dt>Jornada</dt><dd>Día ' + e.dia + "</dd></div>" +
       "<div><dt>Salidas</dt><dd>" + (e.zona.salidas.map(function (s) { return esc(s.nombre); }).join(" · ") || "Ninguna") + "</dd></div></dl>";
   }
 
@@ -613,6 +623,8 @@
   function entradaLog(e) {
     switch (e.t) {
       case "aviso": return '<div class="narration-line aviso-comida"><span class="line-mark">⚠</span><p>' + esc(e.texto) + "</p></div>";
+      case "objetivo": return '<div class="narration-line objetivo"><span class="line-mark">➤</span><p>' + esc(e.texto) + "</p></div>";
+      case "nuevo": return '<div class="narration-line objetivo nuevo"><span class="line-mark">★</span><p>' + esc(e.texto) + "</p></div>";
       case "dia": return '<div class="day-divider"><span>DÍA ' + e.dia + "</span></div>";
       case "cmd": return '<div class="command-line"><span>&gt;</span> ' + esc(e.texto) + "</div>";
       case "sys": return '<div class="narration-line system"><span class="line-mark">◆</span><p>' + esc(e.texto) + "</p></div>";

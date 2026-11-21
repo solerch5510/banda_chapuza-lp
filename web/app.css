@@ -89,6 +89,10 @@ body[data-tema="light"] { background: #f8edcd; }
 .header-stats .comida.hambre_mortal small, .header-stats .comida.sin_queso small, .header-stats .comida.escaso small { color: inherit; }
 .narration-line.aviso-comida { border-left: 3px solid var(--no); background: color-mix(in srgb, var(--no) 8%, transparent); padding-left: 8px; }
 .narration-line.aviso-comida .line-mark { color: var(--no); }
+.narration-line.objetivo { border-left: 3px solid var(--cheddar); background: color-mix(in srgb, var(--cheddar) 9%, transparent); padding-left: 8px; }
+.narration-line.objetivo .line-mark { color: var(--cheddar); }
+.narration-line.objetivo.nuevo { font-weight: 600; }
+.objetivo-actual { margin: 0 0 10px; padding: 8px 10px; border-left: 3px solid var(--cheddar); background: color-mix(in srgb, var(--cheddar) 9%, transparent); font-size: 14px; line-height: 1.4; }
 
 /* La ficha de un personaje */
 .member-card.clicable { cursor: pointer; }

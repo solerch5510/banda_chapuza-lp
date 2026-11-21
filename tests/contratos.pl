@@ -584,7 +584,7 @@ test(el_tablon_no_vale_en_combate) :-
 
 test(aceptar_las_ratas, [setup(nueva_partida)]) :-
     ordena(aceptar(ratas_del_granero), Items),
-    Items == [msg(acepta, [ratas_del_granero], 0)],
+    Items = [msg(acepta, [ratas_del_granero], 0)|_],          % y, detras, el aviso de que el objetivo cambia
     estado:contrato_activo(ratas_del_granero).
 
 test(aceptar_dos_contratos, [setup(nueva_partida)]) :-
@@ -606,7 +606,7 @@ test(aceptar_la_gallina_sin_venda_es_un_error, [setup(nueva_partida)]) :-
 test(aceptar_la_gallina_con_la_venda_en_la_taberna, [setup(nueva_partida)]) :-
     aplicar_efecto(equipar(baldomero, venda_de_caballos)),
     ordena(aceptar(gallina_noble), Items),
-    Items == [msg(acepta, [gallina_noble], 0)].
+    Items = [msg(acepta, [gallina_noble], 0)|_].
 
 test(aceptar_la_despensa_real_al_empezar_es_un_error, [setup(nueva_partida)]) :-
     ordena(aceptar(despensa_real), Items),
@@ -653,7 +653,7 @@ test(el_limite_de_tres_se_aplica_al_aceptar) :-
     assertz(estado:contrato_activo(a)),
     assertz(estado:contrato_activo(b)),
     ordena(aceptar(despensa_real), I1),
-    I1 == [msg(acepta, [despensa_real], 0)],
+    I1 = [msg(acepta, [despensa_real], 0)|_],
     estado:contrato_activo(despensa_real),                % ya hay tres activos
     ordena(aceptar(gato_en_el_arbol), I2),
     I2 == [error(no_puede_aceptar(gato_en_el_arbol))].
