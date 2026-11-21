@@ -104,6 +104,23 @@ test(ninguna_opcion_da_mas_de_dos_quesos_netos) :-
                findall(P, member(perder_queso(P), Efs), Ps), sumlist(Ps, Perdido),
                Neto is Ganado - Perdido, assertion(Neto =< 2) )).
 
+test(el_hilo_son_seis_piezas_y_todas_estan_en_el_diario) :-
+    charlas:hilo(Ps), length(Ps, N), assertion(N == 6),
+    forall(member(P, Ps), assertion(charlas:saber(P))).
+
+test(cada_pieza_del_hilo_se_puede_averiguar_con_alguien_que_esta_alguna_vez) :-
+    charlas:hilo(Ps),
+    forall(member(P, Ps),
+           assertion(( charlas:opcion_charla(Escena, _, _, _, Efs), memberchk(saber(P), Efs),
+                       charlas:escena_de(Npc, Escena), charlas:presente(Npc, _, _, _) ))).
+
+test(las_piezas_del_hilo_se_pueden_conseguir_a_partir_del_dia_seis) :-
+    % todas las escenas que dan una pieza tienen a su personaje presente el dia 6
+    charlas:hilo(Ps),
+    forall(member(P, Ps),
+           assertion(( charlas:opcion_charla(Escena, _, _, _, Efs), memberchk(saber(P), Efs),
+                       charlas:escena_de(Npc, Escena), charlas:presente(Npc, _, D, H), D =< 6, H >= 6 ))).
+
 test(el_total_de_queso_de_todas_las_charlas_no_pasa_de_ocho) :-
     % la regla de oro del balance (docs/12 §4): hablar no arregla la economia
     findall(Mejor,
@@ -126,16 +143,39 @@ test(en_la_taberna_los_primeros_dias_hay_dos) :-
 
 test(pasado_el_dia_cinco_se_va_el_viajante) :-
     en(taberna, 5), charlas:presentes(P5), assertion(memberchk(gruyere, P5)),
-    en(taberna, 6), charlas:presentes(P6), assertion(P6 == [mantecosa]).
+    en(taberna, 6), charlas:presentes(P6), assertion(P6 == [mantecosa, inspectora_cuajaron]).
 
 test(en_la_aldea_se_va_el_tendero_el_dia_seis) :-
     en(aldea, 3), charlas:presentes(A), assertion(A == [alcaldesa_nata, ricota]),
-    en(aldea, 6), charlas:presentes(B), assertion(B == [alcaldesa_nata]).
+    en(aldea, 6), charlas:presentes(B), assertion(B == [alcaldesa_nata, eustaquio]).
 
-test(cada_zona_tiene_alguien_con_quien_hablar_cualquier_dia) :-
-    forall(( mundo:zona(Z, _), Z \== taberna ; Z == taberna ),
-           forall(member(Dia, [1, 3, 5, 6, 9, 12]),
-                  (   en(Z, Dia), charlas:presentes(Ps), assertion(Ps \== []) ))).
+test(cada_zona_tiene_al_menos_dos_personajes_cualquier_dia) :-
+    % la peticion del autor: dos o mas por lugar, y no siempre los mismos
+    forall(mundo:zona(Z, _),
+           forall(member(Dia, [1, 3, 5, 6, 9, 12, 30]),
+                  (   en(Z, Dia), charlas:presentes(Ps), length(Ps, N), assertion(N >= 2) ))).
+
+test(el_grupo_de_los_primeros_dias_y_el_de_despues_no_coinciden_salvo_el_fijo) :-
+    forall(mundo:zona(Z, _),
+           (   en(Z, 1), charlas:presentes(A), en(Z, 6), charlas:presentes(B),
+               intersection(A, B, Comunes), length(Comunes, N), assertion(N == 1),
+               assertion(A \== B) )).
+
+test(el_reparto_es_el_acordado_con_el_autor) :-
+    % cada personaje, su zona y sus dias (docs/12-npcs.md §5): si se cambia uno, esta prueba obliga a decirlo
+    forall(member(Npc-Zona-Desde-Hasta,
+                  [mantecosa-taberna-1-99, gruyere-taberna-1-5, inspectora_cuajaron-taberna-6-99,
+                   alcaldesa_nata-aldea-1-99, ricota-aldea-1-5, eustaquio-aldea-6-99,
+                   penicilio-bosque-1-99, seta_chismosa-bosque-1-5, aldeano_perdido-bosque-6-99,
+                   ganso_recaudador-camino_real-1-99, capitan_pecorino-camino_real-1-5, bandido_arrepentido-camino_real-6-99,
+                   rey_brieto-castillo-1-99, lord_tapanarices-castillo-1-5, reina_viuda-castillo-6-99,
+                   el_eco-cuevas-1-99, rata_exiliada-cuevas-1-5, murcielago_azul-cuevas-6-99]),
+           assertion(charlas:presente(Npc, Zona, Desde, Hasta))).
+
+test(hay_dieciocho_personajes_con_escena_seis_fijos_y_doce_que_rotan) :-
+    findall(Npc, charlas:personaje_de_charla(Npc), L), length(L, N), assertion(N == 18),
+    findall(Npc, ( charlas:presente(Npc, _, 1, 99) ), Fijos), length(Fijos, NF), assertion(NF == 6),
+    findall(Npc, ( charlas:presente(Npc, _, D, H), \+ ( D == 1, H == 99 ) ), Rotan), length(Rotan, NR), assertion(NR == 12).
 
 test(en_otra_zona_no_se_puede_hablar_con_alguien_que_esta_en_la_taberna) :-
     en(aldea, 1), assertion(\+ charlas:puede_hablar(mantecosa)).
@@ -261,9 +301,9 @@ test(las_opciones_que_solo_dan_informacion_no_tocan_el_queso) :-
                economia:queso_total(Q1), assertion(Q0 == Q1) )).
 
 test(cada_opcion_se_puede_elegir_y_deja_la_charla_hecha) :-
-    forall(( charlas:presente(Npc, Zona, _, _), charlas:escena_de(Npc, Escena),
+    forall(( charlas:presente(Npc, Zona, Desde, _), charlas:escena_de(Npc, Escena),
              charlas:opcion_charla(Escena, Op, _, _, _) ),
-           (   en(Zona, 1), con_queso(6),
+           (   en(Zona, Desde), con_queso(6),
                orden(hablar(Npc), _), orden(elegir(Op), Items),
                assertion(\+ memberchk(error(_), Items)),
                assertion(estado:marca(charla_hecha(Npc))) )).
@@ -371,6 +411,47 @@ test(una_partida_nueva_olvida_el_diario_y_las_charlas) :-
     nueva_partida,
     assertion(\+ charlas:sabe(moho_en_la_despensa)), assertion(\+ charlas:charla_hecha(mantecosa)).
 
+test(sin_las_seis_piezas_el_diario_no_cierra_la_historia) :-
+    nueva_partida, estado:aplicar_efectos([marcar(sabe(moho_en_la_despensa)), marcar(sabe(moho_con_hambre))]),
+    assertion(\+ charlas:hilo_completo),
+    orden(diario, Is), with_output_to(atom(T), ui:mostrar(resultado(Is))),
+    assertion(\+ contiene(T, 'Última página')).
+
+test(con_cinco_de_las_seis_tampoco) :-
+    nueva_partida, charlas:hilo(Ps), Ps = [_|Cinco],
+    forall(member(P, Cinco), estado:aplicar_efectos([marcar(sabe(P))])),
+    assertion(\+ charlas:hilo_completo).
+
+test(con_las_seis_el_diario_cuenta_la_historia_del_principe) :-
+    nueva_partida, charlas:hilo(Ps),
+    forall(member(P, Ps), estado:aplicar_efectos([marcar(sabe(P))])),
+    assertion(charlas:hilo_completo),
+    orden(diario, Is), with_output_to(atom(T), ui:mostrar(resultado(Is))),
+    assertion(contiene(T, 'Última página del diario')), assertion(contiene(T, 'príncipe Roque de Fort')),
+    assertion(contiene(T, 'nadie fue a buscar')).
+
+test(la_api_dice_si_el_hilo_esta_completo) :-
+    nueva_partida, api:ejecutar_orden(diario, R0), campo(R0, items, I0), member(D0, I0), campo(D0, tipo, diario), !,
+    campo(D0, completo, C0), campo(D0, cierre, Z0), assertion(C0 == @(false)), assertion(Z0 == @(null)),
+    charlas:hilo(Ps), forall(member(P, Ps), estado:aplicar_efectos([marcar(sabe(P))])),
+    api:ejecutar_orden(diario, R1), campo(R1, items, I1), member(D1, I1), campo(D1, tipo, diario), !,
+    campo(D1, completo, C1), campo(D1, cierre, Z1), assertion(C1 == @(true)), assertion(contiene(Z1, 'Última página')).
+
+test(se_puede_completar_el_hilo_hablando_de_verdad) :-
+    % la historia entera, jugada con los comandos: seis personajes, cada uno en su zona y su dia
+    nueva_partida, con_queso(12),
+    forall(member(Zona-Dia-Npc-Op, [taberna-6-mantecosa-invitar_al_caldo,
+                                    bosque-6-penicilio-hablar_con_el_moho,
+                                    aldea-6-eustaquio-escuchar_la_historia_entera,
+                                    cuevas-6-el_eco-susurrar_una_pregunta,
+                                    taberna-6-inspectora_cuajaron-ojear_el_maletin,
+                                    castillo-6-rey_brieto-preguntar_por_la_despensa]),
+           (   retractall(estado:en_zona(_)), assertz(estado:en_zona(Zona)),
+               retractall(estado:dia(_)), assertz(estado:dia(Dia)),
+               orden(hablar(Npc), _), orden(elegir(Op), Items),
+               assertion(\+ memberchk(error(_), Items)) )),
+    assertion(charlas:hilo_completo).
+
 :- end_tests(el_diario).
 
 :- begin_tests(consola_api_y_web).
@@ -449,6 +530,7 @@ test(la_web_sabe_pintar_a_la_gente_las_charlas_y_el_diario) :-
     assertion(contiene(J, 'case "presentes": return presentesHTML(e);')),
     assertion(contiene(J, 'case "charla": return charlaHTML(e);')),
     assertion(contiene(J, 'case "diario": return diarioHTML(e);')),
+    assertion(contiene(J, 'e.completo && e.cierre')), assertion(contiene(J, 'diario-cierre')),
     assertion(contiene(J, 'hablar: "Hablar"')), assertion(contiene(J, 'diario: "Diario"')).
 
 :- end_tests(consola_api_y_web).

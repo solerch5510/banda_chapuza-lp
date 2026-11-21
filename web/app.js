@@ -605,7 +605,8 @@
   function diarioHTML(e) {
     if (!e.saberes.length) return '<div class="narration-line system"><span class="line-mark">◆</span><p>El diario está en blanco: todavía no sabéis nada del Gran Rancio. Hablad con la gente.</p></div>';
     return '<section class="event-choice diario"><p class="panel-kicker">DIARIO DE LA BANDA</p><h2>Lo que sabéis del Gran Rancio</h2><ul>' +
-      e.saberes.map(function (s) { return "<li>" + esc(s.texto) + "</li>"; }).join("") + "</ul></section>";
+      e.saberes.map(function (s) { return "<li>" + esc(s.texto) + "</li>"; }).join("") + "</ul>" +
+      (e.completo && e.cierre ? '<p class="diario-cierre">' + esc(e.cierre) + "</p>" : "") + "</section>";
   }
 
   // La despensa completa (PantryFull del diseno).

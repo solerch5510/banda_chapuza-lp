@@ -11,10 +11,11 @@
 % Estado: la marca charla_abierta(Npc) mientras esta a medias, charla_hecha(Npc) al resolverla y sabe(Marca)
 % por cada fragmento averiguado.
 
-:- module(charlas, [presente/4, escena_de/2, opcion_charla/5, saber/1, personaje_de_charla/1,
+:- module(charlas, [presente/4, escena_de/2, opcion_charla/5, saber/1, personaje_de_charla/1, hilo/1, hilo_completo/0,
                     presentes/1, puede_hablar/1, charla_abierta/1, charla_hecha/1,
                     opciones_de/2, puede_elegir/2, resolver_opcion/3,
                     efectos_apertura/2, efectos_eleccion/3, saberes/1, sabe/1]).
+:- discontiguous presente/4, escena_de/2, opcion_charla/5.
 :- use_module(mundo).
 :- use_module(estado).
 :- use_module(compania).
@@ -81,7 +82,7 @@ opcion_charla(la_oferta, cantar_el_anuncio, rufino,
               [objeto(pocion)]).
 opcion_charla(la_oferta, regatear, tuerca,
               [en_pie(tuerca)],
-              [ganar_queso(2), moral(tuerca, -1)]).
+              [ganar_queso(1), moral(tuerca, -1)]).
 opcion_charla(la_oferta, preguntar_por_los_precios, pimentina,
               [en_pie(pimentina)],
               [moral(pimentina, 1)]).
@@ -126,14 +127,152 @@ opcion_charla(lo_que_repites, susurrar_una_pregunta, tuerca,
               [en_pie(tuerca)],
               [saber(el_eco_habla_solo)]).
 
-% saber(Marca): los fragmentos de historia, en el orden en que los ensena el diario.
+% --- el segundo lote: los diez personajes de los grupos A y B (docs/12-npcs.md) ---
+% Grupo A (dias 1 a 5) y grupo B (del 6 en adelante): en cada zona, uno fijo y uno que rota.
+presente(inspectora_cuajaron, taberna,     6, 99).
+presente(eustaquio,           aldea,       6, 99).
+presente(seta_chismosa,       bosque,      1,  5).
+presente(aldeano_perdido,     bosque,      6, 99).
+presente(capitan_pecorino,    camino_real, 1,  5).
+presente(bandido_arrepentido, camino_real, 6, 99).
+presente(lord_tapanarices,    castillo,    1,  5).
+presente(reina_viuda,         castillo,    6, 99).
+presente(rata_exiliada,       cuevas,      1,  5).
+presente(murcielago_azul,     cuevas,      6, 99).
+
+escena_de(inspectora_cuajaron, la_auditoria).
+escena_de(eustaquio,           la_cena).
+escena_de(seta_chismosa,       el_cotilleo).
+escena_de(aldeano_perdido,     el_camino).
+escena_de(capitan_pecorino,    el_sermon).
+escena_de(bandido_arrepentido, la_confesion).
+escena_de(lord_tapanarices,    la_nariz).
+escena_de(reina_viuda,         el_pesame).
+escena_de(rata_exiliada,       la_guia).
+escena_de(murcielago_azul,     los_chillidos).
+
+opcion_charla(la_auditoria, firmar_sin_leer, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, -1)]).
+opcion_charla(la_auditoria, pagar_la_tasa, pimentina,
+              [en_pie(pimentina), queso_min(1)],
+              [perder_queso(1), saber(gremio_oculta)]).
+opcion_charla(la_auditoria, ojear_el_maletin, tuerca,
+              [en_pie(tuerca)],
+              [saber(gremio_oculta), moral(tuerca, -1)]).
+
+opcion_charla(la_cena, escuchar_la_historia_entera, rufino,
+              [en_pie(rufino)],
+              [moral(grupo, 1), saber(principe_madura)]).
+opcion_charla(la_cena, exigir_que_se_vaya, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, -1)]).
+opcion_charla(la_cena, ofrecerle_una_cena, pimentina,
+              [en_pie(pimentina), queso_min(1)],
+              [perder_queso(1), saber(principe_madura)]).
+
+opcion_charla(el_cotilleo, preguntar_por_si_mismo, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, -1)]).
+opcion_charla(el_cotilleo, pedir_una_critica_de_baladas, rufino,
+              [en_pie(rufino)],
+              [moral(rufino, 1)]).
+opcion_charla(el_cotilleo, preguntar_por_el_queso_escondido, tuerca,
+              [en_pie(tuerca)],
+              [ganar_queso(1)]).
+
+opcion_charla(el_camino, acompanarle_a_casa, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, 1)]).
+opcion_charla(el_camino, darle_de_comer, pimentina,
+              [en_pie(pimentina), queso_min(1)],
+              [perder_queso(1), objeto(pocion)]).
+opcion_charla(el_camino, seguirle_por_un_atajo, tuerca,
+              [en_pie(tuerca)],
+              [moral(tuerca, -1)]).
+
+opcion_charla(el_sermon, saludar_con_firmeza, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, 1)]).
+opcion_charla(el_sermon, ofrecerle_una_marcha, rufino,
+              [en_pie(rufino)],
+              [moral(rufino, 1)]).
+opcion_charla(el_sermon, preguntar_por_su_ronda, pimentina,
+              [en_pie(pimentina)],
+              [saber(pecorino_celoso)]).
+
+opcion_charla(la_confesion, perdonarle_en_nombre_del_honor, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, 1)]).
+opcion_charla(la_confesion, aceptar_el_queso_robado, tuerca,
+              [en_pie(tuerca)],
+              [ganar_queso(1)]).
+opcion_charla(la_confesion, escribirle_una_balada_de_perdon, rufino,
+              [en_pie(rufino)],
+              [moral(grupo, 1)]).
+
+opcion_charla(la_nariz, prestarle_un_panuelo, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, 1)]).
+opcion_charla(la_nariz, cantar_para_distraer_la_nariz, rufino,
+              [en_pie(rufino)],
+              [moral(rufino, 1)]).
+opcion_charla(la_nariz, venderle_aire_perfumado, tuerca,
+              [en_pie(tuerca)],
+              [moral(tuerca, 1)]).
+
+opcion_charla(el_pesame, hacer_la_reverencia_de_luto, baldomero,
+              [en_pie(baldomero)],
+              [moral(grupo, 1)]).
+opcion_charla(el_pesame, preguntar_por_su_hijo, pimentina,
+              [en_pie(pimentina)],
+              [saber(brieto_firmo)]).
+opcion_charla(el_pesame, cantar_una_nana, rufino,
+              [en_pie(rufino)],
+              [moral(rufino, 1)]).
+
+opcion_charla(la_guia, disculparse_por_el_granero, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, 1)]).
+opcion_charla(la_guia, compartir_un_queso, pimentina,
+              [en_pie(pimentina), queso_min(1)],
+              [perder_queso(1), moral(grupo, 1)]).
+opcion_charla(la_guia, preguntarle_por_las_cuevas, tuerca,
+              [en_pie(tuerca)],
+              [saber(ratas_huyen_de_abajo)]).
+
+opcion_charla(los_chillidos, escuchar_los_chillidos, rufino,
+              [en_pie(rufino)],
+              [saber(sumiller_del_principe)]).
+opcion_charla(los_chillidos, espantarlo_con_la_espada, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, -1)]).
+opcion_charla(los_chillidos, ofrecerle_queso_azul, pimentina,
+              [en_pie(pimentina), queso_min(1)],
+              [perder_queso(1), moral(pimentina, 1)]).
+
+% saber(Marca): los fragmentos de historia, en el orden en que los ensena el diario: primero las seis piezas
+% del hilo del Gran Rancio y despues los de ambientacion.
 saber(moho_en_la_despensa).
 saber(moho_con_hambre).
-saber(brieto_firmo).
+saber(principe_madura).
 saber(el_eco_habla_solo).
+saber(gremio_oculta).
+saber(brieto_firmo).
 saber(gremio_sin_peaje).
 saber(vacas_azules).
 saber(bandidos_a_caballo).
+saber(pecorino_celoso).
+saber(ratas_huyen_de_abajo).
+saber(sumiller_del_principe).
+
+% hilo(Marcas): las seis piezas con las que se entiende al Gran Roquefort. Con las seis, el diario cuenta la historia.
+hilo([moho_en_la_despensa, moho_con_hambre, principe_madura, el_eco_habla_solo, gremio_oculta, brieto_firmo]).
+
+% hilo_completo: ya se saben las seis piezas.
+hilo_completo :-
+    hilo(Marcas),
+    \+ ( member(M, Marcas), \+ sabe(M) ).
 
 % personaje_de_charla(?Npc): los que tienen escena.
 personaje_de_charla(Npc) :-

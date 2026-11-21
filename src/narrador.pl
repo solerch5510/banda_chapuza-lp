@@ -148,7 +148,7 @@ frase(suceso(charla_abre(ricota)), ambos,
 frase(suceso(charla_elige(ricota, cantar_el_anuncio)), ambos,
       'Rufino compone «Oferta eterna» en tres minutos. Ricota, emocionado, le paga con una poción «de muestra»: el primer pago por música de la historia de la aldea.').
 frase(suceso(charla_elige(ricota, regatear)), ambos,
-      'Tuerca regatea tan bien que Ricota le da dos quesos para que se vaya. Pero ahora lo miran mal en la aldea y Tuerca pierde ánimo.').
+      'Tuerca regatea tan bien que Ricota le da un queso para que se vaya. Pero ahora lo miran mal en la aldea y Tuerca pierde ánimo.').
 frase(suceso(charla_elige(ricota, preguntar_por_los_precios)), ambos,
       'Pimentina anota los precios con interés profesional. No saca nada, pero se siente muy informada y de buen humor.').
 
@@ -203,6 +203,113 @@ frase(suceso(saber_nuevo(vacas_azules)), ambos,
       'Diario: en la aldea la leche sale con vetas azules desde que empezó el moho.').
 frase(suceso(saber_nuevo(bandidos_a_caballo)), ambos,
       'Diario: en el Camino Real hay bandidos a caballo, y a Baldomero los caballos le dan pavor.').
+
+% --- el segundo lote de charlas: los diez personajes de los grupos A y B ---
+frase(suceso(charla_abre(capitan_pecorino)), ambos,
+      'El capitán Pecorino Duro os corta el paso con una armadura tan pulida que se ve a sí mismo y no le gusta. «Mercenarios. Sois como la humedad: nadie os quiere, pero siempre estáis. Un consejo gratis, que no cobro: si os topáis con un jinete, no corráis. Los caballos huelen el miedo. Y el queso».').
+frase(suceso(charla_elige(capitan_pecorino, saludar_con_firmeza)), ambos,
+      'Baldomero se cuadra con un taconazo que levanta polvo. Pecorino asiente, a regañadientes: «Al menos este sabe saludar». Baldomero se siente, por un momento, de la guardia real.').
+frase(suceso(charla_elige(capitan_pecorino, ofrecerle_una_marcha)), ambos,
+      'Rufino toca una marcha militar con el laúd. Pecorino aguanta tres compases con la barbilla en alto y al cuarto empieza a marcar el paso sin darse cuenta. Rufino sale convencido de su talento.').
+frase(suceso(charla_elige(capitan_pecorino, preguntar_por_su_ronda)), ambos,
+      'Pimentina pregunta por su ronda con interés sincero. Pecorino se desahoga: lleva meses esperando que el rey lo contrate a él y no a «gente de saldo». Se arrepiente a medias y se aleja marcando el paso.').
+
+frase(suceso(charla_abre(seta_chismosa)), ambos,
+      'Una seta del tamaño de una silla se inclina hacia vosotros y baja la voz, que en una seta es subir el volumen. «Psst. Yo lo sé todo de todos. De vosotros, por ejemplo, sé más de lo que me conviene. ¿Qué queréis saber?» Y se relame, que en una seta es ensancharse.').
+frase(suceso(charla_elige(seta_chismosa, preguntar_por_si_mismo)), ambos,
+      'La seta no se corta: «Dicen que teme a los caballos y que duerme con la armadura puesta». Baldomero se queda mudo, que es su forma de reconocerlo, y su ánimo baja.').
+frase(suceso(charla_elige(seta_chismosa, pedir_una_critica_de_baladas)), ambos,
+      'La seta se lo piensa un buen rato: «Las he oído desde el bosque. Los hongos aplauden». Rufino no sabe si es un cumplido, pero lo toma como tal y se anima.').
+frase(suceso(charla_elige(seta_chismosa, preguntar_por_el_queso_escondido)), ambos,
+      'La seta lo señala con el sombrero: «Bajo la tercera raíz». Tuerca escarba y encuentra un queso olvidado por alguien con peor memoria que él.').
+
+frase(suceso(charla_abre(aldeano_perdido)), ambos,
+      'Un aldeano con barba de tres días y cara de seis os mira con alivio. «¡Gente! Salí a buscar setas y llevo tres días buscando la salida. El bosque se ha movido. Estoy casi seguro de que se ha movido».').
+frase(suceso(charla_elige(aldeano_perdido, acompanarle_a_casa)), ambos,
+      'Baldomero lo lleva a su aldea con paso firme y el aldeano le da las gracias llorando. El honor de un caballero se mide en barbas rescatadas, y Baldomero se siente rico.').
+frase(suceso(charla_elige(aldeano_perdido, darle_de_comer)), ambos,
+      'Pimentina le da un queso y el aldeano, agradecido, rebusca en su zurrón y le regala una poción de su abuela. Dice que sabe a abuela y que cura casi todo. Pimentina decide no preguntar el «casi».').
+frase(suceso(charla_elige(aldeano_perdido, seguirle_por_un_atajo)), ambos,
+      'El atajo da la vuelta al mismo árbol cuatro veces. Tuerca vuelve cansado y de mal humor, con la sensación de haber pagado por algo que era gratis: perderse.').
+
+frase(suceso(charla_abre(lord_tapanarices)), ambos,
+      'Lord Tapanarices pasea por el patio con una pinza en la nariz y un pañuelo perfumado en cada mano. «Disculpad que no os dé la mano: la necesito para respirar. Esto no era así. Antes olíamos a nata y a poder. Ahora olemos a... decisiones».').
+frase(suceso(charla_elige(lord_tapanarices, prestarle_un_panuelo)), ambos,
+      'Baldomero le da su pañuelo, que el lord acepta como quien acepta un título. Se despide con una reverencia y Baldomero se siente un poco menos plebeyo.').
+frase(suceso(charla_elige(lord_tapanarices, cantar_para_distraer_la_nariz)), ambos,
+      'Rufino canta una balada sobre flores. El lord llora un poco y aplaude con el pañuelo. Es el mejor público que ha tenido Rufino desde que cantó para un fantasma.').
+frase(suceso(charla_elige(lord_tapanarices, venderle_aire_perfumado)), ambos,
+      'Tuerca llena un frasco con el aire del patio y lo vende como «Brisa de Alcoba Real». El lord lo paga con elogios: «¡Qué bouquet!». Tuerca no cobra nada, pero se siente un artista del comercio, que es mejor que cobrar.').
+
+frase(suceso(charla_abre(reina_viuda)), ambos,
+      'La reina viuda Nata Doble os recibe en una sala llena de retratos de su hijo, todos con la misma cara de «¿dónde firmo?». «Mi Brieto era un niño encantador. Firmaba todo lo que le ponían delante. Todo. Con letra preciosa. Y sin leer ni una línea».').
+frase(suceso(charla_elige(reina_viuda, hacer_la_reverencia_de_luto)), ambos,
+      'Baldomero se inclina con tanto sentimiento que la reina viuda lo confunde con un pariente lejano y le pellizca una mejilla. La Banda sale con la moral alta y el pómulo de Baldomero, no tanto.').
+frase(suceso(charla_elige(reina_viuda, preguntar_por_su_hijo)), ambos,
+      'La reina viuda suspira: su hijo firmó el permiso de las cuevas porque ponía «afinar» y sonaba bien. Lo cuenta como quien cuenta una travesura, sin imaginar que es una catástrofe.').
+frase(suceso(charla_elige(reina_viuda, cantar_una_nana)), ambos,
+      'La reina viuda cierra los ojos y sonríe: lleva años sin que nadie le cante. Rufino sale con la garganta caliente y el ánimo alto.').
+
+frase(suceso(charla_abre(rata_exiliada)), ambos,
+      'Una rata de pelaje gris, con una gorra de guía de cuevas, os saluda desde una roca. «¿Venís a matarme? Ya me mataron media familia en el granero. Yo escapé: por listo. Y ahora, por no tener otro oficio, enseño las cuevas. Gratis, que las propinas me dan un poco de vergüenza».').
+frase(suceso(charla_elige(rata_exiliada, disculparse_por_el_granero)), ambos,
+      'Baldomero se disculpa con la mano en el pecho y la rata asiente con dignidad: «Cosas del oficio». Baldomero se siente más noble y un poquito culpable, que es lo mismo.').
+frase(suceso(charla_elige(rata_exiliada, compartir_un_queso)), ambos,
+      'La rata come con delicadeza, mirando a Pimentina con respeto: «Hay quien nos echa. Hay quien nos da de comer. Os recordaré». Todos salen con la sensación de haber hecho algo bueno por casi nada.').
+frase(suceso(charla_elige(rata_exiliada, preguntarle_por_las_cuevas)), ambos,
+      'La rata se pone seria: «Nos fuimos del fondo porque allí abajo ya no queda nada de comer. Lo que hay, tiene hambre». Y se pone a limpiarse los bigotes para no pensarlo.').
+
+frase(suceso(charla_abre(murcielago_azul)), ambos,
+      'Un murciélago azul, colgado boca abajo, os mira con un ojo, luego con el otro, luego con ambos. Chilla algo agudo y largo. Por el tono, no parece insultar. Por la duración, parece que cuenta una historia.').
+frase(suceso(charla_elige(murcielago_azul, escuchar_los_chillidos)), ambos,
+      'Rufino, que sabe de agudos, traduce: el murciélago fue sumiller del príncipe Roque y catalogaba sus quesos por el olor. Hoy no queda nada que catalogar, salvo al propio príncipe.').
+frase(suceso(charla_elige(murcielago_azul, espantarlo_con_la_espada)), ambos,
+      'Baldomero agita la espada y el murciélago cambia de rama con gran calma. Baldomero guarda la espada con la sensación de haber perdido una discusión con alguien que no habla.').
+frase(suceso(charla_elige(murcielago_azul, ofrecerle_queso_azul)), ambos,
+      'El murciélago lo huele, lo mira, lo desprecia con elegancia y se lo come entero. Pimentina se siente juzgada por un murciélago y, curiosamente, mejor persona.').
+
+frase(suceso(charla_abre(eustaquio)), ambos,
+      'Un mayordomo translúcido se endereza la corbata inexistente. «Sirvo al príncipe Roque de Fort desde antes de que él supiera pronunciarlo. Un día me dijo: "Eustaquio, voy a madurar un poco". Eso fue hace trescientos años. Mi cena sigue sin llegar. ¿Querrían escuchar la historia completa? Dura tres días. Les haré una versión de tres minutos».').
+frase(suceso(charla_elige(eustaquio, escuchar_la_historia_entera)), ambos,
+      'Rufino escucha, toma notas y compone «La cena del príncipe» de un trago. El fantasma se emociona y cuenta cómo el príncipe se retiró a las cuevas a «madurar» y dijo que volvería cuando estuviera en su punto. La Banda sale conmovida.').
+frase(suceso(charla_elige(eustaquio, exigir_que_se_vaya)), ambos,
+      'Baldomero exige con voz de espada. Eustaquio se ofende tanto que se vuelve casi transparente del todo y se calla. No hay historia: solo un mayordomo muy digno que ya no habla con vosotros.').
+frase(suceso(charla_elige(eustaquio, ofrecerle_una_cena)), ambos,
+      'Pimentina le sirve un plato imaginario con un queso de verdad al lado. El fantasma llora de gratitud sobre el plato y confiesa lo del príncipe: se fue a «madurar» y no volvió.').
+
+frase(suceso(charla_abre(inspectora_cuajaron)), ambos,
+      'Una mujer de gafas redondas y maletín cuadrado revisa la taberna con un bolígrafo. «Inspectora Cuajarón, del Gremio de Afinadores. Una auditoría rutinaria. Rutinaria, quiero decir, para mí. Para ustedes, no sé: depende de lo que encuentre».').
+frase(suceso(charla_elige(inspectora_cuajaron, firmar_sin_leer)), ambos,
+      'Baldomero firma con letra de caballero y la inspectora sonríe como quien suma. Más tarde descubrirá que ha firmado una multa. El honor, a veces, se paga en quesos que aún no tiene.').
+frase(suceso(charla_elige(inspectora_cuajaron, pagar_la_tasa)), ambos,
+      'Pimentina paga y la inspectora, de mejor humor, deja escapar un comentario: el Gremio sabe de lo que pasa en las cuevas desde hace años, pero ha preferido callar para que no se hunda el precio del queso.').
+frase(suceso(charla_elige(inspectora_cuajaron, ojear_el_maletin)), ambos,
+      'Tuerca descubre un informe sobre las cuevas: «SE SABE. NO SE DICE». La inspectora lo pilla leyendo y le da un manotazo con la carpeta. Tuerca sale con el dato y el amor propio magullado.').
+
+frase(suceso(charla_abre(bandido_arrepentido)), ambos,
+      'Un bandido sin caballo, con la cara de quien no ha dormido desde el último robo, os sale al paso con las manos en alto. «No os asaltaré, lo juro. Me he vuelto honrado. Es muy aburrido, pero se duerme mejor. ¿Aceptaríais mi arrepentimiento? Es lo único que me queda».').
+frase(suceso(charla_elige(bandido_arrepentido, perdonarle_en_nombre_del_honor)), ambos,
+      'Baldomero lo perdona con una solemnidad que hace llorar al bandido. Es el primer perdón oficial de la Banda y le sienta tan bien a Baldomero que se queda un rato mirando el horizonte.').
+frase(suceso(charla_elige(bandido_arrepentido, aceptar_el_queso_robado)), ambos,
+      'El bandido devuelve un queso que robó hace semanas, un poco mohoso. Tuerca lo acepta con la profesionalidad de quien sabe dónde acaban esas cosas.').
+frase(suceso(charla_elige(bandido_arrepentido, escribirle_una_balada_de_perdon)), ambos,
+      'Rufino compone «El bandido que quiso ser bueno» en un cuarto de hora. El bandido llora, la Banda también y hasta un cuervo cercano aplaude con un ala.').
+
+% Los fragmentos nuevos del diario (los dos que cierran el hilo y tres de ambientacion).
+frase(suceso(saber_nuevo(principe_madura)), ambos,
+      'Diario: el último príncipe de Roquefort se retiró a «madurar un poco» y no ha vuelto.').
+frase(suceso(saber_nuevo(gremio_oculta)), ambos,
+      'Diario: el Gremio sabe lo de las cuevas desde hace años y lo calla para no hundir el precio del queso.').
+frase(suceso(saber_nuevo(pecorino_celoso)), ambos,
+      'Diario: el capitán Pecorino quiere que el rey lo contrate a él y no a mercenarios.').
+frase(suceso(saber_nuevo(ratas_huyen_de_abajo)), ambos,
+      'Diario: las ratas huyeron de las cuevas: allí abajo ya no queda nada de comer.').
+frase(suceso(saber_nuevo(sumiller_del_principe)), ambos,
+      'Diario: el murciélago azul fue el sumiller del príncipe Roque y lo conoce por el olor.').
+
+% La ultima pagina: cuando se saben las seis piezas del hilo, el narrador junta la historia.
+frase(suceso(diario_completo), ambos,
+      'Última página del diario: el príncipe Roque de Fort se retiró a las cuevas a «madurar»; el moho que sale de allí solo tiene hambre; el Gremio lo supo y lo calló; el rey firmó el permiso sin leerlo y su despensa se pudre. El Gran Roquefort no es un monstruo: es un príncipe al que nadie fue a buscar.').
 
 frase(suceso(botin(1)), ambos,
       'Botín: 1 queso fresco. Lo guardaba «para emergencias». Esto lo era.').
@@ -445,6 +552,16 @@ nombre(penicilio,        'el Hermano Penicilio').
 nombre(ganso_recaudador, 'el Ganso Recaudador').
 nombre(rey_brieto,       'el Rey Brieto IV').
 nombre(el_eco,           'el Eco').
+nombre(inspectora_cuajaron, 'la Inspectora Cuajarón').
+nombre(eustaquio,           'Eustaquio').
+nombre(seta_chismosa,       'la Seta Chismosa').
+nombre(aldeano_perdido,     'el Aldeano Perdido').
+nombre(capitan_pecorino,    'el Capitán Pecorino').
+nombre(bandido_arrepentido, 'el Bandido Arrepentido').
+nombre(lord_tapanarices,    'Lord Tapanarices').
+nombre(reina_viuda,         'la Reina Viuda Nata Doble').
+nombre(rata_exiliada,       'la Rata Exiliada').
+nombre(murcielago_azul,     'el Murciélago Azul').
 
 % nombre_visible(+Id, -Texto): los numeros y lo desconocido pasan tal cual.
 nombre_visible(Id, Texto) :-
@@ -751,6 +868,50 @@ descripcion_opcion_charla(rey_brieto, registrar_los_bolsillos_reales,  'Tuerca r
 descripcion_opcion_charla(el_eco, cantar_a_la_cueva,          'Rufino canta a la cueva').
 descripcion_opcion_charla(el_eco, gritarle_al_eco,            'Sir Baldomero le grita al eco').
 descripcion_opcion_charla(el_eco, susurrar_una_pregunta,      'Tuerca susurra una pregunta al eco').
+
+% (el segundo lote de descripciones, mas abajo, se declara discontiguo a proposito)
+:- discontiguous descripcion_personaje/2, descripcion_opcion_charla/3.
+descripcion_personaje(inspectora_cuajaron, 'Inspectora del Gremio de Afinadores, con gafas redondas y un maletín cuadrado.').
+descripcion_personaje(eustaquio,           'Un mayordomo fantasma que lleva trescientos años esperando su cena.').
+descripcion_personaje(seta_chismosa,       'Una seta del tamaño de una silla que lo sabe todo de todos.').
+descripcion_personaje(aldeano_perdido,     'Un aldeano que lleva tres días buscando la salida del bosque.').
+descripcion_personaje(capitan_pecorino,    'Jefe de las Lanzas Parmesanas: todo lo que dice parece un sermón.').
+descripcion_personaje(bandido_arrepentido, 'Un bandido sin caballo que se ha vuelto honrado y lo encuentra aburrido.').
+descripcion_personaje(lord_tapanarices,    'Un cortesano con una pinza en la nariz y un pañuelo perfumado en cada mano.').
+descripcion_personaje(reina_viuda,         'La reina viuda Nata Doble, madre de un rey que firmaba sin leer.').
+descripcion_personaje(rata_exiliada,       'Una rata que escapó del granero y ahora hace de guía de cuevas.').
+descripcion_personaje(murcielago_azul,     'Un murciélago azul que chilla historias largas colgado boca abajo.').
+
+descripcion_opcion_charla(inspectora_cuajaron, firmar_sin_leer,   'Sir Baldomero firma el formulario sin leerlo').
+descripcion_opcion_charla(inspectora_cuajaron, pagar_la_tasa,     'Madame Pimentina paga la tasa de inspección (cuesta 1 queso)').
+descripcion_opcion_charla(inspectora_cuajaron, ojear_el_maletin,  'Tuerca ojea el maletín de la inspectora').
+descripcion_opcion_charla(eustaquio, escuchar_la_historia_entera, 'Rufino escucha la historia entera (y la convierte en balada)').
+descripcion_opcion_charla(eustaquio, exigir_que_se_vaya,          'Sir Baldomero exige que se marche de la aldea').
+descripcion_opcion_charla(eustaquio, ofrecerle_una_cena,          'Madame Pimentina le ofrece, por fin, una cena (cuesta 1 queso)').
+descripcion_opcion_charla(seta_chismosa, preguntar_por_si_mismo,           'Sir Baldomero pregunta qué dicen de él').
+descripcion_opcion_charla(seta_chismosa, pedir_una_critica_de_baladas,     'Rufino le pide una crítica de sus baladas').
+descripcion_opcion_charla(seta_chismosa, preguntar_por_el_queso_escondido, 'Tuerca pregunta, como quien no quiere la cosa, dónde hay queso escondido').
+descripcion_opcion_charla(aldeano_perdido, acompanarle_a_casa,   'Sir Baldomero acompaña al aldeano a casa').
+descripcion_opcion_charla(aldeano_perdido, darle_de_comer,       'Madame Pimentina le da de comer (cuesta 1 queso)').
+descripcion_opcion_charla(aldeano_perdido, seguirle_por_un_atajo, 'Tuerca se ofrece a seguirlo por un atajo').
+descripcion_opcion_charla(capitan_pecorino, saludar_con_firmeza,  'Sir Baldomero saluda con firmeza').
+descripcion_opcion_charla(capitan_pecorino, ofrecerle_una_marcha, 'Rufino le ofrece una marcha militar').
+descripcion_opcion_charla(capitan_pecorino, preguntar_por_su_ronda, 'Madame Pimentina le pregunta por su ronda').
+descripcion_opcion_charla(bandido_arrepentido, perdonarle_en_nombre_del_honor, 'Sir Baldomero le perdona en nombre del honor').
+descripcion_opcion_charla(bandido_arrepentido, aceptar_el_queso_robado,        'Tuerca acepta el queso que robó el bandido').
+descripcion_opcion_charla(bandido_arrepentido, escribirle_una_balada_de_perdon, 'Rufino le escribe una balada de perdón').
+descripcion_opcion_charla(lord_tapanarices, prestarle_un_panuelo,           'Sir Baldomero le presta su pañuelo').
+descripcion_opcion_charla(lord_tapanarices, cantar_para_distraer_la_nariz,  'Rufino canta para que no piense en el olor').
+descripcion_opcion_charla(lord_tapanarices, venderle_aire_perfumado,        'Tuerca le vende un frasco de «aire perfumado»').
+descripcion_opcion_charla(reina_viuda, hacer_la_reverencia_de_luto, 'Sir Baldomero hace una reverencia de luto').
+descripcion_opcion_charla(reina_viuda, preguntar_por_su_hijo,       'Madame Pimentina le pregunta por su hijo').
+descripcion_opcion_charla(reina_viuda, cantar_una_nana,             'Rufino canta una nana a la reina viuda').
+descripcion_opcion_charla(rata_exiliada, disculparse_por_el_granero,  'Sir Baldomero se disculpa por lo del granero').
+descripcion_opcion_charla(rata_exiliada, compartir_un_queso,          'Madame Pimentina comparte un queso con ella (cuesta 1 queso)').
+descripcion_opcion_charla(rata_exiliada, preguntarle_por_las_cuevas,  'Tuerca le pregunta por las cuevas').
+descripcion_opcion_charla(murcielago_azul, escuchar_los_chillidos,    'Rufino intenta traducir los chillidos').
+descripcion_opcion_charla(murcielago_azul, espantarlo_con_la_espada,  'Sir Baldomero lo espanta con la espada').
+descripcion_opcion_charla(murcielago_azul, ofrecerle_queso_azul,      'Madame Pimentina le ofrece un trocito de queso (cuesta 1 queso)').
 
 % texto_saber(+Marca, -Texto): la linea del diario (la misma frase con la que se anuncia al averiguarlo).
 texto_saber(Marca, Texto) :-

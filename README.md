@@ -167,7 +167,7 @@ Cada suite corre en su propio proceso (así ninguna contagia a otra), se escribe
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/combate -g "run_tests,halt" -t "halt(1)"
 ```
 
-Suites actuales (35 suites, 2048 pruebas):
+Suites actuales (35 suites, 2059 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -188,7 +188,7 @@ Suites actuales (35 suites, 2048 pruebas):
 | `tests/api.pl` (97) | El adaptador JSON y el servidor: el árbol como nodos (profundidad, estado, tipo, pliegue), todos los items con su JSON, `ejecutar_orden/2` (errores como la consola, nunca falla), estado y acciones habilitadas ciertos y sin tocar la partida, **lo que cuenta la web es lo que cuenta la consola**, y el servidor HTTP real (GET, POST, UTF-8, estáticos, 404, rutas fuera de `web/`, cerrojo). |
 | `tests/agregador.pl` (4) | Vigila a `tests/todas.pl`: una suite buena da verde, una que falla da código 1, **también si falla con `assertion/1`** (en 5.10.4 eso abre el depurador y el proceso sale con 0). |
 | `tests/usar.pl` (41) | Usar objetos: la regla `economia:puede_usar/2` (una poción, un miembro vivo y herido), la cura sin pasar de la vida máxima, `usar` fuera de combate (no pasa el tiempo) y **en combate (gasta el turno)**, los errores y `por_que_no`, la consola, la API (botón solo si hay poción y herido) y la web, y de dónde salen las pociones (contrato de las ratas y la charla con Ricota). |
-| `tests/hablar.pl` (73) | Hablar con los NPC: el **validador de contenido** (cada personaje tiene escena, cada opción su texto y su frase, cada fragmento del diario sale de una opción, y **el queso que se puede sacar hablando tiene techo**), quién está y cuándo según el día, el flujo `hablar` → `elegir` (se hace una vez, queda a medias si te vas, un evento de contrato manda sobre la charla), los efectos de cada opción, los errores, el diario, la consola, la API y la web, y que **el jugador que habla con todos no gana menos ni se hace rico** (simulador). |
+| `tests/hablar.pl` (84) | Hablar con los NPC: el **validador de contenido** (cada personaje tiene escena, cada opción su texto y su frase, cada fragmento del diario sale de una opción, y **el queso que se puede sacar hablando tiene techo**), quién está y cuándo según el día, el flujo `hablar` → `elegir` (se hace una vez, queda a medias si te vas, un evento de contrato manda sobre la charla), los efectos de cada opción, los errores, el diario, la consola, la API y la web, y que **el jugador que habla con todos no gana menos ni se hace rico** (simulador). |
 | `tests/botin.pl` (26) | El botín tras el combate: la tabla de datos `mundo:botin/3`, la regla pura `combate:botin_de/5` (una tirada por enemigo con la semilla del juego, la cantidad, el límite exacto de la probabilidad, la frecuencia en una racha larga), los efectos al ganar (el mensaje de lo que cae o de que no cae nada, y la semilla guardada), un combate de verdad y que **la misma semilla da el mismo botín**. Es el primer azar del juego. |
 | `tests/ayuno.pl` (31) | La regla de hambre más justa: el contador de días seguidos sin comer y sus efectos, cuándo es derrota (queso a cero, nada por cobrar y ayuno agotado), el paso de los días (comerse la última ración ya no acaba la partida, un día alimentado pone la cuenta a cero, cobrar a tiempo salva), los avisos (`a_cero` suave y `hambre_mortal`), la consola, la API y la web, y lo que mide el simulador. |
 | `tests/pago.pl` (28) | El pago de los contratos derivado de lo que cuestan: la distancia entre zonas, los días de ruta y los enemigos de cada contrato, la fórmula con otros números (cada término, el mínimo, monotonía), lo que paga el catálogo (14 / 12 / 21 y el jefe en 40), **que cada contrato compensa su viaje**, que el marcador `quesos(pago)` nunca llega al tablón y que el juego sigue siendo ganable (con el simulador). |
@@ -261,7 +261,8 @@ Documentos en `docs/`:
 | [09-guion-exposicion.md](docs/09-guion-exposicion.md) | Guion de la exposición, plan B y preguntas probables. |
 | [guia-rapida.md](docs/guia-rapida.md) | Guía rápida para jugar en cinco minutos. |
 | [10-checklist-entrega.md](docs/10-checklist-entrega.md) | Lista de verificación de la entrega y etiquetas propuestas. |
-| [12-npcs.md](docs/12-npcs.md) | Hablar con los NPC: el diseño (reparto por zonas y días, hilo de historia, balance) y qué hay ya hecho. |
+| [13-ampliacion.md](docs/13-ampliacion.md) | Valoración de ampliar el mundo (más contratos y enemigos, encuentros, más zonas con refugios, otro reino con peaje, eventos únicos): coste, riesgos, orden y calendario. |
+| [12-npcs.md](docs/12-npcs.md) | Hablar con los NPC: el diseño (reparto por zonas y días, hilo de historia, balance) y su estado: los 18 personajes están escritos. |
 | [11-balance.md](docs/11-balance.md) | Balance de la economía del queso medido con el simulador: qué se midió, variantes de pagos y qué sigue. |
 
 ## Contexto académico

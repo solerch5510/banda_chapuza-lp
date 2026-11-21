@@ -239,8 +239,12 @@ item(vista(charla, Npc, Opciones), json([tipo=charla, personaje=Npc, nombre=N, o
                 bool(Si == si, Disp)
             ),
             Os).
-item(vista(diario, Marcas), json([tipo=diario, saberes=Js])) :-
-    findall(json([marca=M, texto=T]), ( member(M, Marcas), narrador:texto_saber(M, T) ), Js).
+item(vista(diario, Marcas), json([tipo=diario, saberes=Js, completo=Completo, cierre=Cierre])) :-
+    findall(json([marca=M, texto=T]), ( member(M, Marcas), narrador:texto_saber(M, T) ), Js),
+    (   charlas:hilo_completo
+    ->  Completo = @(true), narrador:texto(diario_completo, [], 0, Cierre)
+    ;   Completo = @(false), Cierre = @(null)
+    ).
 item(vista(prueba, Accion, Prueba),
      json([tipo=prueba, accion=A, nivel=Nivel, nodos=Nodos, narrador=Comentario, notas=Notas])) :-
     nivel_actual(Nivel),

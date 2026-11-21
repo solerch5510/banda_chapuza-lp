@@ -117,7 +117,11 @@ mostrar_conocido(vista(diario, Marcas)) :-
     ->  format("El diario está en blanco: todavía no sabéis nada del Gran Rancio. Hablad con la gente (hablar.).~n", [])
     ;   format("El diario de la Banda (lo que sabéis del Gran Rancio):~n", []),
         forall(member(M, Marcas),
-               (   narrador:texto_saber(M, Texto), format("  - ~w~n", [Texto]) ))
+               (   narrador:texto_saber(M, Texto), format("  - ~w~n", [Texto]) )),
+        (   charlas:hilo_completo
+        ->  narrador:texto(diario_completo, [], 0, Cierre), format("~n~w~n", [Cierre])
+        ;   true
+        )
     ).
 mostrar_conocido(vista(comida, Riesgo)) :-
     narrador:texto_riesgo(Riesgo, Texto),

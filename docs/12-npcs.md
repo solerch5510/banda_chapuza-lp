@@ -106,19 +106,12 @@ Pruebas en `tests/hablar.pl` (la regla `puede_hablar`, la presencia por día, ca
 
 ## 10. Estado (20 de noviembre de 2026)
 
-> **Actualización:** ya existe `usar(Objeto, Miembro)` (nota 44). Cantar el anuncio a Ricota da ahora **una poción** en vez de un queso, así que el objeto tiene dónde nacer y para qué servir.
+**Hecho:** el reparto completo del §5. Los **18 personajes** tienen escena (6 fijos y 12 que rotan, de modo que en **cada zona y cada día hay al menos dos**), con sus datos en `src/charlas.pl` y sus textos en `src/narrador.pl`.
 
-**Hecho** (el autor eligió «motor + 8 escenas» y «sobre todo información»):
+- **El hilo del Gran Rancio, completo:** las seis piezas están repartidas (Mantecosa, Penicilio, Eustaquio, el Eco, la Inspectora y el rey, que además la repite por boca de su madre) y, con las seis, **el diario cierra la historia** con una «última página». Las piezas de Eustaquio y la Inspectora solo se consiguen a partir del día 6, a propósito: la historia no se puede acabar en la primera semana.
+- **Ambientación:** otros seis fragmentos (los bandidos a caballo, las vacas azules, el sumiller murciélago…). El diario ordena primero las piezas del hilo y luego esas.
+- **Balance:** el techo de queso por hablar sigue en **8 en total** (2 por opción), comprobado por una prueba; las pociones (usables, nota 44) salen de dos charlas (Ricota y el aldeano perdido, esta pagando un queso).
+- **Validador y reparto fijado:** una prueba fija a cada personaje con su zona y sus días; otra comprueba que la historia entera se puede conseguir hablando de verdad.
+- **Simulador:** el jugador que habla con todos y elige siempre lo que más queso da acaba con **unos 5 quesos más** de media (11,5 frente a 6,3, con errores) y gana lo mismo salvo ruido (95 % frente a 96,5 %); sin errores, +7,5 quesos y 100 % en ambos casos.
 
-- El comando `hablar`, `hablar(Nombre)` y `diario`, la regla `puede_hablar/1`, las escenas con opciones y el diario (`src/charlas.pl`; los textos, en `narrador.pl`).
-- **Las 8 escenas:** los 6 fijos (Mantecosa, Alcaldesa Nata, Penicilio, Ganso recaudador, Rey Brieto, el Eco) y los dos del tramo A de la taberna y la aldea (Gruyère y Ricota). Siete fragmentos de diario, cuatro de ellos del hilo del Gran Rancio (Mantecosa, Penicilio, el Eco y el rey) y tres de ambientación.
-- **El validador de contenido** (`tests/hablar.pl`): cada personaje tiene escena, nombre y frase de apertura; cada opción, su texto y su frase de resultado; cada fragmento del diario sale de una opción; y el techo de queso (8 en total, 2 por opción) está comprobado.
-- **Web:** botones «Hablar», la gente presente, la escena con sus opciones y el diario.
-
-**Lo que midió el simulador** (200 partidas con 10 % de errores y 10 partidas sin errores): el jugador que habla con todos y siempre elige lo que más queso da acaba con **unos 4 quesos más** (10,5 frente a 6,3) y gana lo mismo o algo más (98 % frente a 96,5 %). Sin errores, +7,5 quesos de media, justo bajo el techo de 8. Las opciones de información son la recompensa real: el queso es la excepción.
-
-**Pendiente:**
-
-- Los 10 personajes que faltan (los rotativos del grupo B y los del grupo A de bosque, camino real, castillo y cuevas) y los dos fragmentos que cierran el hilo (Eustaquio y la Inspectora), con la frase final del diario cuando estén los seis.
-- Más objetos que se puedan usar: hoy solo cura la poción; una cataplasma o un objeto de moral serían datos nuevos (`mundo:curacion/2` y la regla de `usar`).
-- Añadir contenido ya no necesita tocar código: basta con filas en `presente/4`, `escena_de/2`, `opcion_charla/5`, `saber/1` y sus textos; el validador avisa si falta algo.
+**Pendiente:** más personajes y escenas solo si se amplía el mundo (`docs/13-ampliacion.md`); añadir contenido sigue siendo solo datos (filas en `presente/4`, `escena_de/2`, `opcion_charla/5`, `saber/1` y sus textos; el validador avisa si falta algo).
