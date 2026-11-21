@@ -108,17 +108,21 @@ test(fuera_de_combate_no_hay_fin, [setup(nueva_partida), fail]) :-
 
 :- begin_tests(efectos_de_fin).
 
-test(la_victoria_da_botin_por_cada_enemigo_que_lleva_queso, [nondet]) :-
-    montado([bandido_torpe, bandido_montado, rata_quesera]),
+test(la_victoria_da_botin_siempre_por_cada_bandido, [nondet]) :-
+    montado([bandido_torpe, bandido_montado]),
     combate:efectos_fin(victoria, Efs),
     memberchk(ganar_queso(cheddar, 0, 2), Efs),
     memberchk(mensaje(botin, [2]), Efs).
 
-test(sin_enemigos_con_queso_no_hay_botin, [nondet]) :-
-    montado([rata_quesera, moho_saltarin]),
+test(sin_enemigos_con_botin_no_hay_botin_ni_tirada, [nondet]) :-
+    montado([moho_saltarin]),
+    estado:semilla(S0),
     combate:efectos_fin(victoria, Efs),
     \+ memberchk(ganar_queso(_, _, _), Efs),
-    \+ memberchk(mensaje(botin, _), Efs).
+    \+ memberchk(mensaje(botin, _), Efs),
+    \+ memberchk(mensaje(sin_botin, _), Efs),
+    \+ memberchk(fijar_semilla(_), Efs),                  % sin tirada, la semilla no se toca
+    estado:semilla(S0).
 
 test(la_victoria_sube_la_moral_de_todos, [nondet]) :-
     montado([rata_quesera]),
@@ -458,11 +462,11 @@ test(los_caidos_se_levantan_con_uno_al_ganar, [nondet]) :-
     \+ estado:en_combate(_),
     estado:vida(rufino, 1).
 
-test(una_rata_cae_de_un_golpe_y_se_gana_sin_botin, [nondet]) :-
+test(una_rata_cae_de_un_golpe_y_se_gana_con_o_sin_botin, [nondet]) :-
     empieza([rata_quesera]),
     ordena(atacar(rata_quesera), Items),
     memberchk(msg(victoria, [], _), Items),
-    \+ memberchk(msg(botin, _, _), Items),
+    (   memberchk(msg(botin, _, _), Items) ; memberchk(msg(sin_botin, [], _), Items) ),   % depende de la tirada
     \+ estado:en_combate(_).
 
 test(perder_acaba_la_partida, [nondet]) :-

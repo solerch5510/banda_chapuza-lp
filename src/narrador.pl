@@ -110,6 +110,8 @@ frase(suceso(aparece(T)), ambos,
       '~w se interpone en tu camino. Nadie ha preguntado si tenía permiso.'-[T]).
 frase(suceso(victoria), ambos,
       'Victoria. Nadie la esperaba, y menos que nadie la propia Banda.').
+frase(suceso(sin_botin), ambos,
+      'Registráis los restos con todo el cuidado de un recaudador: ni una corteza. Hoy los bolsillos de esta gente estaban de huelga.').
 frase(suceso(botin(1)), ambos,
       'Botín: 1 queso fresco. Lo guardaba «para emergencias». Esto lo era.').
 frase(suceso(botin(N)), ambos,

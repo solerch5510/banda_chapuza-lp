@@ -85,6 +85,7 @@ escoger([P-Cmd|Resto], K, Elegida) :-
 episodio(Politica, Semilla, Max, Resumen) :-
     fijar_azar(Semilla),
     estado:nueva_partida,
+    estado:aplicar_efectos([fijar_semilla(Semilla)]),          % cada partida simulada tira con su propia semilla (botin)
     pasos(Politica, 0, Max, Resumen).
 
 pasos(Pol, N, Max, Resumen) :-

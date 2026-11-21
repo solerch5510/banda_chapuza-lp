@@ -1,6 +1,6 @@
 # examples/
 
-Guiones de comandos y sus transcripciones guardadas. Todo se **genera** con el propio juego (no hay nada escrito a mano), es **reproducible** (la partida arranca siempre con el mismo estado y no hay azar) y está en UTF-8 con fin de línea LF.
+Guiones de comandos y sus transcripciones guardadas. Todo se **genera** con el propio juego (no hay nada escrito a mano), es **reproducible** (la partida arranca siempre con el mismo estado y el único azar, el botín de los combates, tira con la semilla del juego: la misma semilla da el mismo resultado) y está en UTF-8 con fin de línea LF.
 
 | Archivo | Qué es |
 |---|---|

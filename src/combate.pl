@@ -352,20 +352,42 @@ bando_en_pie(Bando) :-
     compania:vivo(Id).
 
 % efectos_fin(+Resultado, -Efectos): lo que pasa al cerrar el combate.
-%   victoria: el botin (1 cheddar fresco por cada enemigo que llevaba queso), la moral sube y se
-%             termina el combate (los caidos se levantan con 1 de vida);
+%   victoria: el botin (de cada enemigo, los quesos de mundo:botin/3 con su probabilidad, tirando con la
+%             semilla del juego), la moral sube y se termina el combate (los caidos se levantan con 1 de vida);
 %   derrota : fin de la partida.
 efectos_fin(victoria, Efectos) :-
-    findall(x, ( estado:instancia(_, Tipo), mundo:lleva_queso(Tipo) ), Botin),
-    length(Botin, N),
+    findall(Tipo, estado:instancia(_, Tipo), Tipos),
+    (   estado:semilla(S0) -> true ; S0 = 0 ),
+    botin_de(Tipos, S0, S, N, Tiradas),
     mundo:parametro(moral_victoria, Sube),
     findall(mod_moral(Id, Sube), compania:miembro(Id), Moral),
-    (   N > 0
-    ->  Queso = [ganar_queso(cheddar, 0, N), mensaje(botin, [N])]
+    (   N > 0       -> Queso = [ganar_queso(cheddar, 0, N), mensaje(botin, [N])]
+    ;   Tiradas > 0 -> Queso = [mensaje(sin_botin, [])]
     ;   Queso = []
     ),
-    append([[mensaje(victoria, [])], Queso, Moral, [terminar_combate]], Efectos).
+    (   Tiradas > 0 -> Semilla = [fijar_semilla(S)] ; Semilla = [] ),
+    append([[mensaje(victoria, [])], Queso, Semilla, Moral, [terminar_combate]], Efectos).
+
 efectos_fin(derrota, [fin(derrota(derrota_combate)), mensaje(derrota_combate, [])]).
+
+% tirada_de_botin(+Cantidad, +Probabilidad, +S0, -S1, -Quesos): una tirada de 0 a 99 con la semilla; si sale
+% por debajo de la probabilidad (en %), suelta Cantidad quesos; si no, ninguno.
+tirada_de_botin(Cantidad, Probabilidad, S0, S1, Quesos) :-
+    estado:tirada(100, S0, R, S1),
+    (   R < Probabilidad -> Quesos = Cantidad ; Quesos = 0 ).
+
+% botin_de(+Tipos, +S0, -S, -Quesos, -Tiradas): una tirada (de 0 a 99) por cada enemigo con botin; suelta si sale menos
+% que su probabilidad. Tiradas dice cuantas se hicieron (si no se hizo ninguna, la semilla no cambia).
+botin_de([], S, S, 0, 0).
+botin_de([Tipo|Tipos], S0, S, Quesos, Tiradas) :-
+    (   mundo:botin(Tipo, Cantidad, Probabilidad)
+    ->  tirada_de_botin(Cantidad, Probabilidad, S0, S1, Suyos),
+        Hechas = 1
+    ;   S1 = S0, Suyos = 0, Hechas = 0
+    ),
+    botin_de(Tipos, S1, S, Quesos1, Tiradas1),
+    Quesos is Quesos1 + Suyos,
+    Tiradas is Tiradas1 + Hechas.
 
 % ---------------------------------------------------------------------------
 % Efectos que abren el combate y cada ronda (se devuelven como datos; los aplica estado).

@@ -18,19 +18,20 @@ $antiguo = @(
 
 # Cada variante cambia numeros del texto de src/. Los pagos salen de la formula de contratos:pago_de/2
 # (base + por_dia * dias de ruta + por_enemigo * enemigos, con un minimo); los parametros estan en src/mundo.pl.
+$rata = 'botin(rata_quesera,    1,  60).'
 $variantes = [ordered]@{
-    'ayuno 0 (la regla antigua: a cero, se acabo)' = @(,
-        @('src/mundo.pl', 'parametro(dias_de_ayuno_max, 2)', 'parametro(dias_de_ayuno_max, 0)'))
-    'ayuno 1 dia'                                  = @(,
-        @('src/mundo.pl', 'parametro(dias_de_ayuno_max, 2)', 'parametro(dias_de_ayuno_max, 1)'))
-    'ayuno 2 dias (actual)'                        = @()
-    'ayuno 3 dias'                                 = @(,
-        @('src/mundo.pl', 'parametro(dias_de_ayuno_max, 2)', 'parametro(dias_de_ayuno_max, 3)'))
-    'ayuno 4 dias'                                 = @(,
-        @('src/mundo.pl', 'parametro(dias_de_ayuno_max, 2)', 'parametro(dias_de_ayuno_max, 4)'))
-    'pagos antiguos fijos (9 / 7 / 14) con ayuno 2' = $antiguo
-    'pagos antiguos fijos (9 / 7 / 14), regla antigua' = @($antiguo[0], $antiguo[1], $antiguo[2],
-        @('src/mundo.pl', 'parametro(dias_de_ayuno_max, 2)', 'parametro(dias_de_ayuno_max, 0)'))
+    'sin botin de ratas (0 %)'            = @(,
+        @('src/mundo.pl', $rata, 'botin(rata_quesera,    1,   0).'))
+    'ratas 30 %'                          = @(,
+        @('src/mundo.pl', $rata, 'botin(rata_quesera,    1,  30).'))
+    'ratas 60 % (actual)'                 = @()
+    'ratas 100 %'                         = @(,
+        @('src/mundo.pl', $rata, 'botin(rata_quesera,    1, 100).'))
+    'ratas 2 quesos al 60 %'              = @(,
+        @('src/mundo.pl', $rata, 'botin(rata_quesera,    2,  60).'))
+    'ratas 60 % y bandidos al 70 %'       = @(
+        @('src/mundo.pl', 'botin(bandido_torpe,   1, 100).', 'botin(bandido_torpe,   1,  70).'),
+        @('src/mundo.pl', 'botin(bandido_montado, 1, 100).', 'botin(bandido_montado, 1,  70).'))
 }
 
 foreach ($nombre in $variantes.Keys) {

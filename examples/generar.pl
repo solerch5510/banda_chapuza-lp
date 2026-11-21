@@ -4,7 +4,7 @@
 %   swipl -q -s examples/generar -g generar -t halt
 %
 % (con "C:\Program Files\pl\bin\swipl.exe" en Windows). Es determinista: la partida arranca siempre con la misma
-% semilla y no hay azar en el juego, asi que volver a generar da byte a byte los mismos archivos. Los archivos se
+% semilla y el unico azar (el botin de los combates) tira con la semilla del juego, asi que volver a generar da byte a byte los mismos archivos. Los archivos se
 % escriben en UTF-8 y con fin de linea LF; tests/demo.pl comprueba que lo guardado coincide con lo que se genera.
 %
 % Salidas:

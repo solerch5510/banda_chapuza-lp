@@ -70,6 +70,7 @@ Madame Pimentina lanza una Fondue Flamígera contra la Rata Quesera. Huele a cen
 Madame Pimentina le suelta un golpe a la Rata Quesera: 8 de vida menos. Ha sido casi técnico.
 La Rata Quesera se tumba, cierra los ojos y espera. Esta vez es en serio. Ofendida, pero en serio.
 Victoria. Nadie la esperaba, y menos que nadie la propia Banda.
+Botín: 1 queso fresco. Lo guardaba «para emergencias». Esto lo era.
 Contrato resuelto con éxito: «Ratas del Granero». La recompensa os espera en la taberna, en cuanto Doña Mantecosa deje de contarla.
 Su Excelencia Bigotes lleva tres días en lo alto del árbol y dice que desde allí se juzga mejor. Tenéis tres intentos y ninguna idea.
 El Gato en el Árbol: Su Excelencia Bigotes no piensa bajar solo.
@@ -92,8 +93,9 @@ Cobráis por «El Gato en el Árbol». Los quesos entran en la despensa y los su
 Objetivo: acepta un contrato en el tablón de la taberna.
 
 > inventario
-Despensa (día 3): 29 quesos (valor informativo: 58)
+Despensa (día 3): 30 quesos (valor informativo: 60)
   cheddar x3   edad 2 (fresco)
+  cheddar x1   edad 1 (fresco)
   cheddar x26   edad 0 (fresco)
 Objetos: pocion x1, venda_de_caballos x1
 

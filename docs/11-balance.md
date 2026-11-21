@@ -118,12 +118,33 @@ Jugador con plan y 10 % de errores, 250 partidas por variante (`herramientas/bar
 
 Lectura: de 0 a 1 día se recuperan 14 partidas; de 1 a 2, las victorias no suben, pero las derrotas pasan de «hambre» a «combate» (la Banda hambrienta llega más débil); de 2 a 4 no hay ganancia y casi nadie pierde ya de hambre, lo que **quitaría el peso al queso**. Con dos días se puede ir a una zona, hacer el contrato y volver a cobrar (justo el viaje de la partida perdida), sin que la comida deje de importar.
 
+## Aplicado: el botín con probabilidad (el primer azar del juego)
+
+Antes solo los bandidos soltaban un queso, siempre. Ahora hay una tabla de datos, `mundo:botin(Tipo, Quesos, Probabilidad)`: al ganar un combate, cada enemigo suelta sus quesos con esa probabilidad. Los bandidos, siempre (100 %); las ratas, el 60 % de las veces; el jefe y los mohos, nada.
+
+- **Reproducible:** la tirada (de 0 a 99) usa la semilla del juego y su generador propio, nunca `random/1`. La misma semilla da el mismo botín, así que las partidas, los ejemplos y las pruebas siguen siendo exactos. Cada tirada avanza la semilla (`fijar_semilla`); si ningún enemigo tiene botín, la semilla no se toca.
+- **Se nota:** si cae, «Botín: N quesos frescos»; si no cae nada de lo posible, «ni una corteza».
+- **El simulador** reparte semillas distintas a cada partida simulada (antes todas tiraban con la misma).
+
+Jugador con plan y 10 % de errores, 300 partidas por variante (`herramientas/barrido.ps1`):
+
+| Botín de las ratas | Victorias | Sobrante medio |
+|---|---|---|
+| Ninguno (0 %) | 274 (91 %) | 5,6 |
+| 30 % | 276 (92 %) | 6,0 |
+| **60 % (elegido)** | **280 (93 %)** | **6,3** |
+| 100 % | 285 (95 %) | 6,9 |
+| 2 quesos al 60 % | 284 (95 %) | 7,1 |
+| Ratas 60 % y bandidos al 70 % | 279 (93 %) | 5,6 |
+
+Lectura: **el botín apenas mueve el equilibrio** (de 5,6 a 6,3 quesos de sobrante, +2 puntos de victorias) y no era su papel: tras arreglar los pagos y el hambre, la economía ya tiene margen. Lo que aporta es **variedad**: dos partidas iguales ya no acaban con el mismo queso, y una racha mala o buena se nota. Por eso el 60 % y una sola unidad: más sería regalar queso. Los **objetos** como botín (una poción, por ejemplo) quedan para cuando exista `usar`: hoy solo los enemigos los gastan, y un objeto que el jugador no puede usar no es un premio.
+
 ## Qué sigue (en este orden, cada paso con el simulador)
 
 1. ~~Pago según distancia y enemigos~~ (hecho).
 2. ~~Regla de hambre más justa~~ (hecho).
-3. **Botín tras el combate** (azar con semilla, reproducible). Ya existe `lleva_queso/1` para algunos enemigos; hay que medir cuánto añade.
-4. **Hablar con NPC** (el contenido es lo caro).
+3. ~~Botín tras el combate~~ (hecho).
+4. **Hablar con NPC** (el contenido es lo caro). Un comando `usar` para los objetos encaja con él.
 
 ## Límites de lo medido
 

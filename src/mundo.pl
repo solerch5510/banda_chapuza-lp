@@ -8,7 +8,7 @@
 :- module(mundo, [zona/2, descripcion_zona/2, conexion/2, adyacente/2, distancia/3, zona_pacifica/1,
                   personaje/7, fila_preferida/2, alcance/2, rasgo/2,
                   habilidad_de/2, coste_queso/2,
-                  enemigo/4, clase/2, lleva_queso/1, numerar_grupo/2,
+                  enemigo/4, clase/2, lleva_queso/1, botin/3, numerar_grupo/2,
                   curacion/2, lleva_inicial/3,
                   tipo_queso/2, parametro/2, inicio/1]).
 
@@ -142,9 +142,16 @@ curacion(esporas,  8).
 % lleva_inicial(Tipo, Objeto, N): lo que lleva encima un enemigo al empezar el combate.
 lleva_inicial(gran_roquefort, esporas, 1).        % las esporas curativas del jefe: una vez
 
-% lleva_queso(Tipo): suelta 1 queso de botin al caer (el queso entra por botin, nunca se compra).
+% lleva_queso(Tipo): lo que se le puede rebuscar de los bolsillos (la habilidad de Tuerca): siempre 1 queso.
 lleva_queso(bandido_torpe).
 lleva_queso(bandido_montado).
+
+% botin(Tipo, Quesos, Probabilidad): al ganar un combate, cada enemigo de este tipo suelta Quesos cheddar frescos
+% con esta probabilidad (en %, una tirada con la semilla del juego: reproducible). El queso entra por botin,
+% nunca se compra. Los bandidos lo sueltan siempre; las ratas, a veces (docs/11-balance.md).
+botin(bandido_torpe,   1, 100).
+botin(bandido_montado, 1, 100).
+botin(rata_quesera,    1,  60).
 
 % numerar_grupo(+Tipos, -Ids): un grupo de enemigos [rata_quesera, rata_quesera, bandido_torpe]
 % pasa a instancias numeradas por tipo: [e(rata_quesera,1), e(rata_quesera,2), e(bandido_torpe,1)].
