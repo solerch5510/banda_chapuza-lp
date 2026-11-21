@@ -52,7 +52,7 @@ test(los_dias_de_comida_son_enteros) :-
     con_queso(3), economia:dias_de_comida(D3), assertion(D3 == 0).
 
 test(el_riesgo_de_un_dia_segun_el_queso) :-
-    forall(member(Q-Esperado, [12-ninguno, 8-ninguno, 7-escaso, 5-escaso, 4-hambre_mortal, 1-hambre_mortal]),
+    forall(member(Q-Esperado, [12-ninguno, 8-ninguno, 7-escaso, 5-escaso, 4-a_cero, 1-a_cero]),
            (   con_queso(Q), economia:riesgo_de_gasto(0, R), assertion(R == Esperado) )).
 
 test(descansar_gasta_mas_y_el_riesgo_lo_cuenta) :-
@@ -67,7 +67,7 @@ test(si_hay_algo_por_cobrar_no_es_mortal) :-
     economia:riesgo_de_gasto(0, R), assertion(R == sin_queso).
 
 test(cada_riesgo_menos_ninguno_tiene_texto) :-
-    forall(member(R, [hambre_mortal, sin_queso, escaso]),
+    forall(member(R, [hambre_mortal, a_cero, sin_queso, escaso]),
            ( narrador:texto_riesgo(R, T), assertion(atom(T)) )),
     assertion(\+ narrador:texto_riesgo(ninguno, _)).
 
@@ -81,17 +81,29 @@ test(la_linea_de_la_zona_dice_la_racion_y_los_dias) :-
     assertion(contiene(T, 'Queso en la despensa: 12')),
     assertion(contiene(T, 'ración 4 al día (te alcanza para 3)')).
 
-test(tras_viajar_con_la_despensa_justa_se_avisa) :-
+test(tras_viajar_con_la_despensa_a_cero_se_avisa_del_ayuno) :-
     con_queso(8),
-    juego:ejecutar(ir(aldea), resultado(Items)),
+    juego:ejecutar(ir(aldea), resultado(Items)),                 % queda 4: manana se acaba, pero todos comen
+    assertion(memberchk(vista(comida, a_cero), Items)),
+    with_output_to(atom(T0), ui:mostrar(resultado(Items))),
+    assertion(contiene(T0, 'Ojo:')), assertion(contiene(T0, 'os quedáis sin queso')).
+
+test(tras_viajar_con_el_ayuno_a_punto_de_acabar_se_avisa_del_peligro) :-
+    con_queso(3),
+    juego:ejecutar(ir(aldea), resultado(Items)),                 % alguien ya no ha comido: un dia de ayuno
     assertion(memberchk(vista(comida, hambre_mortal), Items)),
     with_output_to(atom(T), ui:mostrar(resultado(Items))),
     assertion(contiene(T, '¡Peligro!')), assertion(contiene(T, 'perderías por hambre')).
 
+test(tras_viajar_con_la_despensa_justa_se_avisa_tambien_sin_ayuno_previo) :-
+    con_queso(8),
+    juego:ejecutar(ir(aldea), resultado(Items)),
+    assertion(memberchk(vista(comida, a_cero), Items)).
+
 test(tras_pagar_con_la_despensa_justa_tambien_se_avisa) :-
-    con_queso(9),
-    estado:aplicar_efectos([desmarcar(sueldos_pagados)]),
-    juego:ejecutar(pagar, resultado(Items)),
+    con_queso(7),
+    estado:aplicar_efectos([desmarcar(sueldos_pagados), contar(dias_de_ayuno, 1)]),
+    juego:ejecutar(pagar, resultado(Items)),                      % quedan 2: manana pasan hambre y se acaba el ayuno
     assertion(\+ memberchk(error(_), Items)),
     assertion(memberchk(vista(comida, hambre_mortal), Items)).
 
@@ -107,11 +119,12 @@ test(un_comando_que_falla_no_lleva_aviso) :-
     assertion(\+ memberchk(vista(comida, _), Items)).
 
 test(el_aviso_de_la_linea_de_la_zona_sale_si_va_justo) :-
-    con_queso(4),
+    con_queso(3),
+    estado:aplicar_efectos([contar(dias_de_ayuno, 1)]),
     juego:ejecutar(mirar, R),
     with_output_to(atom(T), ui:mostrar(R)),
     assertion(contiene(T, '¡Peligro!')),
-    assertion(contiene(T, 'ración 4 al día (te alcanza para 1)')).
+    assertion(contiene(T, 'ración 4 al día (te alcanza para 0)')).
 
 test(con_margen_la_linea_de_la_zona_no_avisa) :-
     nueva_partida,
@@ -134,7 +147,8 @@ test(con_poco_queso_el_estado_avisa) :-
     assertion(Rg == escaso), assertion(contiene(A, 'menos de un día')), assertion(D == 1).
 
 test(viajar_avisa_antes_de_hacerlo_cuando_deja_la_despensa_justa) :-
-    con_queso(4), api:estado_json(E), campo(E, acciones, As),
+    con_queso(3), estado:aplicar_efectos([contar(dias_de_ayuno, 1)]),
+    api:estado_json(E), campo(E, acciones, As),
     member(A, As), campo(A, comando, 'ir(aldea)'), !,
     campo(A, aviso, Aviso),
     assertion(contiene(Aviso, 'perderías por hambre')).
@@ -149,7 +163,7 @@ test(descansar_avisa_con_su_coste_incluido) :-
     campo(A, aviso, Aviso), assertion(contiene(Aviso, 'menos de un día')).
 
 test(el_item_de_aviso_tiene_su_json) :-
-    con_queso(8),
+    con_queso(3),
     api:ejecutar_orden('ir(aldea)', R), campo(R, items, Is),
     member(I, Is), campo(I, tipo, aviso_comida), !,
     campo(I, riesgo, Rg), campo(I, texto, T),

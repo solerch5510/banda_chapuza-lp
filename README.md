@@ -7,7 +7,7 @@
 ## Qué incluye
 
 - **Compañía de mercenarios** (Sir Baldomero, Madame Pimentina, Rufino y Tuerca) con rasgos que modifican las reglas: Baldomero teme a los caballos, Rufino cobra por callar...
-- **Economía del queso:** es la única moneda y también la comida. Madura (fresco, curado, rancio), hay ración diaria, sueldos (`pagar`) y moral; con la moral baja, un miembro se pone en huelga. Lo que paga cada contrato se **deriva** de lo que cuesta hacerlo (días de viaje y enemigos; [docs/11-balance.md](docs/11-balance.md)).
+- **Economía del queso:** es la única moneda y también la comida. Madura (fresco, curado, rancio), hay ración diaria, sueldos (`pagar`) y moral; con la moral baja, un miembro se pone en huelga. Quedarse sin queso no acaba la partida en el acto: la Banda aguanta dos días seguidos sin comer. Lo que paga cada contrato se **deriva** de lo que cuesta hacerlo (días de viaje y enemigos; [docs/11-balance.md](docs/11-balance.md)).
 - **Contratos** con recompensa y consecuencias, y **eventos** con opciones.
 - **Combate por turnos** con filas (frente y retaguardia), habilidades y enemigos con IA por reglas (con prioridad y corte).
 - **Modo explicar:** `explicar` y `por_que_no` enseñan la prueba lógica (el árbol de derivación) de lo que pasó o de por qué no se pudo, con la voz de un narrador sarcástico, en dos niveles (`resumido` y `detallado`). Es el corazón del proyecto: dos meta-intérpretes de Prolog sobre las propias reglas del juego.
@@ -165,7 +165,7 @@ Cada suite corre en su propio proceso (así ninguna contagia a otra), se escribe
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/combate -g "run_tests,halt" -t "halt(1)"
 ```
 
-Suites actuales (31 suites, 1875 pruebas):
+Suites actuales (32 suites, 1908 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -185,6 +185,7 @@ Suites actuales (31 suites, 1875 pruebas):
 | `tests/todas.pl` | El agregador: corre todas las suites en procesos separados y devuelve 0 o 1. |
 | `tests/api.pl` (97) | El adaptador JSON y el servidor: el árbol como nodos (profundidad, estado, tipo, pliegue), todos los items con su JSON, `ejecutar_orden/2` (errores como la consola, nunca falla), estado y acciones habilitadas ciertos y sin tocar la partida, **lo que cuenta la web es lo que cuenta la consola**, y el servidor HTTP real (GET, POST, UTF-8, estáticos, 404, rutas fuera de `web/`, cerrojo). |
 | `tests/agregador.pl` (4) | Vigila a `tests/todas.pl`: una suite buena da verde, una que falla da código 1, **también si falla con `assertion/1`** (en 5.10.4 eso abre el depurador y el proceso sale con 0). |
+| `tests/ayuno.pl` (31) | La regla de hambre más justa: el contador de días seguidos sin comer y sus efectos, cuándo es derrota (queso a cero, nada por cobrar y ayuno agotado), el paso de los días (comerse la última ración ya no acaba la partida, un día alimentado pone la cuenta a cero, cobrar a tiempo salva), los avisos (`a_cero` suave y `hambre_mortal`), la consola, la API y la web, y lo que mide el simulador. |
 | `tests/pago.pl` (28) | El pago de los contratos derivado de lo que cuestan: la distancia entre zonas, los días de ruta y los enemigos de cada contrato, la fórmula con otros números (cada término, el mínimo, monotonía), lo que paga el catálogo (14 / 12 / 21 y el jefe en 40), **que cada contrato compensa su viaje**, que el marcador `quesos(pago)` nunca llega al tablón y que el juego sigue siendo ganable (con el simulador). |
 | `tests/objetivo.pl` (37) | El aviso de contrato nuevo y el objetivo actual: lo que falta para cada contrato (`faltas_de/2`), el paso que toca (`objetivo_actual/2`: cobrar, cumplir, aceptar, explorar, el contrato final), el aviso al visitar el castillo (una sola vez) y cuando el objetivo **cambia** (no en combate, ni al final, ni si la orden falla), su texto, la consola, la API y la web. Nace de una partida en la que el contrato del jefe apareció sin avisar. |
 | `tests/simulador.pl` (26) | El simulador de balance (`herramientas/`): las órdenes que ofrece son las que el juego acepta, el camino más corto y el destino del jugador con plan, las rutas de referencia (la campaña de `examples/` se gana el día 7 y la de la partida perdida llega al día 6), episodios reproducibles y que cada uno acaba, que un jugador con plan **puede ganar** y uno sin plan casi nunca, y el informe. |

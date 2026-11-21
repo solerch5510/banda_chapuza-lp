@@ -444,8 +444,10 @@ objetivo_json(DZ, Json) :-
     ).
 
 % comida_json(-Json): cuanto queso hay, lo que come la Banda al dia, para cuantos dias llega y el aviso si esta justa.
-comida_json(json([queso=Queso, racion=Racion, dias=Dias, riesgo=Riesgo, aviso=Aviso])) :-
+comida_json(json([queso=Queso, racion=Racion, dias=Dias, riesgo=Riesgo, aviso=Aviso, ayuno=Ayuno, ayuno_max=AyunoMax])) :-
     economia:queso_total(Queso),
+    economia:dias_de_ayuno(Ayuno),
+    mundo:parametro(dias_de_ayuno_max, AyunoMax),
     economia:racion_diaria(Racion),
     economia:dias_de_comida(Dias),
     economia:riesgo_de_gasto(0, Riesgo),

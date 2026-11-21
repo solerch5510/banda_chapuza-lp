@@ -10,7 +10,8 @@
                      valor_queso/3, valor_despensa/1, inventario/1,
                      puede_descansar/0, efectos_racion/1, efectos_descanso/1,
                      total_sueldos/1, puede_pagar_sueldos/0, efectos_sueldos/1,
-                     efectos_perdida/2, racion_diaria/1, dias_de_comida/1, riesgo_de_gasto/2]).
+                     efectos_perdida/2, racion_diaria/1, dias_de_comida/1, riesgo_de_gasto/2,
+                     dias_de_ayuno/1, derrota_por_hambre/0, efectos_ayuno/2]).
 :- use_module(mundo).
 :- use_module(estado).
 :- use_module(compania).
@@ -224,10 +225,39 @@ riesgo_de_gasto(Coste, Riesgo) :-
     queso_total(Queso),
     racion_diaria(Racion),
     Resto is Queso - Coste - Racion,
-    (   Resto =< 0, \+ estado:contrato_por_cobrar(_, _) -> Riesgo = hambre_mortal
-    ;   Resto =< 0                                       -> Riesgo = sin_queso
-    ;   Resto < Racion                                   -> Riesgo = escaso
+    dias_de_ayuno(Ayuno0),
+    mundo:parametro(dias_de_ayuno_max, Max),
+    (   Resto < 0 -> Ayuno is Ayuno0 + 1 ; Ayuno = 0 ),     % ese dia pasa hambre quien no llega a su racion
+    (   Resto =< 0, \+ estado:contrato_por_cobrar(_, _), Ayuno >= Max -> Riesgo = hambre_mortal
+    ;   Resto =< 0, estado:contrato_por_cobrar(_, _)                  -> Riesgo = sin_queso
+    ;   Resto =< 0                                                    -> Riesgo = a_cero
+    ;   Resto < Racion                                                -> Riesgo = escaso
     ;   Riesgo = ninguno
+    ).
+
+% ---------------------------------------------------------------------------
+% El ayuno (docs/11-balance.md): quedarse sin queso NO acaba la partida en el acto. La Banda aguanta unos dias
+% seguidos sin comer (mundo:parametro(dias_de_ayuno_max, N)); se pierde por hambre cuando, sin queso y sin nada
+% por cobrar, ya se han aguantado todos. Un dia en que todos comen vuelve a ponerlo a cero. Asi el jugador
+% llega a la zona, acepta el contrato y puede volver a cobrar, en vez de perder antes de poder actuar.
+% ---------------------------------------------------------------------------
+% dias_de_ayuno(-N): dias seguidos en que alguien se ha quedado sin comer.
+dias_de_ayuno(N) :-
+    (   estado:contador(dias_de_ayuno, V) -> N = V ; N = 0 ).
+
+% derrota_por_hambre: sin queso, sin nada por cobrar y con todos los dias de ayuno ya aguantados.
+derrota_por_hambre :-
+    queso_total(0),
+    \+ estado:contrato_por_cobrar(_, _),
+    dias_de_ayuno(Dias),
+    mundo:parametro(dias_de_ayuno_max, Max),
+    Dias >= Max.
+
+% efectos_ayuno(+EfectosDeLaRacion, -Efectos): un dia mas de ayuno si alguien se quedo sin comer; si no, la cuenta vuelve a cero.
+efectos_ayuno(EfectosRacion, Efectos) :-
+    (   memberchk(mensaje(sin_comida, _), EfectosRacion)
+    ->  Efectos = [contar(dias_de_ayuno, 1)]
+    ;   Efectos = [borrar_contador(dias_de_ayuno)]
     ).
 
 % efectos_perdida(+N, -Efectos): se pierden N quesos (los mas rancios primero) o todos si hay menos.

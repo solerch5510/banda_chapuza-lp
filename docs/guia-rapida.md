@@ -38,7 +38,7 @@ Sigue con `atacar(...)`, `defender.` y `habilidad(...)` hasta ganar el combate. 
 
 ## Lo que importa en cada día
 
-- **Queso:** `inventario.` enseña la despensa. Cada día come toda la Banda (cuatro raciones) y cada viaje es un día. El número de la cabecera (por ejemplo `12 · 3 días`) es el queso y para cuántos días de comida te llega; si se pone amarillo o rojo, ve a cobrar. Si el queso llega a cero y no tienes nada por cobrar, pierdes.
+- **Queso:** `inventario.` enseña la despensa. Cada día come toda la Banda (cuatro raciones) y cada viaje es un día. El número de la cabecera (por ejemplo `12 · 3 días`) es el queso y para cuántos días de comida te llega; si se pone amarillo o rojo, ve a cobrar. Quedarte a cero no acaba la partida en el acto: la Banda aguanta **dos días seguidos sin comer** (con castigo de moral y vida). Pierdes si, sin queso y sin nada por cobrar, llegas al segundo; un día en que todos comen vuelve a ponerlo a cero. Cobrar a tiempo te salva.
 - **Junta los contratos:** ir y volver a la aldea cuesta dos días (8 quesos) y sus dos contratos pagan 14 y 12. Cada contrato paga según lo que cuesta hacerlo (días de viaje y enemigos). Hacerlos en un solo viaje sale mucho más barato que uno por uno.
 - **Objetivo:** el juego te dice qué toca ahora (por ejemplo «Objetivo: cumple Ratas del Granero en la Aldea Requesón») y qué te falta para el contrato final. Sale al mirar y cada vez que cambia; en la web está en la pestaña de contratos y de zona. Cuando aparece un contrato nuevo en el tablón (por ejemplo, el del jefe al visitar el castillo) se avisa.
 - **Sueldos:** al volver a la taberna hay sueldos por pagar (`pagar.`). Si sales sin pagar, baja la moral, y con la moral por los suelos alguien se pone en **huelga**.

@@ -188,6 +188,7 @@ parametro(dano_miedo,        2).    % dano extra que recibe quien teme a la clas
 parametro(umbral_vida_baja, 30).   % vida baja: 30 % o menos de la maxima (la IA se cura)
 parametro(dano_embestida,    2).    % dano extra de la primera embestida del bandido montado
 parametro(max_mohos,         2).    % mohos que el jefe puede invocar en un combate
+parametro(dias_de_ayuno_max, 2).    % dias seguidos sin comer que aguanta la Banda antes de perder por hambre (docs/11)
 parametro(pago_base,         6).    % quesos que paga todo contrato antes de sumar nada (balance, docs/11)
 parametro(pago_por_dia,      3).    % ... mas esto por cada dia de viaje de la ruta del contrato
 parametro(pago_por_enemigo,  1).    % ... mas esto por cada enemigo al que hay que vencer

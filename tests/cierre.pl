@@ -654,6 +654,7 @@ test(si_la_partida_acaba_al_llegar_el_objetivo_no_empieza, [nondet]) :-
     nueva_partida,
     ordena(aceptar(ratas_del_granero), _),
     aplicar_efecto(gastar_queso(cheddar, 0, 12)),       % sin queso y sin nada que cobrar: hambre
+    aplicar_efecto(contar(dias_de_ayuno, 1)),           % y ya se ha pasado un dia sin comer
     ordena(ir(aldea), Items),
     memberchk(msg(fin_hambre, [], _), Items),
     \+ memberchk(msg(objetivo, _, _), Items),

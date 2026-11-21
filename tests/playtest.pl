@@ -165,14 +165,14 @@ test(nunca_pagar_se_nota_en_la_pantalla, [setup(nueva_partida), nondet]) :-
 
 test(ignorar_la_comida_acaba_en_hambre_y_se_cuenta, [setup(nueva_partida), nondet]) :-
     limpiar_playtest,
-    orden(descansar), orden(descansar),
+    orden(descansar), orden(descansar), orden(ir(aldea)), orden(ir(taberna)),
     estado:fin_partida(derrota(derrota_hambre)),
     findall(T, visto(_-T), Ts),
     member(T, Ts), contiene(T, 'Sin ración'), !.
 
 test(despues_del_final_todo_se_rechaza_con_buenas_palabras, [setup(nueva_partida), nondet]) :-
     limpiar_playtest,
-    orden(descansar), orden(descansar), orden(descansar),
+    orden(descansar), orden(descansar), orden(ir(aldea)), orden(ir(taberna)), orden(descansar),
     visto(descansar-T), contiene(T, 'La partida ha terminado'), !.
 
 test(los_contratos_sin_condiciones_se_rechazan_y_se_pregunta_por_que, [setup(nueva_partida), nondet]) :-

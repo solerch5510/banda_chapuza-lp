@@ -574,7 +574,7 @@ datos_de_combate(combate(Ronda, Turno, Enemigos)) :-
 % mirar: los datos de la zona donde estas.
 % ---------------------------------------------------------------------------
 datos_de_zona([nombre(Nombre), descripcion(Texto), salidas(Salidas), dia(Dia), queso(Queso),
-               racion(Racion), dias(Dias), riesgo(Riesgo), objetivo(Paso, Faltas)]) :-
+               racion(Racion), dias(Dias), riesgo(Riesgo), ayuno(Ayuno, AyunoMax), objetivo(Paso, Faltas)]) :-
     once(estado:en_zona(Zona)),
     mundo:zona(Zona, Nombre),
     mundo:descripcion_zona(Zona, Texto),
@@ -587,6 +587,8 @@ datos_de_zona([nombre(Nombre), descripcion(Texto), salidas(Salidas), dia(Dia), q
     economia:racion_diaria(Racion),
     economia:dias_de_comida(Dias),
     economia:riesgo_de_gasto(0, Riesgo),
+    economia:dias_de_ayuno(Ayuno),
+    mundo:parametro(dias_de_ayuno_max, AyunoMax),
     (   contratos:objetivo_actual(Paso0, Faltas0) -> Paso = Paso0, Faltas = Faltas0 ; Paso = ninguno, Faltas = [] ).
 
 % ---------------------------------------------------------------------------
@@ -610,12 +612,14 @@ pasar_dia(Items) :-
     etapa([envejecer_quesos], I1),
     economia:efectos_racion(Efectos),
     etapa(Efectos, I2),
+    economia:efectos_ayuno(Efectos, Ayuno),                % un dia mas sin comer, o la cuenta a cero
+    etapa(Ayuno, I2b),
     findall(x, member(gastar_queso(_, _, _), Efectos), Comidos),
     length(Comidos, Racion),                               % los quesos que se comieron hoy
     once(estado:dia(Hoy)),
     Manana is Hoy + 1,
     etapa([avanzar_dia, mensaje(dia_nuevo, [Manana, Racion])], I3),
-    append([I1, I2, I3], Items).
+    append([I1, I2, I2b, I3], Items).
 
 % Llegar a la taberna trae sueldos pendientes: se quita la bandera sueldos_pagados.
 llegada(Zona, Items) :-
@@ -698,10 +702,10 @@ resolver_contrato(C, Items) :-
     siguiente_objetivo(I2),
     append(I1, I2, Items).
 
-% Fin por hambre: sin queso y sin nada por cobrar no se puede alimentar a nadie manana.
+% Fin por hambre: sin queso, sin nada por cobrar y con todos los dias de ayuno ya aguantados
+% (economia:derrota_por_hambre/0; quedarse a cero ya no acaba la partida en el acto).
 comprobar_fin(Items) :-
-    (   economia:queso_total(0),
-        \+ estado:contrato_por_cobrar(_, _)
+    (   economia:derrota_por_hambre
     ->  etapa([fin(derrota(derrota_hambre)), mensaje(fin_hambre, [])], Items)
     ;   Items = []
     ).

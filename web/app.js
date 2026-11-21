@@ -770,7 +770,7 @@
   function indicadorComida(e) {
     var c = e.comida;
     if (!c) return '<span title="Quesos en la despensa">' + icono("cheese", 17) + e.despensa.total + "</span>";
-    return '<span class="comida ' + esc(c.riesgo) + '" title="' + esc("Ración: " + c.racion + " quesos al día. " + (c.aviso || "Hay margen.")) + '">' + icono("cheese", 17) +
+    return '<span class="comida ' + esc(c.riesgo) + '" title="' + esc("Ración: " + c.racion + " quesos al día. " + (c.aviso || "Hay margen.") + (c.ayuno ? " Ayuno: " + c.ayuno + " de " + c.ayuno_max + " días seguidos sin comer." : "")) + '">' + icono("cheese", 17) +
       e.despensa.total + " <small>" + c.dias + (c.dias === 1 ? " día" : " días") + "</small></span>";
   }
 

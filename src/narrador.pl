@@ -773,7 +773,8 @@ texto_falta(visita(Z), Texto) :- nombre_visible(Z, N), format(atom(Texto), 'visi
 texto_falta(rasgo(_), 'resolver un impedimento de la compañía').
 
 % texto_riesgo(+Riesgo, -Texto): el aviso de comida (economia:riesgo_de_gasto/2). ninguno no tiene texto.
-texto_riesgo(hambre_mortal, '¡Peligro! Otro día así y la despensa se queda a cero sin nada por cobrar: perderías por hambre.').
+texto_riesgo(hambre_mortal, '¡Peligro! Otro día así y perderías por hambre: sin queso, sin nada por cobrar y con el ayuno que la Banda aguanta ya agotado.').
+texto_riesgo(a_cero, 'Ojo: otro día así y os quedáis sin queso. Sin comida y sin nada por cobrar solo se aguantan unos días antes de perder por hambre.').
 texto_riesgo(sin_queso, 'Otro día así y la despensa se queda a cero (aunque tienes algo por cobrar).').
 texto_riesgo(escaso, 'Ojo: otro día así y te quedaría menos de un día de ración.').
 

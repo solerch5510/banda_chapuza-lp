@@ -94,11 +94,36 @@ Sin errores del jugador, la fórmula gana **200 de 200** con 6,5 quesos de media
 
 **Por qué base 6 y no más:** de 6 a 8 las victorias suben apenas dos puntos y el juego se vuelve más fácil sin ganar tensión. Las derrotas por hambre que quedan (un 12 %) no son de dinero: la regla de hambre se aplica **al llegar**, antes de que el jugador pueda aceptar el contrato que le habría pagado. Eso es lo siguiente.
 
+## Aplicado: la regla de hambre más justa (el ayuno)
+
+Antes, quedarse sin queso acababa la partida **en el acto**: al llegar a una zona, antes de que el jugador pudiera aceptar el contrato que le habría pagado, y aunque nadie hubiera pasado hambre todavía (bastaba con comerse la última ración). Era la causa del 12 % de derrotas por hambre que quedaba tras arreglar los pagos.
+
+Ahora la Banda aguanta unos **días seguidos sin comer** (`mundo:parametro(dias_de_ayuno_max, 2)`):
+
+- Un día en que alguien se queda sin ración suma uno al contador (`dias_de_ayuno`, un contador del estado); un día en que todos comen lo pone a cero.
+- Se pierde por hambre (`economia:derrota_por_hambre/0`) cuando hay **cero queso, nada por cobrar y el contador ha llegado al límite**.
+- Cobrar a tiempo salva: al llegar a la taberna el cobro se hace antes de comprobar el final.
+- Sigue habiendo castigo: cada día sin comer baja la moral y la vida (nunca por debajo de 1), así que una Banda famélica pierde más combates.
+- Los avisos se adaptan: `a_cero` («os quedáis sin queso») es un aviso suave y `hambre_mortal` solo sale cuando de verdad el siguiente día sin comer es el último.
+
+Jugador con plan y 10 % de errores, 250 partidas por variante (`herramientas/barrido.ps1`):
+
+| Días de ayuno | Victorias | Derrotas por hambre | Derrotas en combate |
+|---|---|---|---|
+| 0 (la regla antigua) | 215 (86 %) | 31 | 4 |
+| 1 | 229 (92 %) | 15 | 6 |
+| **2 (elegido)** | **229 (92 %)** | **10** | 11 |
+| 3 | 231 (92 %) | 4 | 15 |
+| 4 | 231 (92 %) | 3 | 16 |
+
+Lectura: de 0 a 1 día se recuperan 14 partidas; de 1 a 2, las victorias no suben, pero las derrotas pasan de «hambre» a «combate» (la Banda hambrienta llega más débil); de 2 a 4 no hay ganancia y casi nadie pierde ya de hambre, lo que **quitaría el peso al queso**. Con dos días se puede ir a una zona, hacer el contrato y volver a cobrar (justo el viaje de la partida perdida), sin que la comida deje de importar.
+
 ## Qué sigue (en este orden, cada paso con el simulador)
 
-1. ~~Pago según distancia y enemigos~~ (hecho, arriba).
-2. **Botín tras el combate** (azar con semilla, reproducible). Ya existe `lleva_queso/1` para algunos enemigos; hay que medir cuánto añade.
-3. **Regla de hambre más justa**: no perder si hay un contrato aceptable en la zona. Cambia las pruebas de la campaña y debería recoger buena parte de ese 12 %.
+1. ~~Pago según distancia y enemigos~~ (hecho).
+2. ~~Regla de hambre más justa~~ (hecho).
+3. **Botín tras el combate** (azar con semilla, reproducible). Ya existe `lleva_queso/1` para algunos enemigos; hay que medir cuánto añade.
+4. **Hablar con NPC** (el contenido es lo caro).
 
 ## Límites de lo medido
 

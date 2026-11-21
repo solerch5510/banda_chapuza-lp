@@ -315,7 +315,8 @@ test(se_pasa_hambre_si_el_queso_no_llega, [setup(nueva)]) :-
     memberchk(msg(llegada, [aldea], 0), Items).
 
 test(sin_queso_la_partida_termina_por_hambre, [setup(nueva)]) :-
-    despensa_con(4),
+    despensa_con(3),
+    aplicar_efecto(contar(dias_de_ayuno, 1)),             % ya se paso un dia sin comer
     cmd(ir(aldea), Items),
     economia:queso_total(0),
     fin_partida(derrota(derrota_hambre)),
@@ -323,7 +324,8 @@ test(sin_queso_la_partida_termina_por_hambre, [setup(nueva)]) :-
     memberchk(msg(fin_hambre, [], 0), Items).
 
 test(con_la_partida_terminada_no_se_puede_ir, [setup(nueva)]) :-
-    despensa_con(4),
+    despensa_con(3),
+    aplicar_efecto(contar(dias_de_ayuno, 1)),
     cmd(ir(aldea), _),
     cmd(ir(taberna), Items),
     Items == [error(fuera_de_fase(ir(taberna), fin))].

@@ -56,7 +56,7 @@ Ojo: otro día así y te quedaría menos de un día de ración.
 > ir(bosque)
 Amanece el día 14. Alguien tiene hambre y alguien más, una cuenta pendiente. Ración: 4 quesos.
 El Bosque del Moho te recibe con pelusilla. Hasta la sombra tiene moho; las setas opinan de tu forma de caminar.
-¡Peligro! Otro día así y la despensa se queda a cero sin nada por cobrar: perderías por hambre.
+Ojo: otro día así y os quedáis sin queso. Sin comida y sin nada por cobrar solo se aguantan unos días antes de perder por hambre.
 
 > inventario
 Despensa (día 14): 2 quesos (valor informativo: 4)

@@ -19,18 +19,18 @@ $antiguo = @(
 # Cada variante cambia numeros del texto de src/. Los pagos salen de la formula de contratos:pago_de/2
 # (base + por_dia * dias de ruta + por_enemigo * enemigos, con un minimo); los parametros estan en src/mundo.pl.
 $variantes = [ordered]@{
-    'formula actual (6 + 3/dia + 1/enemigo, min 12)' = @()
-    'pagos antiguos fijos (9 / 7 / 14)'              = $antiguo
-    'formula base 4'                                 = @(,
-        @('src/mundo.pl', 'parametro(pago_base,         6)', 'parametro(pago_base,         4)'))
-    'formula base 8'                                 = @(,
-        @('src/mundo.pl', 'parametro(pago_base,         6)', 'parametro(pago_base,         8)'))
-    'formula sin minimo (min 0)'                     = @(,
-        @('src/mundo.pl', 'parametro(pago_minimo,      12)', 'parametro(pago_minimo,       0)'))
-    'formula 4 por dia'                              = @(,
-        @('src/mundo.pl', 'parametro(pago_por_dia,      3)', 'parametro(pago_por_dia,      4)'))
-    'formula actual + inicio 16 quesos'              = @(,
-        @('src/mundo.pl', 'queso(cheddar, 0, 12)', 'queso(cheddar, 0, 16)'))
+    'ayuno 0 (la regla antigua: a cero, se acabo)' = @(,
+        @('src/mundo.pl', 'parametro(dias_de_ayuno_max, 2)', 'parametro(dias_de_ayuno_max, 0)'))
+    'ayuno 1 dia'                                  = @(,
+        @('src/mundo.pl', 'parametro(dias_de_ayuno_max, 2)', 'parametro(dias_de_ayuno_max, 1)'))
+    'ayuno 2 dias (actual)'                        = @()
+    'ayuno 3 dias'                                 = @(,
+        @('src/mundo.pl', 'parametro(dias_de_ayuno_max, 2)', 'parametro(dias_de_ayuno_max, 3)'))
+    'ayuno 4 dias'                                 = @(,
+        @('src/mundo.pl', 'parametro(dias_de_ayuno_max, 2)', 'parametro(dias_de_ayuno_max, 4)'))
+    'pagos antiguos fijos (9 / 7 / 14) con ayuno 2' = $antiguo
+    'pagos antiguos fijos (9 / 7 / 14), regla antigua' = @($antiguo[0], $antiguo[1], $antiguo[2],
+        @('src/mundo.pl', 'parametro(dias_de_ayuno_max, 2)', 'parametro(dias_de_ayuno_max, 0)'))
 }
 
 foreach ($nombre in $variantes.Keys) {

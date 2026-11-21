@@ -341,8 +341,9 @@ test(solo_se_guarda_la_ultima_prueba, [setup(nueva)]) :-
     As == [ir(taberna)].
 
 test(explicar_funciona_con_la_partida_terminada, [setup(nueva)]) :-
-    despensa_de([q(cheddar, 0, 4)]),
-    cmd(ir(aldea), _),                                     % se acaba el queso: fin por hambre
+    despensa_de([q(cheddar, 0, 3)]),
+    aplicar_efecto(contar(dias_de_ayuno, 1)),
+    cmd(ir(aldea), _),                                     % se acaba el queso y el ayuno: fin por hambre
     once(estado:fase(fin)),
     cmd(explicar, [vista(prueba, ir(aldea), _)]).
 

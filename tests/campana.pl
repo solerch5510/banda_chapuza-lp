@@ -301,11 +301,16 @@ test(la_derrota_en_combate_se_cuenta_en_pantalla, [nondet]) :-
     atomic_list_concat(Ts, '\n', Texto),
     sub_atom(Texto, _, _, _, 'Cuajados').
 
-test(vagar_sin_cobrar_es_derrota_por_hambre, [nondet]) :-
+% Quedarse a cero ya no acaba la partida en el acto: la Banda aguanta dos dias seguidos sin comer (docs/11).
+test(vagar_sin_cobrar_es_derrota_por_hambre_tras_el_ayuno, [nondet]) :-
     nueva_partida,
     ordena(ir(aldea), _),
     ordena(ir(bosque), _),
-    ordena(ir(camino_real), Items),
+    ordena(ir(camino_real), I3),                    % la ultima racion: queso a cero, pero todos han comido
+    \+ memberchk(msg(fin_hambre, [], _), I3),
+    ordena(ir(taberna), I4),                        % primer dia sin comer
+    \+ memberchk(msg(fin_hambre, [], _), I4),
+    ordena(ir(aldea), Items),                       % segundo: se acabo el ayuno
     memberchk(msg(fin_hambre, [], _), Items),
     estado:fin_partida(derrota(derrota_hambre)).
 
@@ -313,7 +318,8 @@ test(el_hambre_se_cuenta_en_pantalla, [nondet]) :-
     nueva_partida,
     ordena(ir(aldea), _),
     ordena(ir(bosque), _),
-    pantalla(ir(camino_real), Texto),
+    ordena(ir(camino_real), _), ordena(ir(taberna), _),
+    pantalla(ir(aldea), Texto),
     sub_atom(Texto, _, _, _, 'Sin ración'),
     sub_atom(Texto, _, _, _, 'Fin de la partida').
 
@@ -327,6 +333,7 @@ test(con_un_cobro_pendiente_el_hambre_no_acaba_la_partida, [nondet]) :-
 test(descansar_sin_comida_tambien_puede_acabar_la_partida, [nondet]) :-
     nueva_partida,
     aplicar_efecto(gastar_queso(cheddar, 0, 10)),       % quedan 2: justo para descansar
+    aplicar_efecto(contar(dias_de_ayuno, 1)),           % y ya se ha pasado un dia sin comer
     ordena(descansar, Items),
     memberchk(msg(fin_hambre, [], _), Items),
     estado:fin_partida(derrota(derrota_hambre)).
@@ -334,6 +341,7 @@ test(descansar_sin_comida_tambien_puede_acabar_la_partida, [nondet]) :-
 test(tras_la_derrota_no_se_puede_seguir, [nondet]) :-
     nueva_partida,
     ordena(ir(aldea), _), ordena(ir(bosque), _), ordena(ir(camino_real), _),
+    ordena(ir(taberna), _), ordena(ir(aldea), _),
     ordena(ir(taberna), Items),
     Items = [error(fuera_de_fase(_, fin))].
 

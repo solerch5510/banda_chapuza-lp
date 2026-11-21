@@ -84,9 +84,9 @@ body[data-tema="light"] { background: #f8edcd; }
 
 /* La comida: indicador de la cabecera y avisos */
 .header-stats .comida small { font-size: 12px; color: var(--muted); }
-.header-stats .comida.escaso, .header-stats .comida.sin_queso { color: var(--cheddar); }
+.header-stats .comida.escaso, .header-stats .comida.sin_queso, .header-stats .comida.a_cero { color: var(--cheddar); }
 .header-stats .comida.hambre_mortal { color: var(--no); font-weight: 700; }
-.header-stats .comida.hambre_mortal small, .header-stats .comida.sin_queso small, .header-stats .comida.escaso small { color: inherit; }
+.header-stats .comida.hambre_mortal small, .header-stats .comida.sin_queso small, .header-stats .comida.a_cero small, .header-stats .comida.escaso small { color: inherit; }
 .narration-line.aviso-comida { border-left: 3px solid var(--no); background: color-mix(in srgb, var(--no) 8%, transparent); padding-left: 8px; }
 .narration-line.aviso-comida .line-mark { color: var(--no); }
 .narration-line.objetivo { border-left: 3px solid var(--cheddar); background: color-mix(in srgb, var(--cheddar) 9%, transparent); padding-left: 8px; }
