@@ -29,7 +29,7 @@
 % frase/3 es un hecho ESTATICO (nadie hace assert sobre el). Es multifile para que las
 % pruebas puedan anadir frases de ejemplo sin tocar el banco real.
 :- multifile frase/3.
-:- discontiguous frase/3.
+:- discontiguous frase/3, descripcion_evento/2, descripcion_opcion/3.
 
 % ===========================================================================
 % El banco de frases
@@ -83,6 +83,18 @@ frase(suceso(evento_elige(rescate_gato, sacudir_arbol)), ambos,
       'Sir Baldomero sacude el árbol por su honor. El gato cae, el árbol también y el pozo de la alcaldesa recibe a los dos.').
 frase(suceso(evento_elige(rescate_gato, cantar)), ambos,
       'Rufino canta una balada. El gato la escucha entera y sube más alto, por prudencia.').
+frase(suceso(evento_abre(escuchar_al_fantasma)), ambos,
+      'Un mayordomo translúcido os recibe en la Casa del Cuervo Gordo con una reverencia de trescientos años. «Qué alegría. Hacía siglos que nadie venía a que lo asusten. ¿Les cuento mi historia?» Tenéis tres intentos y ninguna prisa, que él tampoco.').
+frase(suceso(evento_elige(escuchar_al_fantasma, escuchar_la_historia)), ambos,
+      'Rufino escucha la historia entera, con pausas y todo. Al llegar a la cena, el fantasma llora de alivio y se despide: nadie le había dejado terminar nunca.').
+frase(suceso(evento_elige(escuchar_al_fantasma, exorcizar_con_fondue)), ambos,
+      'Pimentina enciende una fondue flamígera y el fantasma, ofendido, se esfuma con dignidad. La casa queda en paz, sin gracias. Cuesta un queso.').
+frase(suceso(evento_elige(escuchar_al_fantasma, exigirle_que_se_vaya)), ambos,
+      'Baldomero exige que se marche, con voz de espada. El fantasma lo mira con cortesía y empieza otra vez desde el principio.').
+frase(suceso(evento_elige(escuchar_al_fantasma, fingir_que_se_escucha)), ambos,
+      'Tuerca asiente con cara de atención mientras cuenta las tablas del techo. El fantasma nota la diferencia y se lo toma a mal, con mucha educación.').
+frase(suceso(intento_fallido(escuchar_al_fantasma, 0)), ambos,
+      'Se acabaron los intentos con el fantasma. Se queda en la casa, muy a gusto, y la alcaldesa suspira: otro siglo de visitas gratis.').
 frase(suceso(intento_fallido(E, 0)), ambos,
       'Se acabaron los intentos en «~w». El gato se muda a otro árbol y la alcaldesa suspira con experiencia.'-[E]).
 frase(suceso(intento_fallido(_, 1)), ambos,
@@ -551,6 +563,8 @@ frase(falla(visita(Z)), ambos,
       'Antes hay que presentarse en ~w: el rey no firma con desconocidos.'-[Z]).
 frase(falla(moral_media_min(N)), ambos,
       'La moral de la Banda no llega a la media de ~w que exige el rey. Un buen descanso no vendría mal.'-[N]).
+frase(falla(cumplido(C)), ambos,
+      'El rey no se fía de quien no ha cumplido «~w». Primero ese trabajo; después, hablamos del jefe.'-[C]).
 frase(falla(miembros_en_pie_min(N)), ambos,
       'El rey quiere al menos ~w miembros en pie. Los demás pueden mirar, pero no cuentan.'-[N]).
 frase(falla(disponible(_)), ambos,
@@ -595,6 +609,13 @@ nombre(bandido_torpe,   'el Bandido Torpe').
 nombre(moho_saltarin,   'el Moho Saltarín').
 nombre(bandido_montado, 'el Bandido Montado').
 nombre(gran_roquefort,  'el Gran Roquefort').
+nombre(ganso_de_peaje,  'el Ganso del Peaje').
+nombre(seta_belicosa,   'la Seta Belicosa').
+nombre(carretero_anonimo, 'el Carretero Anónimo').
+nombre(peaje_del_ganso,    'El Peaje del Ganso').
+nombre(fantasma_charlatan, 'El Fantasma Charlatán').
+nombre(paz_del_moho,       'La Paz del Moho').
+nombre(escuchar_al_fantasma, 'la historia del fantasma').
 nombre(mantecosa,        'Doña Mantecosa').
 nombre(gruyere,          'Gruyère').
 nombre(alcaldesa_nata,   'la Alcaldesa Nata').
@@ -883,11 +904,20 @@ descripcion_opcion(rescate_gato, hechizo_de_raclette, 'Madame Pimentina lo atrae
 descripcion_opcion(rescate_gato, sacudir_arbol,       'Sir Baldomero sacude el árbol con todo su honor').
 descripcion_opcion(rescate_gato, cantar,              'Rufino le canta una balada (gasta un intento)').
 
+descripcion_evento(escuchar_al_fantasma, 'El Fantasma Charlatán: Eustaquio lleva siglos asustando a la Casa del Cuervo Gordo para tener con quién hablar.').
+descripcion_opcion(escuchar_al_fantasma, escuchar_la_historia,  'Rufino escucha su historia entera').
+descripcion_opcion(escuchar_al_fantasma, exorcizar_con_fondue,  'Madame Pimentina lo exorciza con fondue (cuesta 1 queso)').
+descripcion_opcion(escuchar_al_fantasma, exigirle_que_se_vaya,  'Sir Baldomero le exige que se vaya (gasta un intento)').
+descripcion_opcion(escuchar_al_fantasma, fingir_que_se_escucha, 'Tuerca finge que escucha (gasta un intento)').
+
 % descripcion_contrato(+Contrato, -Texto): el chiste de cada contrato, que enseña el tablon.
 descripcion_contrato(ratas_del_granero, 'Las ratas dicen tener papeles de alquiler por un queso al siglo y se hacen las muertas para cobrar el seguro.').
 descripcion_contrato(gato_en_el_arbol,  'Su Excelencia Bigotes lleva tres días arriba y dice que desde allí se juzga mejor.').
 descripcion_contrato(gallina_noble,     'Lady Clotilde exige palanquín, escolta y que nadie cante a su alrededor: «Si canta, picoteo».').
 descripcion_contrato(despensa_real,     'El rey contrata a los peores porque los buenos no cobran en promesas de cobro.').
+descripcion_contrato(peaje_del_ganso,    'Un ganso cobra «el peaje del peaje» en el Camino Real y nadie se atreve a discutirle la tarifa.').
+descripcion_contrato(fantasma_charlatan, 'La Casa del Cuervo Gordo está encantada por un mayordomo que solo quiere que alguien le escuche.').
+descripcion_contrato(paz_del_moho,       'Las setas del bosque han perdido la paciencia y el moho saltarín, los modales.').
 
 % descripcion_personaje(+Npc, -Texto): quien es, para la lista de `hablar.`
 descripcion_personaje(mantecosa,        'La dueña del Cuajo Torcido: cobra todo y no perdona nada.').
@@ -1167,6 +1197,7 @@ texto_falta(contratos(1), 'un contrato más cumplido') :- !.
 texto_falta(contratos(K), Texto) :- format(atom(Texto), '~w contratos más cumplidos', [K]).
 texto_falta(moral(N), Texto) :- format(atom(Texto), 'subir la moral media a ~w', [N]).
 texto_falta(en_pie(N), Texto) :- format(atom(Texto), 'tener ~w miembros en pie', [N]).
+texto_falta(contrato(C), Texto) :- nombre_visible(C, N), format(atom(Texto), 'cumplir «~w»', [N]).
 texto_falta(visita(Z), Texto) :- nombre_visible(Z, N), format(atom(Texto), 'visitar ~w', [N]).
 texto_falta(rasgo(_), 'resolver un impedimento de la compañía').
 

@@ -1,5 +1,5 @@
 % Partida de respaldo (plan B de la exposición): la campaña completa por la vía cómoda, 
-% los cuatro contratos y el jefe, jugada como en docs/07-playtest-1.md. Se pasa entera con:
+% los cinco contratos (ratas, gato, gallina, peaje y el jefe), jugada como en docs/07-playtest-1.md. Se pasa entera con:
 %   swipl -q -s src/main -g main -t halt < examples/campana-comandos.txt
 % y la transcripción guardada está en campana-salida.txt.
 ayuda.
@@ -25,6 +25,12 @@ habilidad(bandido_torpe).
 habilidad(bandido_torpe).
 habilidad.
 habilidad(bandido_torpe).
+aceptar(peaje_del_ganso).
+habilidad(ganso_de_peaje).
+habilidad(ganso_de_peaje).
+habilidad(bandido_torpe).
+habilidad.
+habilidad(bandido_torpe).
 ir(castillo).
 aceptar(despensa_real).
 ir(camino_real).
@@ -34,16 +40,12 @@ habilidad(gran_roquefort).
 habilidad(gran_roquefort).
 habilidad.
 habilidad(gran_roquefort).
-atacar(gran_roquefort).
+habilidad(gran_roquefort).
 atacar(gran_roquefort).
 habilidad.
 habilidad(gran_roquefort).
-atacar(gran_roquefort).
-atacar(gran_roquefort).
-habilidad.
 habilidad(gran_roquefort).
-atacar(moho_saltarin).
-habilidad(moho_saltarin).
+atacar(gran_roquefort).
 habilidad.
 habilidad(moho_saltarin).
 explicar.

@@ -436,7 +436,7 @@ test(el_mapa_son_las_seis_zonas_y_sus_conexiones_reales) :-
 test(los_contratos_visibles_con_sus_estados) :-
     nueva_partida, estado_json(E), campo(E, contratos, Cs),
     findall(Id-Es, ( member(C, Cs), campo(C, id, Id), campo(C, estado, Es) ), Ps),
-    assertion(Ps = [ratas_del_granero-_, gato_en_el_arbol-_, gallina_noble-bloqueado]),
+    assertion(Ps = [ratas_del_granero-_, gato_en_el_arbol-_, gallina_noble-bloqueado, peaje_del_ganso-_, fantasma_charlatan-_]),
     forall(member(C, Cs), ( campo(C, nombre, N), campo(C, recompensa, R), assertion(atom(N)), assertion(atom(R)) )).
 
 test(en_exploracion_sin_combate_ni_final) :-

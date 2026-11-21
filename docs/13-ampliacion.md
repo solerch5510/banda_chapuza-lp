@@ -4,8 +4,8 @@
 
 ## 0. Estado (20 de noviembre de 2026)
 
-- **Hecho:** los **sucesos de zona** (§4), con cinco sucesos (bosque, aldea, Camino Real, castillo y cuevas). Etiqueta `v1.0-rc2` marcada antes de empezar como punto de vuelta atrás.
-- **Pendiente:** contratos y enemigos nuevos (§3), encuentros al moverse (§5) y, si el autor lo decide el 27 de noviembre, el paquete C (§6).
+- **Hecho:** los **sucesos de zona** (§4), con cinco sucesos (bosque, aldea, Camino Real, castillo y cuevas), y **contratos y enemigos nuevos** (§3): el peaje del ganso, el fantasma charlatán y la paz del moho; el ganso del peaje y la seta belicosa. El jefe exige ahora dos contratos concretos (la escolta y el peaje). Etiqueta `v1.0-rc2` marcada antes de empezar como punto de vuelta atrás.
+- **Pendiente:** encuentros al moverse (§5), el paquete D de niveles y experiencia (§10) y, si el autor lo decide el 27 de noviembre, el paquete C (§6).
 
 ## 1. Resumen
 
@@ -107,3 +107,46 @@ La exposición es de **Programación Declarativa**: lo que luce es que el juego 
 3. **Peaje:** ¿una cantidad fija de queso por cruzar, o que dependa de algo (el contrato de Clotilde, un sello)?
 4. **Tamaño del reino vecino:** ¿cuatro o cinco zonas o menos? (más zonas = más texto)
 5. **Fecha de congelación:** ¿se mantiene el 4 de diciembre o se mueve?
+
+## 10. Paquete D: niveles, experiencia y dificultad por zona (valoración)
+
+*Propuesta del autor (20 de noviembre de 2026): enemigos con un nivel por zona, de modo que haya que subir de nivel a los personajes para aumentar sus cifras y ganar alguna habilidad (niveles 3, 5, 10, 15 y 20); más dificultad para fomentar el farmeo; y que en los eventos se gane experiencia, según quién resuelva y en qué intento, en lugar de queso.*
+
+### 10.1 Qué hay hoy y qué obligaría a cambiar
+
+- **Cifras fijas como datos:** `mundo:personaje/7` guarda vida, ataque y defensa de cada miembro. Se leen en **unos 10 puntos de `src/`** (daño, defensa, vida máxima, fichas de la API, estado inicial). Con niveles, esas lecturas pasan por reglas derivadas (`ataque_de/2`, `defensa_de/2`, `vida_maxima_de/2`) que suman el crecimiento del nivel.
+- **Una habilidad por miembro:** `habilidad_de/2` es una por personaje, y el comando `habilidad` usa «la del que actúa». Con varias habilidades hace falta elegir cuál (`habilidad(Nombre, Objetivo)`) y cambiar los botones de la web.
+- **Los enemigos son una tabla** (`enemigo/4`): el nivel de una zona pediría o una tabla de niveles por zona y un escalado de cifras al empezar el combate, o enemigos distintos por zona.
+- **Experiencia:** hoy no existe. Los eventos ya saben **quién** resuelve (`Quien`) y **en qué intento** (`intentos_hechos/2`), así que la regla «más experiencia cuanto antes se resuelva» cabe en `eventos.pl`.
+- **Pruebas:** hay más de 150 apariciones de daños y ataques concretos en las pruebas. **Regla de oro del diseño: el nivel 1 debe ser exactamente las cifras de hoy**; solo se crece a partir del 2. Así lo que ya está verificado sigue valiendo.
+
+### 10.2 Cómo sería, en datos
+
+| Pieza | Dato o regla |
+|---|---|
+| Crecimiento por rol | `crecimiento(Rol, vida(+V), ataque(+A), defensa(+D))`: cada nivel suma esto a las cifras base |
+| Curva de experiencia | `xp_para(Nivel, XP)`, por ejemplo 20 × nivel (se ajusta con el simulador) |
+| Nivel de las zonas | `nivel_de_zona(Zona, N)`: los enemigos de esa zona escalan; la web avisa del **nivel recomendado** |
+| Habilidades | `habilidad_en(Id, Nivel, Habilidad)`: 2 por miembro (niveles 3 y 5) para empezar |
+| Experiencia por evento | `xp_por_intento(Intentos, XP)`: más cuanto antes se resuelve; la gana **quien** lo resolvió |
+| Efectos | `ganar_xp(Id, N)` y la subida de nivel como efectos que aplica `estado.pl` |
+
+### 10.3 Lo que cuesta y lo que arriesga
+
+- **Mínimo útil (niveles 1 a 5):** crecimiento por rol, experiencia por combate, contrato y evento, nivel de zona con aviso, **dos habilidades por miembro** (niveles 3 y 5), ficha y cabecera de la web, simulador con política de «farmeo» y pruebas. **De 5 a 7 días**, con riesgo alto porque toca el cálculo del combate.
+- **Los niveles 10, 15 y 20** solo tienen sentido con **mucho más juego**: hoy una partida dura de 7 a 14 días y daría para llegar al nivel 4 o 5. Se pueden dejar **definidos en los datos y sin contenido** (la curva existe, las habilidades no), para que la ampliación futura solo añada filas.
+- **El farmeo necesita dos cosas que hoy no hay:** combates que se puedan repetir (los **encuentros al moverse**, §5, que dan experiencia y botín) y una economía que lo aguante: cada día cuesta 4 quesos de ración, así que farmear solo compensa si el botín y los contratos lo pagan. Hay que medirlo con el simulador, igual que se hizo con los pagos y el ayuno.
+- **Las habilidades nuevas son contenido caro:** cada una pide su efecto, su texto, su prueba y su botón. Con 4 miembros, 2 habilidades cada uno son 8.
+- **Cuidado con el muro:** si la zona nueva pide un nivel que el jugador no puede alcanzar sin farmear días y días, la partida se vuelve un trámite. El **nivel recomendado visible** y una subida de nivel rápida al principio lo suavizan.
+
+### 10.4 Recomendación
+
+Hacer **D mínimo (niveles 1 a 5)** después de los encuentros (§5), que son su base. **No combinarlo con el paquete C en la misma quincena**: son los dos grandes y juntos sobrepasan el margen hasta el 4 de diciembre. Si hay que elegir uno, D da más «sensación de juego» y reutiliza lo ya hecho (datos, simulador, efectos); C da más tamaño pero también más texto y más riesgo. La decisión es del autor el **27 de noviembre**.
+
+### 10.5 Decisiones que necesito del autor
+
+1. **Experiencia compartida o individual:** ¿gana cada miembro por lo que hace (quien resuelve un evento, quien da el golpe final) o todos por igual? (lo que el autor describe es **individual**).
+2. **Qué sustituye al queso:** en los eventos, ¿las opciones que hoy dan queso pasan a dar experiencia, o la dan además?
+3. **Hasta qué nivel con contenido real:** ¿5 (propuesta) o más?
+4. **Qué habilidades:** ¿las propongo yo (8, con su texto) para que las corrijas?
+5. **Prioridad:** ¿D antes que C, C antes que D, o solo uno de los dos?

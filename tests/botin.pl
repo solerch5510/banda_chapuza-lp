@@ -230,8 +230,8 @@ test(el_simulador_fija_la_semilla_del_juego_en_cada_partida) :-
     episodio(azar, 99, 0, _), estado:semilla(S2), assertion(S2 == 99).
 
 test(cada_partida_simulada_tira_con_su_propia_semilla) :-
-    episodio(plan(0, 2), 11, 400, r(victoria, _, Q1, _)),
-    findall(Q, ( between(12, 40, S), episodio(plan(0, 2), S, 400, r(victoria, _, Q, _)) ), Qs),
+    episodio(plan(0, 2), 11, 400, r(_, _, Q1, _)),
+    findall(Q, ( between(12, 40, S), episodio(plan(0, 2), S, 400, r(_, _, Q, _)) ), Qs),
     sort([Q1|Qs], Distintos), length(Distintos, N), assertion(N >= 2).
 
 :- end_tests(lo_que_mide_el_simulador).

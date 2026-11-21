@@ -38,9 +38,21 @@ contrato(gato_en_el_arbol, aldea, evento(rescate_gato),
 contrato(gallina_noble, camino_real, escoltar(gallina_noble, castillo),
          recompensa([quesos(pago), queso(brie, 0, 1)]),
          [requiere(rasgo_no(teme_caballos))]).
+contrato(peaje_del_ganso, camino_real, eliminar([ganso_de_peaje-1, bandido_torpe-1]),
+         recompensa([quesos(pago)]), []).
+contrato(fantasma_charlatan, aldea, evento(escuchar_al_fantasma),
+         recompensa([quesos(pago), objeto(pocion)]),
+         [requiere(moral_media_min(4))]).
+contrato(paz_del_moho, bosque, eliminar([seta_belicosa-2, moho_saltarin-1]),
+         recompensa([quesos(pago)]), []).
+% El jefe: el rey no se fia de cualquiera. Ademas de tres contratos cumplidos, pide dos concretos: la escolta de
+% Clotilde (la prueba de que se puede confiar en la Banda con lo valioso) y el peaje del Camino Real (el camino
+% hasta las cuevas tiene que estar libre).
 contrato(despensa_real, cuevas, derrotar(gran_roquefort),
          recompensa([quesos(40)]),
-         [requiere(contratos_cumplidos_min(3)), requiere(visita(castillo)),
+         [requiere(contratos_cumplidos_min(3)),
+          requiere(cumplido(gallina_noble)), requiere(cumplido(peaje_del_ganso)),
+          requiere(visita(castillo)),
           requiere(moral_media_min(4)), requiere(miembros_en_pie_min(3))]).
 
 % ---------------------------------------------------------------------------
@@ -91,12 +103,18 @@ resolver_premio(_, Premio, Premio).
 oferente(ratas_del_granero, alcaldesa_nata, aldea).
 oferente(gato_en_el_arbol,  alcaldesa_nata, aldea).
 oferente(gallina_noble,     gallina_noble,  camino_real).
+oferente(peaje_del_ganso,    carretero_anonimo, camino_real).
+oferente(fantasma_charlatan, alcaldesa_nata,    aldea).
+oferente(paz_del_moho,        alcaldesa_nata,    aldea).
 oferente(despensa_real,     rey_brieto,     castillo).
 
 % aparece(Contrato, Condiciones): cuando se ve en el tablon (son del mismo vocabulario).
 aparece(ratas_del_granero, []).
 aparece(gato_en_el_arbol,  []).
 aparece(gallina_noble,     []).                      % visible el dia 1, pero bloqueado sin la venda
+aparece(peaje_del_ganso,    []).
+aparece(fantasma_charlatan, []).
+aparece(paz_del_moho,       [requiere(visita(bosque))]).     % solo se oye hablar de el al pasar por el bosque
 aparece(despensa_real,     [requiere(visita(castillo))]).
 
 % enemigos_de(Contrato, Grupo): los enemigos de los contratos cuyo objetivo es escoltar.
@@ -113,6 +131,11 @@ resolucion(gato_en_el_arbol,  fracaso,  []).
 resolucion(gallina_noble,     exito,    [contador_max(golpes_a_clotilde, 2)]).
 resolucion(gallina_noble,     a_medias, [contador_max(golpes_a_clotilde, 4)]).
 resolucion(gallina_noble,     fracaso,  []).
+resolucion(peaje_del_ganso,    exito,    []).
+resolucion(fantasma_charlatan, exito,    [marca(fantasma_escuchado)]).
+resolucion(fantasma_charlatan, a_medias, [marca(fantasma_espantado)]).
+resolucion(fantasma_charlatan, fracaso,  []).
+resolucion(paz_del_moho,       exito,    []).
 resolucion(despensa_real,     exito,    []).
 
 % ---------------------------------------------------------------------------
@@ -183,6 +206,8 @@ condicion_cumple(contratos_cumplidos_min(N)) :-
 condicion_cumple(moral_media_min(N)) :-
     compania:moral_media(M),
     M >= N.
+condicion_cumple(cumplido(C)) :-
+    contrato_cumplido(C).
 condicion_cumple(visita(Z)) :-
     estado:visitada(Z).
 condicion_cumple(miembros_en_pie_min(N)) :-
@@ -266,6 +291,7 @@ falta_de(contratos_cumplidos_min(N), contratos(K)) :- contratos_cumplidos(C), K 
 falta_de(moral_media_min(N),         moral(N)).
 falta_de(miembros_en_pie_min(N),     en_pie(N)).
 falta_de(visita(Z),                  visita(Z)).
+falta_de(cumplido(C),                contrato(C)).
 falta_de(rasgo_no(R),                rasgo(R)).
 
 % objetivo_actual(-Paso, -Faltas): el paso que toca y, aparte, lo que falta para el contrato final.
@@ -306,6 +332,9 @@ faltas_del_final(Faltas) :-
 dificultad(ratas_del_granero, 1).
 dificultad(gato_en_el_arbol,  1).
 dificultad(gallina_noble,     3).
+dificultad(peaje_del_ganso,    3).
+dificultad(fantasma_charlatan, 2).
+dificultad(paz_del_moho,       3).
 dificultad(despensa_real,     5).
 
 
@@ -329,6 +358,11 @@ consecuencia(gato_en_el_arbol,  fracaso,  [moral(grupo, -1)]).
 consecuencia(gallina_noble,     exito,    [cobrar(todo), moral(grupo, 1), marcar(recomendada_por_clotilde)]).
 consecuencia(gallina_noble,     a_medias, [cobrar(mitad), marcar(recomendada_por_clotilde)]).
 consecuencia(gallina_noble,     fracaso,  [perder_queso(3), moral(grupo, -2)]).
+consecuencia(peaje_del_ganso,    exito,    [cobrar(todo), moral(grupo, 1)]).
+consecuencia(fantasma_charlatan, exito,    [cobrar(todo), moral(grupo, 1), marcar(fantasma_amigo)]).
+consecuencia(fantasma_charlatan, a_medias, [cobrar(mitad), cobrar(objetos)]).
+consecuencia(fantasma_charlatan, fracaso,  [moral(grupo, -1)]).
+consecuencia(paz_del_moho,       exito,    [cobrar(todo), moral(grupo, 1)]).
 consecuencia(despensa_real,     exito,    [cobrar(todo), victoria]).    % ganar el jefe es ganar la partida
 
 % --- los finales de victoria (docs/04 §8.4) ---

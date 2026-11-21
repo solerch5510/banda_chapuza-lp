@@ -6,7 +6,7 @@ Guiones de comandos y sus transcripciones guardadas. Todo se **genera** con el p
 |---|---|
 | `demo-comandos.txt` | El guion de la demostración de la exposición (~13 min): las cinco escenas y los comandos de cada una. Un comando por línea; las líneas que empiezan por `%` son comentarios. |
 | `demo-salida.txt` | Su transcripción: cada orden aparece tras `> ` y debajo lo que respondió el juego. |
-| `campana-comandos.txt` | La **partida de respaldo** (plan B si algo falla en directo): la campaña entera por la vía cómoda, con los cuatro contratos y el jefe. |
+| `campana-comandos.txt` | La **partida de respaldo** (plan B si algo falla en directo): la campaña entera por la vía cómoda, con los contratos del camino al jefe (ratas, gato, gallina y peaje) y el jefe. |
 | `campana-salida.txt` | Su transcripción (acaba en victoria). |
 | `explicaciones/*.txt` | Las pantallas clave de `explicar` y `por_que_no`, una por archivo y en sus dos niveles (resumido y detallado): ataque explicado, el miedo de Baldomero, el turno enemigo con el corte, y la gallina noble con y sin venda. |
 | `generar.pl` | Regenera todas las salidas a partir de los guiones. |

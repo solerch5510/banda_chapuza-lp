@@ -14,7 +14,7 @@ Autor: solerch5510 · Repositorio: <https://github.com/solerch5510/banda_chapuza
 
 La idea central es que **el juego entero es un programa lógico**: el mundo son hechos, las reglas son cláusulas y dos **meta-intérpretes** (programas Prolog que ejecutan programas Prolog) permiten preguntar, con la voz de un narrador sarcástico, **por qué** pasó algo (`explicar`) o **por qué no** se pudo hacer (`por_que_no`), mostrando el árbol de derivación de las propias reglas del juego. Esa pregunta no es un añadido: es el motivo de que el proyecto exista.
 
-El resultado es un programa de unas 5 200 líneas en 16 módulos, con **36 suites de pruebas y 2 110 pruebas**, una demostración reproducible y, como extra, un frontend web que usa el mismo motor.
+El resultado es un programa de unas 5 200 líneas en 16 módulos, con **37 suites de pruebas y 2 157 pruebas**, una demostración reproducible y, como extra, un frontend web que usa el mismo motor.
 
 ## 2. Introducción y objetivos
 
@@ -218,7 +218,7 @@ Con `nivel(detallado)` el mismo comando muestra cada una de esas negaciones desp
 
 La verificación fue una parte principal del trabajo, no un final:
 
-- **36 suites y 2 110 pruebas** (`plunit`), que se ejecutan con una sola orden (`tests/todas.pl`, un proceso por suite, código de salida 0 o 1) y que un clon limpio del repositorio pasa.
+- **37 suites y 2 157 pruebas** (`plunit`), que se ejecutan con una sola orden (`tests/todas.pl`, un proceso por suite, código de salida 0 o 1) y que un clon limpio del repositorio pasa.
 - **Pruebas de mutación hechas a mano.** Tras cada tarea se rompe el código a propósito (un mutante por cada decisión importante: una condición al revés, un `>=` por un `>`, un corte quitado) y se comprueba que alguna prueba falla. Un mutante que sobrevive indica una prueba que falta, y varias veces llevó a escribir una nueva; los pocos equivalentes (que no cambian el comportamiento) se anotaron como tales.
 - **Pruebas de equivalencia del meta-intérprete.** Para 40 objetivos del juego en 8 escenarios (320 comparaciones, 971 soluciones), ejecutar la meta directamente y demostrarla con `solve/2` da **las mismas soluciones en el mismo orden**; es lo que garantiza que `explicar` no miente. Incluye negación, if-then-else, aritmética, `findall`, `forall` y la IA con corte.
 - **Oráculos y arneses aleatorios.** La IA con corte contra su gemela declarativa (permanente, en las suites). Además, durante el desarrollo se usaron arneses que juegan miles de pasos al azar con entradas válidas, inválidas y raras (por ejemplo, 400 partidas de 40 pasos) y comprueban invariantes tras cada paso: un error no cambia el estado, la vida y la moral están siempre dentro de rango, la fase es coherente con los hechos y `ejecutar/2` nunca falla ni imprime. Esos arneses no forman parte del repositorio; lo permanente son las suites.
@@ -240,7 +240,7 @@ El proyecto se hizo en tareas pequeñas y verificables (T-01 a T-42 más el extr
 
 ## 9. Limitaciones y trabajo futuro
 
-- **Alcance.** Se cumplió el nivel mínimo (4 contratos, 5 enemigos, 17 comandos, 3 finales) y parte del objetivo (`nivel`, `demo` y más frases). No se hicieron `usar`, `huir`, `comer`, más contratos ni enemigos, tienda, `guardar`/`cargar` ni reclutas.
+- **Alcance.** Se cumplió el nivel mínimo y se fue más allá: 7 contratos, 7 enemigos, 21 comandos (con `hablar`, `usar`, `explorar` y `diario`), botín con azar reproducible, ayuno, charlas con 18 personajes, sucesos de zona y un simulador de balance. No se hicieron `huir`, `comer`, tienda, `guardar`/`cargar` ni reclutas.
 - **Balance.** La ruta cómoda gana el día 7 con **cero** quesos de margen: el juego es ganable pero ajustado, y un segundo playtest con otra persona queda como mejora.
 - **Web.** Una partida por servidor, y la crónica vive en el navegador (se pierde al recargar).
 - **Versión de SWI-Prolog.** Se usó solo lo disponible en la 5.10.4 (sin `yall`, `foldl/4` ni `sort/4`), lo que obligó a escribir ayudantes propios.

@@ -26,6 +26,7 @@
 %   Final: resuelve (el evento acaba y el contrato se resuelve) o intento (cuenta como intento fallido).
 % ---------------------------------------------------------------------------
 intentos_maximos(rescate_gato, 3).
+intentos_maximos(escuchar_al_fantasma, 3).
 
 opcion_evento(rescate_gato, trepar, tuerca,
               [en_pie(tuerca)],
@@ -38,6 +39,21 @@ opcion_evento(rescate_gato, sacudir_arbol, baldomero,
               [marcar(gato_bajado_a_golpes)], resuelve).
 opcion_evento(rescate_gato, cantar, rufino,
               [en_pie(rufino)],
+              [], intento).
+
+% El fantasma charlaton: lo que quiere es que alguien escuche su historia entera. Escucharle lo resuelve bien; el
+% exorcismo de Pimentina lo resuelve a medias (se va, pero sin gratitud); exigirle o fingir que se escucha no sirve.
+opcion_evento(escuchar_al_fantasma, escuchar_la_historia, rufino,
+              [en_pie(rufino)],
+              [marcar(fantasma_escuchado)], resuelve).
+opcion_evento(escuchar_al_fantasma, exorcizar_con_fondue, pimentina,
+              [en_pie(pimentina), queso_min(1)],
+              [perder_queso(1), marcar(fantasma_espantado)], resuelve).
+opcion_evento(escuchar_al_fantasma, exigirle_que_se_vaya, baldomero,
+              [en_pie(baldomero)],
+              [], intento).
+opcion_evento(escuchar_al_fantasma, fingir_que_se_escucha, tuerca,
+              [en_pie(tuerca)],
               [], intento).
 
 % evento_de_contrato(?Contrato, ?Evento, ?Zona): el evento que es el objetivo de un contrato.

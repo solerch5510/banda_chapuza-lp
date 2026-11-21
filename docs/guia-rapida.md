@@ -45,6 +45,7 @@ Sigue con `atacar(...)`, `defender.` y `habilidad(...)` hasta ganar el combate. 
 - **Objetos:** `usar(pocion, tuerca).` gasta una poción y cura a ese miembro (hasta su vida máxima). Fuera de combate no pasa el tiempo; en combate gasta el turno de quien actúa. Las pociones llegan como recompensa de contrato o de alguna charla.
 - **Gente:** `hablar.` enseña quién hay aquí hoy (algunos solo están los primeros días). `hablar(Nombre).` abre su escena: eliges con `elegir(1).` qué miembro de la Banda hace qué. Cuesta poco o nada y da pistas; `diario.` lista lo que ya sabéis del Gran Rancio.
 - **Botín:** al ganar un combate, los bandidos sueltan siempre un queso y las ratas, a veces (una tirada con la semilla del juego: la misma partida da el mismo botín).
+- **El jefe:** el rey no te encarga al Gran Roquefort hasta que hayas cumplido **la escolta de Lady Clotilde y el peaje del Camino Real** (además de tres contratos en total, y de haber visitado el castillo). Los demás contratos son extra: pagan, pero no hacen falta.
 - **Sueldos:** al volver a la taberna hay sueldos por pagar (`pagar.`). Si sales sin pagar, baja la moral, y con la moral por los suelos alguien se pone en **huelga**.
 - **Descansar** (`descansar.`, solo en la taberna) cura a todos pero cuesta queso.
 - **Contratos:** los premios se cobran en la taberna. Algunos contratos están **bloqueados** por algo de la Banda (por ejemplo, a Baldomero le dan miedo los caballos).

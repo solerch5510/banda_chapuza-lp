@@ -43,13 +43,15 @@ listo_para_el_rey :-
     cerrar(ratas_del_granero, exito),
     cerrar(gato_en_el_arbol, a_medias),
     cerrar(gallina_noble, exito),
+    cerrar(peaje_del_ganso, exito),
     aplicar_efecto(visitar(castillo)).
 
 :- begin_tests(catalogo).
 
-test(hay_cuatro_contratos_de_la_version_minima) :-
+test(hay_siete_contratos_los_cuatro_de_la_version_minima_y_tres_de_la_ampliacion) :-
     findall(C, contratos:contrato(C, _, _, _, _), Cs),
-    Cs == [ratas_del_granero, gato_en_el_arbol, gallina_noble, despensa_real].
+    Cs == [ratas_del_granero, gato_en_el_arbol, gallina_noble, peaje_del_ganso, fantasma_charlatan,
+           paz_del_moho, despensa_real].
 
 test(cada_contrato_tiene_zona_conocida) :-
     forall(contratos:contrato(_, Z, _, _, _), mundo:zona(Z, _)).
@@ -93,9 +95,12 @@ test(cada_contrato_tiene_una_dificultad_de_1_a_5) :-
     forall(contratos:contrato(C, _, _, _, _),
            ( contratos:dificultad(C, D), between(1, 5, D) )).
 
-test(las_condiciones_de_la_despensa_real_son_cuatro_y_en_orden) :-
+test(las_condiciones_de_la_despensa_real_son_seis_y_en_orden) :-
+    % tres cumplidos, la escolta y el peaje en concreto, la visita, la moral y los miembros en pie
     contratos:contrato(despensa_real, _, _, _, Cs),
-    Cs == [requiere(contratos_cumplidos_min(3)), requiere(visita(castillo)),
+    Cs == [requiere(contratos_cumplidos_min(3)),
+           requiere(cumplido(gallina_noble)), requiere(cumplido(peaje_del_ganso)),
+           requiere(visita(castillo)),
            requiere(moral_media_min(4)), requiere(miembros_en_pie_min(3))].
 
 test(la_gallina_exige_que_nadie_tema_a_los_caballos) :-
@@ -110,7 +115,7 @@ test(ratas_y_gato_no_tienen_condiciones) :-
 test(las_condiciones_usan_solo_el_vocabulario_conocido) :-
     forall(( contratos:contrato(_, _, _, _, Cs), member(requiere(X), Cs) ),
            memberchk(X, [rasgo_no(_), contratos_cumplidos_min(_), moral_media_min(_),
-                         visita(_), miembros_en_pie_min(_)])).
+                         visita(_), miembros_en_pie_min(_), cumplido(_)])).
 
 test(los_enemigos_de_la_escolta_son_tipos_del_bestiario) :-
     contratos:enemigos_de(gallina_noble, G),
@@ -396,30 +401,30 @@ test(nueva_partida_borra_los_contratos, [setup(nueva_partida)]) :-
 
 :- begin_tests(que_se_ve_y_que_se_acepta).
 
-test(al_empezar_se_ven_tres_contratos, [setup(nueva_partida)]) :-
+test(al_empezar_se_ven_cinco_contratos_y_el_del_bosque_aun_no, [setup(nueva_partida)]) :-
     findall(C, contratos:visible(C), Cs),
-    Cs == [ratas_del_granero, gato_en_el_arbol, gallina_noble].
+    Cs == [ratas_del_granero, gato_en_el_arbol, gallina_noble, peaje_del_ganso, fantasma_charlatan].
 
 test(la_despensa_real_no_se_ve_hasta_visitar_el_castillo, [setup(nueva_partida)]) :-
     \+ contratos:visible(despensa_real),
     aplicar_efecto(visitar(castillo)),
     contratos:visible(despensa_real).
 
-test(en_la_taberna_estan_disponibles_los_tres_del_tablon, [setup(nueva_partida)]) :-
+test(en_la_taberna_estan_disponibles_los_cinco_del_tablon, [setup(nueva_partida)]) :-
     findall(C, contratos:disponible(C), Cs),
-    Cs == [ratas_del_granero, gato_en_el_arbol, gallina_noble].
+    Cs == [ratas_del_granero, gato_en_el_arbol, gallina_noble, peaje_del_ganso, fantasma_charlatan].
 
 test(en_la_aldea_solo_estan_los_de_la_alcaldesa) :-
     nueva_partida,
     ordena(ir(aldea), _),
     findall(C, contratos:disponible(C), Cs),
-    Cs == [ratas_del_granero, gato_en_el_arbol].
+    Cs == [ratas_del_granero, gato_en_el_arbol, fantasma_charlatan].
 
-test(en_el_camino_real_esta_la_gallina) :-
+test(en_el_camino_real_estan_la_gallina_y_el_peaje) :-
     nueva_partida,
     ordena(ir(camino_real), _),
     findall(C, contratos:disponible(C), Cs),
-    Cs == [gallina_noble].
+    Cs == [gallina_noble, peaje_del_ganso].
 
 test(en_el_bosque_no_hay_nada_disponible) :-
     nueva_partida,
@@ -428,9 +433,9 @@ test(en_el_bosque_no_hay_nada_disponible) :-
     findall(C, contratos:disponible(C), Cs),
     Cs == [].
 
-test(se_pueden_aceptar_las_ratas_y_el_gato, [setup(nueva_partida)]) :-
+test(al_empezar_se_pueden_aceptar_cuatro_la_gallina_no, [setup(nueva_partida)]) :-
     findall(C, contratos:puede_aceptar(C), Cs),
-    Cs == [ratas_del_granero, gato_en_el_arbol].
+    Cs == [ratas_del_granero, gato_en_el_arbol, peaje_del_ganso, fantasma_charlatan].
 
 test(la_gallina_esta_bloqueada_sin_la_venda, [setup(nueva_partida), fail]) :-
     contratos:puede_aceptar(gallina_noble).
@@ -516,10 +521,11 @@ test(puede_aceptar_no_modifica_el_estado, [setup(nueva_partida)]) :-
 
 :- begin_tests(el_tablon).
 
-test(al_empezar_el_tablon_ensena_tres_fichas, [setup(nueva_partida)]) :-
+test(al_empezar_el_tablon_ensena_cinco_fichas, [setup(nueva_partida)]) :-
     ordena(contratos, [vista(contratos, Fichas)]),
     findall(Id-Estado, member(contrato(Id, _, _, _, Estado), Fichas), Ps),
-    Ps == [ratas_del_granero-disponible, gato_en_el_arbol-disponible, gallina_noble-bloqueado].
+    Ps == [ratas_del_granero-disponible, gato_en_el_arbol-disponible, gallina_noble-bloqueado,
+           peaje_del_ganso-disponible, fantasma_charlatan-disponible].
 
 test(una_ficha_lleva_zona_dificultad_y_premio, [setup(nueva_partida), nondet]) :-
     ordena(contratos, [vista(contratos, Fichas)]),
@@ -744,12 +750,12 @@ test(con_la_venda_la_gallina_tiene_prueba_y_ensena_la_regla_del_rasgo, [setup(nu
     once(( member(L, Lineas), sub_atom(L, _, _, _, 'condicion_cumple(rasgo_no(teme_caballos))') )),
     once(( member(L2, Lineas), sub_atom(L2, _, _, _, '\\+ (activo(A), rasgo(A, teme_caballos)') )).
 
-test(la_prueba_de_la_despensa_real_ensena_las_cuatro_condiciones, [setup(nueva_partida), nondet]) :-
+test(la_prueba_de_la_despensa_real_ensena_las_seis_condiciones, [setup(nueva_partida), nondet]) :-
     listo_para_el_rey,
     ordena(explicar(aceptar(despensa_real)), [vista(prueba, _, Prueba)]),
     explicar:prueba_a_lineas(Prueba, Lineas),
-    forall(member(Cond, ['contratos_cumplidos_min(3)', 'visita(castillo)', 'moral_media_min(4)',
-                          'miembros_en_pie_min(3)']),
+    forall(member(Cond, ['contratos_cumplidos_min(3)', 'cumplido(gallina_noble)', 'cumplido(peaje_del_ganso)',
+                          'visita(castillo)', 'moral_media_min(4)', 'miembros_en_pie_min(3)']),
            once(( member(L, Lineas), sub_atom(L, _, _, _, Cond) ))).
 
 test(explicar_un_contrato_que_no_existe, [setup(nueva_partida)]) :-

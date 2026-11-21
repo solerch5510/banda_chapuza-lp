@@ -46,7 +46,7 @@ orden_y_combate(Cmd) :-
 
 % En su turno cada miembro usa su habilidad si puede (contra el enemigo mas fuerte vivo) y, si no, ataca.
 objetivo_fuerte(T) :-
-    member(T, [gran_roquefort, bandido_montado, bandido_torpe, moho_saltarin, rata_quesera]),
+    member(T, [gran_roquefort, bandido_montado, ganso_de_peaje, seta_belicosa, bandido_torpe, moho_saltarin, rata_quesera]),
     estado:instancia(E, T), compania:vivo(E), !.
 
 orden_de_turno(Cmd) :-
@@ -82,6 +82,7 @@ la_via_comoda :-
     orden(inventario), orden(pagar), orden(compania),
     orden_y_combate(ir(camino_real)),
     orden_y_combate(aceptar(gallina_noble)),
+    orden_y_combate(aceptar(peaje_del_ganso)),
     orden_y_combate(ir(castillo)),
     orden_y_combate(aceptar(despensa_real)),
     orden_y_combate(ir(camino_real)),
@@ -113,8 +114,9 @@ test(se_gana_con_pocos_comandos, [setup(la_via_comoda), nondet]) :-
 test(no_se_acaba_sin_queso_negativo, [setup(la_via_comoda), nondet]) :-
     economia:queso_total(Q), Q >= 0.
 
-test(los_cuatro_contratos_quedan_cumplidos, [setup(la_via_comoda), nondet]) :-
-    forall(contratos:contrato(C, _, _, _, _), contratos:contrato_cumplido(C)).
+test(los_cinco_contratos_del_camino_al_jefe_quedan_cumplidos, [setup(la_via_comoda), nondet]) :-
+    forall(member(C, [ratas_del_granero, gato_en_el_arbol, gallina_noble, peaje_del_ganso, despensa_real]),
+           contratos:contrato_cumplido(C)).
 
 test(nadie_se_queda_en_huelga_ni_caido, [setup(la_via_comoda), nondet]) :-
     forall(compania:miembro(Id), ( compania:vivo(Id), \+ compania:esta_en_huelga(Id) )).

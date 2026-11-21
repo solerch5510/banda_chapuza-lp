@@ -38,7 +38,7 @@ pelea_hasta_el_final(0) :- !.
 pelea_hasta_el_final(N) :-
     (   ( \+ estado:en_combate(_) ; estado:fin_partida(_) )
     ->  true
-    ;   (   member(Obj, [gran_roquefort, moho_saltarin, bandido_montado, bandido_torpe, rata_quesera]),
+    ;   (   member(Obj, [gran_roquefort, moho_saltarin, bandido_montado, ganso_de_peaje, seta_belicosa, bandido_torpe, rata_quesera]),
             ordena(atacar(Obj), I), \+ I = [error(_)|_]
         ->  true
         ;   ordena(defender, _)
@@ -65,6 +65,7 @@ campana :-
     paso(pagar),
     paso(ir(camino_real)),
     paso(aceptar(gallina_noble)),
+    paso(aceptar(peaje_del_ganso)),
     paso(ir(castillo)),
     paso(aceptar(despensa_real)),
     paso(ir(camino_real)),
@@ -75,14 +76,14 @@ nueva_partida_en_el_jefe_y_ganar(Texto) :-
     % la misma campana, pero capturando lo que se ve en el ultimo combate
     nueva_partida,
     paso(aceptar(ratas_del_granero)), paso(aceptar(gato_en_el_arbol)), paso(ir(aldea)), paso(elegir(trepar)),
-    paso(ir(taberna)), paso(pagar), paso(ir(camino_real)), paso(aceptar(gallina_noble)), paso(ir(castillo)),
+    paso(ir(taberna)), paso(pagar), paso(ir(camino_real)), paso(aceptar(gallina_noble)), paso(aceptar(peaje_del_ganso)), paso(ir(castillo)),
     paso(aceptar(despensa_real)), paso(ir(camino_real)),
     ordena(ir(cuevas), _),
     findall(T, ( between(1, 150, _), \+ estado:fin_partida(_), estado:en_combate(_), golpe_con_texto(T) ), Ts),
     atomic_list_concat(Ts, '\n', Texto).
 
 golpe_con_texto(Texto) :-
-    (   member(Obj, [gran_roquefort, moho_saltarin, bandido_montado, bandido_torpe, rata_quesera]),
+    (   member(Obj, [gran_roquefort, moho_saltarin, bandido_montado, ganso_de_peaje, seta_belicosa, bandido_torpe, rata_quesera]),
         ejecutar(atacar(Obj), R), R = resultado(I), \+ I = [error(_)|_]
     ->  with_output_to(atom(Texto), ui:mostrar(R))
     ;   pantalla(defender, Texto)
@@ -205,9 +206,10 @@ test(la_campana_dura_una_semana_y_deja_queso, [nondet]) :-
     D =< 8,
     Q > 0.
 
-test(en_la_campana_se_cumplen_los_cuatro_contratos, [nondet]) :-
+test(en_la_campana_se_cumplen_los_cinco_contratos_del_camino_al_jefe, [nondet]) :-
     campana,
-    forall(contratos:contrato(C, _, _, _, _), contratos:contrato_cumplido(C)).
+    forall(member(C, [ratas_del_granero, gato_en_el_arbol, gallina_noble, peaje_del_ganso, despensa_real]),
+           contratos:contrato_cumplido(C)).
 
 test(las_ratas_y_el_gato_se_cobran_en_la_taberna_y_los_ultimos_quedan_por_cobrar, [nondet]) :-
     campana,

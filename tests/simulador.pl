@@ -87,7 +87,7 @@ test(con_un_contrato_el_destino_es_su_zona) :-
 
 test(la_campana_de_ejemplo_se_gana) :-
     ruta_de_referencia('examples/campana-comandos.txt', r(Fin, Dia, _Queso, Pasos)),
-    assertion(Fin == victoria), assertion(Dia == 7), assertion(Pasos == 40).
+    assertion(Fin == victoria), assertion(Dia == 7), assertion(Pasos == 42).
 
 test(la_ruta_de_la_partida_perdida_llega_al_dia_6_sin_final_aun) :-
     ruta_separada(Ruta), jugar_ruta(Ruta, r(Fin, Dia, _, Pasos)),

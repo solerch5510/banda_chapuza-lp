@@ -90,6 +90,8 @@ fila_preferida(bandido_torpe,   frente).
 fila_preferida(moho_saltarin,   frente).
 fila_preferida(bandido_montado, frente).
 fila_preferida(gran_roquefort,  frente).
+fila_preferida(ganso_de_peaje,  frente).
+fila_preferida(seta_belicosa,   frente).
 
 rasgo(baldomero, teme_caballos).
 rasgo(pimentina, hechizos_de_cocina).
@@ -116,6 +118,8 @@ alcance(bandido_torpe,   cuerpo).
 alcance(moho_saltarin,   cuerpo).
 alcance(bandido_montado, cuerpo).
 alcance(gran_roquefort,  cuerpo).
+alcance(ganso_de_peaje,  cuerpo).
+alcance(seta_belicosa,   cuerpo).
 
 % ---------------------------------------------------------------------------
 % Bestiario (version minima, por orden de dificultad): enemigo(Tipo, vida(V), ataque(A), defensa(D)).
@@ -126,6 +130,8 @@ enemigo(rata_quesera,    vida(8),  ataque(4),  defensa(0)).
 enemigo(bandido_torpe,   vida(12), ataque(5),  defensa(2)).
 enemigo(moho_saltarin,   vida(10), ataque(4),  defensa(0)).
 enemigo(bandido_montado, vida(18), ataque(7),  defensa(3)).
+enemigo(ganso_de_peaje,   vida(16), ataque(6),  defensa(2)).     % el que cobra el peaje del Camino Real
+enemigo(seta_belicosa,   vida(14), ataque(5),  defensa(1)).     % las del bosque, con muy mal humor
 enemigo(gran_roquefort,  vida(60), ataque(11), defensa(4)).     % el jefe final
 
 % clase(Tipo, Clase): alimenta reglas como la de teme_caballos (un caballo asusta a Baldomero).
@@ -134,6 +140,8 @@ clase(bandido_torpe,   humano).
 clase(moho_saltarin,   hongo).
 clase(bandido_montado, caballo).
 clase(gran_roquefort,  queso_vivo).
+clase(ganso_de_peaje,  ave).
+clase(seta_belicosa,   hongo).
 
 % curacion(Objeto, Vida): lo que cura un objeto cuando un enemigo lo usa (la IA se cura con el).
 curacion(pocion,  10).
@@ -152,6 +160,8 @@ lleva_queso(bandido_montado).
 botin(bandido_torpe,   1, 100).
 botin(bandido_montado, 1, 100).
 botin(rata_quesera,    1,  60).
+botin(ganso_de_peaje,  1, 100).        % el peaje que habia cobrado
+botin(seta_belicosa,   1,  50).
 
 % numerar_grupo(+Tipos, -Ids): un grupo de enemigos [rata_quesera, rata_quesera, bandido_torpe]
 % pasa a instancias numeradas por tipo: [e(rata_quesera,1), e(rata_quesera,2), e(bandido_torpe,1)].

@@ -34,7 +34,7 @@ hecho(Cmd) :- orden(Cmd, Is), \+ memberchk(error(_), Is).
 
 % En su turno cada miembro usa su habilidad si puede y, si no, ataca (la misma via que el playtest).
 objetivo_fuerte(T) :-
-    member(T, [gran_roquefort, bandido_montado, bandido_torpe, moho_saltarin, rata_quesera]),
+    member(T, [gran_roquefort, bandido_montado, ganso_de_peaje, seta_belicosa, bandido_torpe, moho_saltarin, rata_quesera]),
     estado:instancia(E, T), compania:vivo(E), !.
 
 orden_de_turno(Cmd) :-
@@ -116,10 +116,17 @@ test(con_algo_resuelto_toca_cobrar) :-
     estado:aplicar_efectos([contrato_aceptar(ratas_del_granero), contrato_resolver(ratas_del_granero, exito)]),
     contratos:objetivo_actual(P, _), assertion(P == cobrar).
 
-test(con_tres_contratos_cobrados_y_el_castillo_sin_visitar_toca_explorar) :-
+test(con_tres_contratos_cobrados_pero_otros_por_hacer_toca_aceptar) :-
     la_aldea,
     jugar([ir(camino_real), aceptar(gallina_noble), ir(taberna)]),
     contratos:contratos_cumplidos(N), assertion(N == 3),
+    contratos:objetivo_actual(P, _),
+    assertion(P == aceptar).
+
+test(con_todos_los_demas_cobrados_y_el_castillo_sin_visitar_toca_explorar) :-
+    nueva_partida,
+    forall(member(C, [ratas_del_granero, gato_en_el_arbol, gallina_noble, peaje_del_ganso, fantasma_charlatan]),
+           estado:aplicar_efectos([contrato_aceptar(C), contrato_resolver(C, exito), contrato_cobrar(C)])),
     contratos:objetivo_actual(P, Fs),
     assertion(P == explorar(castillo)), assertion(Fs == []).
 
@@ -127,11 +134,12 @@ test(con_el_jefe_visible_pero_sin_contratos_se_dice_cuantos_faltan) :-
     la_aldea,
     jugar([ir(camino_real), ir(castillo)]),
     contratos:objetivo_actual(P, Fs),
-    assertion(P == aceptar), assertion(Fs == [contratos(1)]).
+    assertion(P == aceptar),
+    assertion(Fs == [contratos(1), contrato(gallina_noble), contrato(peaje_del_ganso)]).      % un contrato mas y los dos concretos
 
-test(con_tres_contratos_cumplidos_y_el_castillo_visto_toca_aceptar_el_jefe) :-
+test(con_los_contratos_exigidos_cumplidos_y_el_castillo_visto_toca_aceptar_el_jefe) :-
     la_aldea,
-    jugar([ir(camino_real), aceptar(gallina_noble), ir(castillo), ir(camino_real), ir(taberna)]),
+    jugar([ir(camino_real), aceptar(gallina_noble), aceptar(peaje_del_ganso), ir(castillo), ir(camino_real), ir(taberna)]),
     contratos:objetivo_actual(P0, _), assertion(P0 == aceptar_final(despensa_real, cuevas)),
     contratos:faltas_de(despensa_real, Fs), assertion(Fs == []).
 
@@ -201,7 +209,7 @@ test(aceptar_la_escolta_abre_un_combate_y_en_el_no_se_interrumpe) :-
 
 test(al_ganar_la_partida_no_se_pinta_un_objetivo) :-
     la_aldea,
-    jugar([ir(camino_real), aceptar(gallina_noble), ir(castillo), aceptar(despensa_real), ir(camino_real)]),
+    jugar([ir(camino_real), aceptar(gallina_noble), aceptar(peaje_del_ganso), ir(castillo), aceptar(despensa_real), ir(camino_real)]),
     hecho(ir(cuevas)), combatir_ultimo(Is),
     assertion(estado:fin_partida(victoria(_))),
     assertion(\+ memberchk(vista(objetivo, _, _), Is)).

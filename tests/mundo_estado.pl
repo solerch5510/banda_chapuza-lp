@@ -277,10 +277,10 @@ test(la_tirada_cae_en_el_rango) :-
 % ===========================================================================
 :- begin_tests(bestiario).
 
-test(son_los_cinco_tipos_de_la_version_minima) :-
+test(son_siete_tipos_los_cinco_de_la_version_minima_y_dos_de_la_ampliacion) :-
     findall(T, enemigo(T, _, _, _), Ts),
     msort(Ts, Ordenados),
-    Ordenados == [bandido_montado, bandido_torpe, gran_roquefort, moho_saltarin, rata_quesera].
+    Ordenados == [bandido_montado, bandido_torpe, ganso_de_peaje, gran_roquefort, moho_saltarin, rata_quesera, seta_belicosa].
 
 test(cada_enemigo_tiene_clase_fila_y_alcance_unicos) :-
     forall(enemigo(T, _, _, _),
@@ -306,7 +306,7 @@ test(bandido_torpe_es_el_canon) :-
 test(las_clases_usadas_son_las_de_la_version_minima) :-
     findall(C, clase(_, C), Cs),
     sort(Cs, Unicas),
-    Unicas == [caballo, hongo, humano, queso_vivo, roedor].
+    Unicas == [ave, caballo, hongo, humano, queso_vivo, roedor].
 
 test(solo_el_bandido_montado_es_un_caballo) :-
     findall(T, clase(T, caballo), Ts),
@@ -321,7 +321,7 @@ test(el_orden_de_dificultad_es_el_de_la_vida) :-
     findall(V-T, enemigo(T, vida(V), _, _), Pares),
     msort(Pares, Ordenados),
     findall(T, member(_-T, Ordenados), Ts),
-    Ts == [rata_quesera, moho_saltarin, bandido_torpe, bandido_montado, gran_roquefort].
+    Ts == [rata_quesera, moho_saltarin, bandido_torpe, seta_belicosa, ganso_de_peaje, bandido_montado, gran_roquefort].
 
 test(el_jefe_es_el_mas_fuerte_en_todo) :-
     enemigo(gran_roquefort, vida(VJ), ataque(AJ), defensa(DJ)),

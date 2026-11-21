@@ -139,6 +139,17 @@ Jugador con plan y 10 % de errores, 300 partidas por variante (`herramientas/bar
 
 Lectura: **el botín apenas mueve el equilibrio** (de 5,6 a 6,3 quesos de sobrante, +2 puntos de victorias) y no era su papel: tras arreglar los pagos y el hambre, la economía ya tiene margen. Lo que aporta es **variedad**: dos partidas iguales ya no acaban con el mismo queso, y una racha mala o buena se nota. Por eso el 60 % y una sola unidad: más sería regalar queso. Los **objetos** como botín (una poción, por ejemplo) quedan para cuando exista `usar`: hoy solo los enemigos los gastan, y un objeto que el jugador no puede usar no es un premio.
 
+## Con los contratos nuevos (ampliación de contenido)
+
+Tres contratos más (peaje del ganso, fantasma charlatán, paz del moho) pagan por la fórmula (14, 12 y 21 quesos) y el jefe exige ahora dos concretos (la escolta y el peaje). Jugador con plan, 100 partidas:
+
+| Jugador | Victorias | Días | Queso final |
+|---|---|---|---|
+| Sin errores | 95 % | 13 | 52 |
+| 10 % de errores | 90 % | 14 de media (7 a 20) | 37 |
+
+Lectura: el jugador que hace **todos** los contratos acaba con muchísimo queso (52) porque cada uno paga más de lo que cuesta; el que va **directo al jefe** (siete días) sigue en la economía ajustada de antes. Las derrotas de ahora (5 a 10 %) son **de combate**, no de hambre: el jugador simulado pelea con todo sin descansar ni usar pociones. Es lo que cabe esperar de contenido opcional bien pagado, y es **el punto de partida para el farmeo**: si se quiere que lo opcional sea obligatorio, hacen falta niveles y enemigos que lo exijan (`docs/13-ampliacion.md` §10).
+
 ## Qué sigue (en este orden, cada paso con el simulador)
 
 1. ~~Pago según distancia y enemigos~~ (hecho).

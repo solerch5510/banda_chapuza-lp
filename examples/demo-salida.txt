@@ -66,6 +66,7 @@ Un puente de setas cruza un barranco del bosque. Las setas se mecen un poco, com
   2. Madame Pimentina endurece el puente con queso curado (cuesta 1 queso) (Madame Pimentina)
   3. Sir Baldomero cruza con la armadura puesta (Sir Baldomero)
 Elige con elegir(Opcion). (el número o el nombre).
+Hay un contrato nuevo en el tablón: «La Paz del Moho».
 Ojo: otro día así y os quedáis sin queso. Sin comida y sin nada por cobrar solo se aguantan unos días antes de perder por hambre.
 
 > inventario
@@ -230,6 +231,10 @@ El tablón de contratos:
       Su Excelencia Bigotes lleva tres días arriba y dice que desde allí se juzga mejor.
   [bloqueado] Lady Clotilde Plumífera (el Camino Real, dificultad 3): 21 quesos, 1 brie
       Lady Clotilde exige palanquín, escolta y que nadie cante a su alrededor: «Si canta, picoteo».
+  [disponible] El Peaje del Ganso (el Camino Real, dificultad 3): 14 quesos
+      Un ganso cobra «el peaje del peaje» en el Camino Real y nadie se atreve a discutirle la tarifa.
+  [lejos] El Fantasma Charlatán (la Aldea Requesón, dificultad 2): 12 quesos, poción
+      La Casa del Cuervo Gordo está encantada por un mayordomo que solo quiere que alguien le escuche.
 
 > por_que_no(aceptar(gallina_noble))
 Por qué no se puede aceptar(gallina_noble):

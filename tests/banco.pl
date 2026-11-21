@@ -166,6 +166,9 @@ conocido(A) :- charlas:presente(A, _, _, _).
 conocido(A) :- charlas:opcion_charla(_, A, _, _, _).
 conocido(A) :- charlas:saber(A).
 conocido(A) :- charlas:suceso(A, _, _).
+conocido(A) :- eventos:opcion_evento(_, A, _, _, _, _).
+conocido(A) :- eventos:intentos_maximos(A, _).
+conocido(A) :- member(A, [ganso_de_peaje, seta_belicosa, carretero_anonimo, ave]).
 conocido(A) :- member(A, [taberna, caballo, ok, nada, exito, a_medias, fracaso, chapuza, resumido, detallado,
                           fallo, hecho, negacion, predefinido, regla, sin_fallo, sin_prueba,
                           ninguno, curarse, robar_queso, invocar_moho, embestir, atacar, defender,
@@ -177,7 +180,7 @@ functor_valido(F) :-
     member(F, [suceso, generica, falla, impide,
                % mensajes
                llegada, descanso, sin_comida, come_rancio, pago, impago, fin_hambre, final, golpe, cae,
-               evento_abre, evento_elige, intento_fallido, objetivo, contrato_resuelto, cobra, acepta, contrato_nuevo, sin_botin, usa_objeto, charla_abre, charla_elige, charla_repite, saber_nuevo, diario_completo, aparece,
+               evento_abre, evento_elige, intento_fallido, objetivo, contrato_resuelto, cobra, acepta, contrato_nuevo, sin_botin, usa_objeto, charla_abre, charla_elige, charla_repite, saber_nuevo, diario_completo, cumplido, aparece,
                victoria, botin, derrota_combate, aturdido, pasa, se_cura, invoca_moho, roba_queso, embiste,
                defiende, carga_heroica, fondue, balada, rebuscar, nivel, golpea_a_clotilde, dia_nuevo,
                % reglas

@@ -53,9 +53,9 @@ test(el_gato_es_el_evento_de_su_contrato, [nondet]) :-
     E == rescate_gato,
     Z == aldea.
 
-test(solo_el_gato_tiene_evento, [nondet]) :-
+test(solo_el_gato_y_el_fantasma_tienen_evento, [nondet]) :-
     findall(C, eventos:evento_de_contrato(C, _, _), Cs),
-    Cs == [gato_en_el_arbol].
+    Cs == [gato_en_el_arbol, fantasma_charlatan].
 
 test(son_tres_intentos) :-
     eventos:intentos_maximos(rescate_gato, N),
