@@ -11,26 +11,25 @@ param([int]$Partidas = 100, [int]$Semilla = 1, [string]$Swipl = 'C:\Program File
 
 $raiz = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 
+$antiguo = @(
+    @('src/contratos.pl', 'recompensa([quesos(pago), objeto(pocion)])',          'recompensa([quesos(9), objeto(pocion)])'),
+    @('src/contratos.pl', 'recompensa([quesos(pago), objeto(venda_de_caballos)])', 'recompensa([quesos(7), objeto(venda_de_caballos)])'),
+    @('src/contratos.pl', 'recompensa([quesos(pago), queso(brie, 0, 1)])',        'recompensa([quesos(14), queso(brie, 0, 1)])'))
+
+# Cada variante cambia numeros del texto de src/. Los pagos salen de la formula de contratos:pago_de/2
+# (base + por_dia * dias de ruta + por_enemigo * enemigos, con un minimo); los parametros estan en src/mundo.pl.
 $variantes = [ordered]@{
-    'base (9/7/14, 12 de inicio)'      = @()
-    'pagos 12/12/18'                   = @(
-        @('src/contratos.pl', 'quesos(9)',  'quesos(12)'),
-        @('src/contratos.pl', 'quesos(7)',  'quesos(12)'),
-        @('src/contratos.pl', 'quesos(14)', 'quesos(18)'))
-    'pagos 12/12/16'                   = @(
-        @('src/contratos.pl', 'quesos(9)',  'quesos(12)'),
-        @('src/contratos.pl', 'quesos(7)',  'quesos(12)'),
-        @('src/contratos.pl', 'quesos(14)', 'quesos(16)'))
-    'pagos 14/12/20 (por distancia)'   = @(
-        @('src/contratos.pl', 'quesos(9)',  'quesos(14)'),
-        @('src/contratos.pl', 'quesos(7)',  'quesos(12)'),
-        @('src/contratos.pl', 'quesos(14)', 'quesos(20)'))
-    'inicio 16 quesos'                 = @(,
-        @('src/mundo.pl', 'queso(cheddar, 0, 12)', 'queso(cheddar, 0, 16)'))
-    'pagos 12/12/18 + inicio 16'       = @(
-        @('src/contratos.pl', 'quesos(9)',  'quesos(12)'),
-        @('src/contratos.pl', 'quesos(7)',  'quesos(12)'),
-        @('src/contratos.pl', 'quesos(14)', 'quesos(18)'),
+    'formula actual (6 + 3/dia + 1/enemigo, min 12)' = @()
+    'pagos antiguos fijos (9 / 7 / 14)'              = $antiguo
+    'formula base 4'                                 = @(,
+        @('src/mundo.pl', 'parametro(pago_base,         6)', 'parametro(pago_base,         4)'))
+    'formula base 8'                                 = @(,
+        @('src/mundo.pl', 'parametro(pago_base,         6)', 'parametro(pago_base,         8)'))
+    'formula sin minimo (min 0)'                     = @(,
+        @('src/mundo.pl', 'parametro(pago_minimo,      12)', 'parametro(pago_minimo,       0)'))
+    'formula 4 por dia'                              = @(,
+        @('src/mundo.pl', 'parametro(pago_por_dia,      3)', 'parametro(pago_por_dia,      4)'))
+    'formula actual + inicio 16 quesos'              = @(,
         @('src/mundo.pl', 'queso(cheddar, 0, 12)', 'queso(cheddar, 0, 16)'))
 }
 

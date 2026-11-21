@@ -5,7 +5,7 @@
 % otro (es la capa mas baja) y nunca cambia. El estado que cambia vive en estado.pl.
 % Los identificadores son los de docs/01-lore-y-ambientacion.md (seccion 10).
 
-:- module(mundo, [zona/2, descripcion_zona/2, conexion/2, adyacente/2, zona_pacifica/1,
+:- module(mundo, [zona/2, descripcion_zona/2, conexion/2, adyacente/2, distancia/3, zona_pacifica/1,
                   personaje/7, fila_preferida/2, alcance/2, rasgo/2,
                   habilidad_de/2, coste_queso/2,
                   enemigo/4, clase/2, lleva_queso/1, numerar_grupo/2,
@@ -55,6 +55,19 @@ conexion(camino_real, cuevas).
 
 adyacente(A, B) :- conexion(A, B).
 adyacente(A, B) :- conexion(B, A).
+
+% distancia(+A, +B, -Dias): los dias de viaje del camino mas corto (cada paso entre zonas cuesta un dia).
+% Se prueba con 0, 1, 2... pasos: el primero que llega es el mas corto.
+distancia(A, B, Dias) :-
+    between(0, 12, Dias),
+    alcanzable_en(A, B, Dias),
+    !.
+
+alcanzable_en(A, A, 0).
+alcanzable_en(A, B, N) :-
+    N > 0, M is N - 1,
+    adyacente(A, C),
+    alcanzable_en(C, B, M).
 
 % Zonas donde la ley prohibe el combate (la consulta combate:permite_combate/1).
 zona_pacifica(taberna).
@@ -175,6 +188,10 @@ parametro(dano_miedo,        2).    % dano extra que recibe quien teme a la clas
 parametro(umbral_vida_baja, 30).   % vida baja: 30 % o menos de la maxima (la IA se cura)
 parametro(dano_embestida,    2).    % dano extra de la primera embestida del bandido montado
 parametro(max_mohos,         2).    % mohos que el jefe puede invocar en un combate
+parametro(pago_base,         6).    % quesos que paga todo contrato antes de sumar nada (balance, docs/11)
+parametro(pago_por_dia,      3).    % ... mas esto por cada dia de viaje de la ruta del contrato
+parametro(pago_por_enemigo,  1).    % ... mas esto por cada enemigo al que hay que vencer
+parametro(pago_minimo,      12).    % ... y nunca menos de esto (ir, pagar a la Banda y curarse tiene que compensar)
 parametro(penal_venda,       3).    % ataque que pierde Baldomero con la venda contra los caballos (lore 7)
 
 % ---------------------------------------------------------------------------

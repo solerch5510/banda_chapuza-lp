@@ -271,7 +271,7 @@ test(un_fracaso_nunca_cobra) :-
 
 test(las_cantidades_acordadas, [nondet]) :-
     contratos:consecuencia(ratas_del_granero, a_medias, A),
-    A == [cobrar(quesos(5)), cobrar(objetos)],
+    A == [cobrar(mitad), cobrar(objetos)],
     contratos:consecuencia(gallina_noble, fracaso, F),
     F == [perder_queso(3), moral(grupo, -2)],
     contratos:consecuencia(gato_en_el_arbol, fracaso, G),
@@ -387,34 +387,34 @@ test(sin_nada_por_cobrar_no_hay_cobro, [setup(nueva_partida)]) :-
 
 test(cobro_de_las_ratas_con_exito, [setup(nueva_partida), nondet]) :-
     contratos:efectos_cobro_de(ratas_del_granero, exito, Efs),
-    Efs == [ganar_queso(cheddar, 0, 9), ganar_objeto(compania, pocion, 1),
+    Efs == [ganar_queso(cheddar, 0, 14), ganar_objeto(compania, pocion, 1),
             contrato_cobrar(ratas_del_granero), mensaje(cobra, [ratas_del_granero])].
 
 test(cobro_de_las_ratas_a_medias, [setup(nueva_partida), nondet]) :-
     contratos:efectos_cobro_de(ratas_del_granero, a_medias, Efs),
-    Efs == [ganar_queso(cheddar, 0, 5), ganar_objeto(compania, pocion, 1),
+    Efs == [ganar_queso(cheddar, 0, 7), ganar_objeto(compania, pocion, 1),
             contrato_cobrar(ratas_del_granero), mensaje(cobra, [ratas_del_granero])].
 
 test(cobro_del_gato_con_exito_equipa_la_venda, [setup(nueva_partida), nondet]) :-
     contratos:efectos_cobro_de(gato_en_el_arbol, exito, Efs),
-    Efs == [ganar_queso(cheddar, 0, 7), ganar_objeto(compania, venda_de_caballos, 1),
+    Efs == [ganar_queso(cheddar, 0, 12), ganar_objeto(compania, venda_de_caballos, 1),
             equipar(baldomero, venda_de_caballos),
             contrato_cobrar(gato_en_el_arbol), mensaje(cobra, [gato_en_el_arbol])].
 
 test(cobro_del_gato_a_medias, [setup(nueva_partida), nondet]) :-
     contratos:efectos_cobro_de(gato_en_el_arbol, a_medias, Efs),
-    Efs == [ganar_queso(cheddar, 0, 5), ganar_objeto(compania, venda_de_caballos, 1),
+    Efs == [ganar_queso(cheddar, 0, 6), ganar_objeto(compania, venda_de_caballos, 1),
             equipar(baldomero, venda_de_caballos),
             contrato_cobrar(gato_en_el_arbol), mensaje(cobra, [gato_en_el_arbol])].
 
 test(cobro_de_la_gallina_con_exito, [setup(nueva_partida), nondet]) :-
     contratos:efectos_cobro_de(gallina_noble, exito, Efs),
-    Efs == [ganar_queso(cheddar, 0, 14), ganar_queso(brie, 0, 1),
+    Efs == [ganar_queso(cheddar, 0, 21), ganar_queso(brie, 0, 1),
             contrato_cobrar(gallina_noble), mensaje(cobra, [gallina_noble])].
 
 test(cobro_de_la_gallina_a_medias_es_la_mitad_sin_brie, [setup(nueva_partida), nondet]) :-
     contratos:efectos_cobro_de(gallina_noble, a_medias, Efs),
-    Efs == [ganar_queso(cheddar, 0, 7),
+    Efs == [ganar_queso(cheddar, 0, 10),
             contrato_cobrar(gallina_noble), mensaje(cobra, [gallina_noble])].
 
 test(cobro_de_la_despensa_real, [setup(nueva_partida), nondet]) :-
@@ -434,7 +434,7 @@ test(aplicar_el_cobro_paga_y_cierra, [setup(nueva_partida), nondet]) :-
     contratos:efectos_cobro(Efs),
     aplicar_efectos(Efs),
     economia:queso_total(Despues),
-    Despues =:= Antes + 9,
+    Despues =:= Antes + 14,
     estado:lleva(compania, pocion, 1),
     estado:contrato_cerrado(ratas_del_granero, exito),
     \+ estado:contrato_por_cobrar(_, _).

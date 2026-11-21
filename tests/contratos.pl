@@ -58,20 +58,20 @@ test(cada_contrato_tiene_una_recompensa_en_una_lista) :-
     forall(contratos:contrato(_, _, _, R, _), ( R = recompensa(L), L = [_|_] )).
 
 test(las_recompensas_usan_solo_premios_conocidos) :-
-    forall(( contratos:contrato(_, _, _, recompensa(L), _), member(P, L) ),
+    forall(( contratos:contrato(C, _, _, _, _), contratos:recompensa_de(C, L), member(P, L) ),
            (   P = quesos(N), integer(N), N > 0
            ;   P = queso(T, E, N), mundo:tipo_queso(T, _), integer(E), integer(N), N > 0
            ;   P = objeto(O), atom(O)
            )).
 
 test(las_recompensas_en_quesos_son_las_acordadas) :-
-    contratos:contrato(ratas_del_granero, _, _, recompensa(R1), _),
-    contratos:contrato(gato_en_el_arbol, _, _, recompensa(R2), _),
-    contratos:contrato(gallina_noble, _, _, recompensa(R3), _),
-    contratos:contrato(despensa_real, _, _, recompensa(R4), _),
-    memberchk(quesos(9), R1), memberchk(objeto(pocion), R1),
-    memberchk(quesos(7), R2), memberchk(objeto(venda_de_caballos), R2),
-    memberchk(quesos(14), R3), memberchk(queso(brie, 0, 1), R3),
+    contratos:recompensa_de(ratas_del_granero, R1),
+    contratos:recompensa_de(gato_en_el_arbol, R2),
+    contratos:recompensa_de(gallina_noble, R3),
+    contratos:recompensa_de(despensa_real, R4),
+    memberchk(quesos(14), R1), memberchk(objeto(pocion), R1),
+    memberchk(quesos(12), R2), memberchk(objeto(venda_de_caballos), R2),
+    memberchk(quesos(21), R3), memberchk(queso(brie, 0, 1), R3),
     R4 == [quesos(40)].
 
 test(los_objetivos_son_del_vocabulario_cerrado) :-
@@ -523,7 +523,7 @@ test(al_empezar_el_tablon_ensena_tres_fichas, [setup(nueva_partida)]) :-
 
 test(una_ficha_lleva_zona_dificultad_y_premio, [setup(nueva_partida), nondet]) :-
     ordena(contratos, [vista(contratos, Fichas)]),
-    memberchk(contrato(gallina_noble, camino_real, 3, [quesos(14), queso(brie, 0, 1)], bloqueado), Fichas).
+    memberchk(contrato(gallina_noble, camino_real, 3, [quesos(21), queso(brie, 0, 1)], bloqueado), Fichas).
 
 test(un_contrato_aceptado_sale_como_activo, [setup(nueva_partida)]) :-
     ordena(aceptar(ratas_del_granero), _),
@@ -562,8 +562,8 @@ test(el_tablon_no_modifica_el_estado, [setup(nueva_partida)]) :-
 test(la_pantalla_del_tablon, [setup(nueva_partida), nondet]) :-
     pantalla(contratos, Texto),
     sub_atom(Texto, _, _, _, 'El tablón de contratos:'),
-    sub_atom(Texto, _, _, _, '[disponible] Ratas del Granero (la Aldea Requesón, dificultad 1): 9 quesos, poción'),
-    sub_atom(Texto, _, _, _, '[bloqueado] Lady Clotilde Plumífera (el Camino Real, dificultad 3): 14 quesos, 1 brie'),
+    sub_atom(Texto, _, _, _, '[disponible] Ratas del Granero (la Aldea Requesón, dificultad 1): 14 quesos, poción'),
+    sub_atom(Texto, _, _, _, '[bloqueado] Lady Clotilde Plumífera (el Camino Real, dificultad 3): 21 quesos, 1 brie'),
     \+ sub_atom(Texto, _, _, _, 'contrato(').
 
 test(el_tablon_funciona_tambien_fuera_de_la_taberna) :-

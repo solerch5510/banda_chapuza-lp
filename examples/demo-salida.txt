@@ -213,11 +213,11 @@ Objetivo: acepta un contrato en el tablón de la taberna.
 
 > contratos
 El tablón de contratos:
-  [lejos] Ratas del Granero (la Aldea Requesón, dificultad 1): 9 quesos, poción
+  [lejos] Ratas del Granero (la Aldea Requesón, dificultad 1): 14 quesos, poción
       Las ratas dicen tener papeles de alquiler por un queso al siglo y se hacen las muertas para cobrar el seguro.
-  [lejos] El Gato en el Árbol (la Aldea Requesón, dificultad 1): 7 quesos, venda de caballos
+  [lejos] El Gato en el Árbol (la Aldea Requesón, dificultad 1): 12 quesos, venda de caballos
       Su Excelencia Bigotes lleva tres días arriba y dice que desde allí se juzga mejor.
-  [bloqueado] Lady Clotilde Plumífera (el Camino Real, dificultad 3): 14 quesos, 1 brie
+  [bloqueado] Lady Clotilde Plumífera (el Camino Real, dificultad 3): 21 quesos, 1 brie
       Lady Clotilde exige palanquín, escolta y que nadie cante a su alrededor: «Si canta, picoteo».
 
 > por_que_no(aceptar(gallina_noble))

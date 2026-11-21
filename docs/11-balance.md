@@ -20,7 +20,7 @@ powershell -ExecutionPolicy Bypass -File herramientas/barrido.ps1 -Partidas 100
 
 El barrido copia el juego a una carpeta temporal, cambia unos números del texto de `src/` y simula sobre la copia: **el repositorio no se toca**.
 
-## Lo que se midió (juego tal como está)
+## Lo que se midió (el juego antes de cambiar los pagos)
 
 Rutas de referencia:
 
@@ -65,11 +65,40 @@ Lectura:
 - **El pago mínimo de 12** que propuso el autor es coherente con los datos: ningún contrato debe pagar menos de lo que cuesta ir y volver (aldea: 2 días = 8 quesos) más una ración de margen.
 - Los días hasta ganar apenas cambian (de 7,6 de media en la base a 7,7–8,0 en las variantes): ajustar la economía **no alarga la partida**.
 
+## Aplicado: el pago se deriva de lo que cuesta el contrato
+
+Cada día de viaje cuesta una ración entera (4 quesos), así que un número fijo por contrato era una apuesta a ciegas. Ahora (`contratos:pago_de/2`):
+
+```text
+pago = max(12, 6 + 3 × días de ruta + 1 × enemigos)
+```
+
+- **Días de ruta:** ir a la zona del contrato y volver a la taberna. Una escolta lleva además al destino (taberna → camino real → castillo → taberna = 4 días).
+- **Enemigos:** a cuántos hay que vencer (`via_objetivo`); un evento cuenta 0.
+- **Parámetros como datos** en `mundo:parametro/2` (`pago_base`, `pago_por_dia`, `pago_por_enemigo`, `pago_minimo`): se ajustan sin tocar reglas.
+- **Resultado:** ratas 14, gato 12 (el mínimo), gallina 21; el jefe **sigue en 40** (ganarlo gana la partida, no hace falta fórmula). «A medias» paga la mitad.
+- **Garantía** (probada en `tests/pago.pl`): ningún contrato paga menos que la ración de sus días de ruta, y los dos de la aldea juntos dejan más que el viaje y los sueldos.
+
+Jugador con plan y 10 % de ruido, 250 partidas por variante (`herramientas/barrido.ps1`):
+
+| Variante | Victorias | Hambre | Sobrante medio |
+|---|---|---|---|
+| Pagos antiguos fijos (9 / 7 / 14) | 193 (77 %) | 51 | 0,2 |
+| Base 4 | 212 (85 %) | 33 | 4,1 |
+| **Fórmula elegida (base 6)** | **215 (86 %)** | 31 | 5,7 |
+| Base 8 | 219 (88 %) | 29 | 9,1 |
+| 4 por día | 219 (88 %) | 29 | 9,3 |
+| Fórmula elegida + inicio de 16 quesos | 221 (88 %) | 28 | 8,8 |
+
+Sin errores del jugador, la fórmula gana **200 de 200** con 6,5 quesos de media al final (antes 198 de 200 con 0,1).
+
+**Por qué base 6 y no más:** de 6 a 8 las victorias suben apenas dos puntos y el juego se vuelve más fácil sin ganar tensión. Las derrotas por hambre que quedan (un 12 %) no son de dinero: la regla de hambre se aplica **al llegar**, antes de que el jugador pueda aceptar el contrato que le habría pagado. Eso es lo siguiente.
+
 ## Qué sigue (en este orden, cada paso con el simulador)
 
-1. **Pago según distancia y enemigos** (mínimo 12): base + por día de ida y vuelta + por enemigo, con los parámetros como datos en `mundo`. Objetivo a medir: con el jugador con plan y 10 % de ruido, **al menos un 85–90 % de victorias** y de 3 a 10 quesos sobrantes.
+1. ~~Pago según distancia y enemigos~~ (hecho, arriba).
 2. **Botín tras el combate** (azar con semilla, reproducible). Ya existe `lleva_queso/1` para algunos enemigos; hay que medir cuánto añade.
-3. **Regla de hambre más justa**: no perder si hay un contrato aceptable en la zona. Cambia las pruebas de la campaña.
+3. **Regla de hambre más justa**: no perder si hay un contrato aceptable en la zona. Cambia las pruebas de la campaña y debería recoger buena parte de ese 12 %.
 
 ## Límites de lo medido
 

@@ -1053,6 +1053,8 @@ Recalculados el 2 de noviembre de 2026 con un script de simulación (fuera del r
 
 **Nota sobre el pago por valor** (lore 11.5, propuesta 01-5): no se adopta (D-13, X-32). Un `cheddar` curado vale 4 y uno fresco 2, pero ninguna decisión del jugador depende de ello en la versión 1: sueldos, recompensas y multas se cuentan en unidades. El valor por tipo sirve para mostrar y para los precios de la tienda de objetos (extra), donde se pagaría antes lo más rancio.
 
+> **Actualización (20 de noviembre de 2026).** El simulador de balance (`herramientas/`) mostró que con estas recompensas el margen era casi nulo; los pagos de `ratas_del_granero`, `gato_en_el_arbol` y `gallina_noble` pasan a derivarse de una fórmula (`contratos:pago_de/2`) y valen ahora 14, 12 y 21 quesos. Ver [11-balance.md](11-balance.md).
+
 **Ajuste de recompensas derivado del recálculo.** Con la versión anterior de las recompensas (`ratas_del_granero` 7, `gato_en_el_arbol` 5, `gallina_noble` 12 + `brie`), la **ruta mínima** (4 contratos) no cerraba: el día 6 quedaban 2 quesos para una ración de 4, dos miembros pasaban hambre el día 7 y se llegaba al jefe con 0 quesos. La causa es estructural: cada día cuesta 4 de comida, la escolta exige 6 desplazamientos después del primer cobro (24 quesos) y solo hay 4 contratos. Se ajustan a **9, 7 y 14 + `brie`** (+6 en total; ratas y gato además dan `pocion` y venda), con lo que la mínima llega al jefe con 4 quesos (9 si se omite un pago de sueldos). Es un ajuste **provisional** hasta el balance de la semana 6 y habrá que propagarlo a las fichas de 01 §5.1 (pendiente de decisión del autor).
 
 ### 9.2 Tablas día a día por ruta

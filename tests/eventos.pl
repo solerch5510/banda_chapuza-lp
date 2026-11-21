@@ -583,13 +583,13 @@ test(a_medias_tambien_entrega_la_venda_pero_cuesta_un_queso, [nondet]) :-
     estado:equipado(baldomero, venda_de_caballos),
     contratos:puede_aceptar(gallina_noble).
 
-test(el_exito_paga_siete_y_el_a_medias_cinco, [nondet]) :-
+test(el_exito_paga_lo_que_manda_la_formula, [nondet]) :-
     con_el_evento_abierto,
     ordena(elegir(trepar), _),
     economia:queso_total(Antes),
     ordena(ir(taberna), _),
     economia:queso_total(D1),
-    D1 =:= Antes - 4 + 7.                              % la racion del viaje y la recompensa
+    D1 =:= Antes - 4 + 12.                             % la racion del viaje y la recompensa (el minimo de la formula)
 
 test(fracasar_no_da_venda, [nondet]) :-
     con_el_evento_abierto,

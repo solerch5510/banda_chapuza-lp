@@ -34,11 +34,11 @@ Estás en la taberna: contratos. enseña el tablón, aceptar(Contrato). acepta u
 
 > contratos
 El tablón de contratos:
-  [disponible] Ratas del Granero (la Aldea Requesón, dificultad 1): 9 quesos, poción
+  [disponible] Ratas del Granero (la Aldea Requesón, dificultad 1): 14 quesos, poción
       Las ratas dicen tener papeles de alquiler por un queso al siglo y se hacen las muertas para cobrar el seguro.
-  [disponible] El Gato en el Árbol (la Aldea Requesón, dificultad 1): 7 quesos, venda de caballos
+  [disponible] El Gato en el Árbol (la Aldea Requesón, dificultad 1): 12 quesos, venda de caballos
       Su Excelencia Bigotes lleva tres días arriba y dice que desde allí se juzga mejor.
-  [bloqueado] Lady Clotilde Plumífera (el Camino Real, dificultad 3): 14 quesos, 1 brie
+  [bloqueado] Lady Clotilde Plumífera (el Camino Real, dificultad 3): 21 quesos, 1 brie
       Lady Clotilde exige palanquín, escolta y que nadie cante a su alrededor: «Si canta, picoteo».
 
 > aceptar(ratas_del_granero)
@@ -92,9 +92,9 @@ Cobráis por «El Gato en el Árbol». Los quesos entran en la despensa y los su
 Objetivo: acepta un contrato en el tablón de la taberna.
 
 > inventario
-Despensa (día 3): 19 quesos (valor informativo: 38)
+Despensa (día 3): 29 quesos (valor informativo: 58)
   cheddar x3   edad 2 (fresco)
-  cheddar x16   edad 0 (fresco)
+  cheddar x26   edad 0 (fresco)
 Objetos: pocion x1, venda_de_caballos x1
 
 > pagar
@@ -206,7 +206,6 @@ Contrato aceptado: «La Despensa Real». Todos asienten con convicción; nadie h
 > ir(camino_real)
 Amanece el día 6. Alguien tiene hambre y alguien más, una cuenta pendiente. Ración: 4 quesos.
 El Camino Real está empedrado con corteza de queso viejo. Se te pega a las botas y a la conversación.
-Ojo: otro día así y te quedaría menos de un día de ración.
 
 > ir(cuevas)
 Día 7 de la Banda Chapuza. El Registro de Compañías sigue donde estaba: abajo. Ración: 4 quesos.

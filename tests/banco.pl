@@ -500,6 +500,6 @@ test(los_chistes_acaban_en_punto) :-
 test(el_tablon_sigue_dando_el_estado_y_la_recompensa, [setup(nueva_partida), nondet]) :-
     pantalla(contratos, T),
     contiene(T, '[disponible] Ratas del Granero'),
-    contiene(T, '9 quesos').
+    contiene(T, '14 quesos').
 
 :- end_tests(descripcion_de_los_contratos).

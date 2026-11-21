@@ -18,7 +18,8 @@
                       efectos_resolucion/3, efectos_cobro/1, efectos_cobro_de/3,
                       escolta_en_curso/0, golpes_dados/1, golpea_a_clotilde/1, efectos_golpe_a_clotilde/2,
                       orden_finales/1, final/2, final_de_la_partida/1,
-                      contrato_final/1, a_la_vista/1, faltas_de/2, objetivo_actual/2]).
+                      contrato_final/1, a_la_vista/1, faltas_de/2, objetivo_actual/2,
+                      pago_de/2, formula_de_pago/4, recompensa_de/2, dias_de_ruta/2, enemigos_del_contrato/2]).
 :- use_module(mundo).
 :- use_module(estado).
 :- use_module(compania).
@@ -27,19 +28,64 @@
 % ---------------------------------------------------------------------------
 % El catalogo (docs/04 §3). contrato(Id, Zona, Objetivo, recompensa(Lista), Condiciones):
 % Zona es donde se cumple el objetivo; las condiciones son las de ACEPTAR.
-% Recompensa: quesos(N) = N cheddar frescos, queso(Tipo, Edad, N), objeto(Id).
+% Recompensa: quesos(N) = N cheddar frescos, queso(Tipo, Edad, N), objeto(Id); quesos(pago) = los que
+% manda la formula de pago_de/2 (el tablon y el cobro usan recompensa_de/2, que la resuelve).
 % ---------------------------------------------------------------------------
 contrato(ratas_del_granero, aldea, eliminar([rata_quesera-2]),
-         recompensa([quesos(9), objeto(pocion)]), []).
+         recompensa([quesos(pago), objeto(pocion)]), []).
 contrato(gato_en_el_arbol, aldea, evento(rescate_gato),
-         recompensa([quesos(7), objeto(venda_de_caballos)]), []).
+         recompensa([quesos(pago), objeto(venda_de_caballos)]), []).
 contrato(gallina_noble, camino_real, escoltar(gallina_noble, castillo),
-         recompensa([quesos(14), queso(brie, 0, 1)]),
+         recompensa([quesos(pago), queso(brie, 0, 1)]),
          [requiere(rasgo_no(teme_caballos))]).
 contrato(despensa_real, cuevas, derrotar(gran_roquefort),
          recompensa([quesos(40)]),
          [requiere(contratos_cumplidos_min(3)), requiere(visita(castillo)),
           requiere(moral_media_min(4)), requiere(miembros_en_pie_min(3))]).
+
+% ---------------------------------------------------------------------------
+% El pago (docs/11-balance). Cada dia de viaje cuesta una racion entera, asi que lo que paga un contrato se
+% deriva de lo que cuesta hacerlo y no de un numero escrito a ojo:
+%   pago = max(minimo, base + por_dia * dias_de_ruta + por_enemigo * enemigos)
+% Los parametros son datos (mundo:parametro/2); el ajuste fino se hizo con el simulador de balance.
+% ---------------------------------------------------------------------------
+pago_de(C, Quesos) :-
+    mundo:parametro(pago_base, Base),
+    mundo:parametro(pago_por_dia, PorDia),
+    mundo:parametro(pago_por_enemigo, PorEnemigo),
+    mundo:parametro(pago_minimo, Minimo),
+    dias_de_ruta(C, Dias),
+    enemigos_del_contrato(C, Enemigos),
+    formula_de_pago(parametros(Base, PorDia, PorEnemigo, Minimo), Dias, Enemigos, Quesos).
+
+% formula_de_pago(+Parametros, +Dias, +Enemigos, -Quesos): la formula sola, para poder probarla con otros numeros.
+formula_de_pago(parametros(Base, PorDia, PorEnemigo, Minimo), Dias, Enemigos, Quesos) :-
+    Calculado is Base + PorDia * Dias + PorEnemigo * Enemigos,
+    Quesos is max(Minimo, Calculado).
+
+% dias_de_ruta(+C, -Dias): lo que se viaja para hacerlo: ir a su zona y volver a la taberna; una escolta
+% lleva ademas al destino (taberna -> zona -> destino -> taberna).
+dias_de_ruta(C, Dias) :-
+    contrato(C, Zona, Objetivo, _, _),
+    mundo:distancia(taberna, Zona, Ida),
+    (   Objetivo = escoltar(_, Destino)
+    ->  mundo:distancia(Zona, Destino, Tramo),
+        mundo:distancia(Destino, taberna, Vuelta),
+        Dias is Ida + Tramo + Vuelta
+    ;   Dias is 2 * Ida
+    ).
+
+% enemigos_del_contrato(+C, -N): a cuantos hay que vencer (0 si el objetivo es un evento).
+enemigos_del_contrato(C, N) :-
+    (   via_objetivo(C, combate(Grupo)) -> length(Grupo, N) ; N = 0 ).
+
+% recompensa_de(+C, -Premios): la recompensa del catalogo con quesos(pago) ya resuelto a quesos(N).
+recompensa_de(C, Premios) :-
+    contrato(C, _, _, recompensa(Crudos), _),
+    maplist(resolver_premio(C), Crudos, Premios).
+
+resolver_premio(C, quesos(pago), quesos(N)) :- !, pago_de(C, N).
+resolver_premio(_, Premio, Premio).
 
 % oferente(Contrato, Npc, ZonaDelNpc): quien lo ofrece y donde esta.
 oferente(ratas_del_granero, alcaldesa_nata, aldea).
@@ -189,7 +235,8 @@ estado_de_contrato(C, Estado) :-
 % ficha(?C, -Ficha): lo que el tablon enseña de cada contrato.
 ficha(C, contrato(C, Zona, Dificultad, Recompensa, Estado)) :-
     estado_de_contrato(C, Estado),
-    contrato(C, Zona, _, recompensa(Recompensa), _),
+    contrato(C, Zona, _, _, _),
+    recompensa_de(C, Recompensa),
     dificultad(C, Dificultad).
 
 % ---------------------------------------------------------------------------
@@ -274,9 +321,9 @@ dificultad(despensa_real,     5).
 % consecuencia(Contrato, Resultado, Efectos04): que pasa con cada resultado (docs/04 §3).
 %   cobrar(todo|mitad|quesos(N)|objetos), moral(grupo|Id, N), marcar(F), perder_queso(N), equipar(Id, O)
 consecuencia(ratas_del_granero, exito,    [cobrar(todo), moral(grupo, 1)]).
-consecuencia(ratas_del_granero, a_medias, [cobrar(quesos(5)), cobrar(objetos)]).
+consecuencia(ratas_del_granero, a_medias, [cobrar(mitad), cobrar(objetos)]).
 consecuencia(gato_en_el_arbol,  exito,    [cobrar(todo), moral(grupo, 1), equipar(baldomero, venda_de_caballos)]).
-consecuencia(gato_en_el_arbol,  a_medias, [cobrar(quesos(5)), cobrar(objetos), perder_queso(1),
+consecuencia(gato_en_el_arbol,  a_medias, [cobrar(mitad), cobrar(objetos), perder_queso(1),
                                            equipar(baldomero, venda_de_caballos)]).
 consecuencia(gato_en_el_arbol,  fracaso,  [moral(grupo, -1)]).
 consecuencia(gallina_noble,     exito,    [cobrar(todo), moral(grupo, 1), marcar(recomendada_por_clotilde)]).
@@ -435,7 +482,7 @@ expandir(C, cobrar(todo),  Efs) :- premios_como_efectos(C, todo, Efs).
 expandir(C, cobrar(mitad), Efs) :- premios_como_efectos(C, mitad, Efs).
 expandir(_, cobrar(quesos(N)), [ganar_queso(cheddar, 0, N)]).
 expandir(C, cobrar(objetos), Efs) :-
-    contrato(C, _, _, recompensa(Premios), _),
+    recompensa_de(C, Premios),
     findall(ganar_objeto(compania, O, 1), member(objeto(O), Premios), Efs).
 expandir(_, equipar(Id, O), [equipar(Id, O)]).
 expandir(_, moral(grupo, N), Efs) :-
@@ -451,7 +498,7 @@ expandir(_, perder_queso(N), Efs) :-
 
 % premios_como_efectos(+C, +Modo, -Efectos): la recompensa entera (todo) o la mitad de los quesos (mitad).
 premios_como_efectos(C, Modo, Efectos) :-
-    contrato(C, _, _, recompensa(Premios), _),
+    recompensa_de(C, Premios),
     findall(E, ( member(P, Premios), premio_efecto(Modo, P, E) ), Efectos).
 
 premio_efecto(todo, quesos(N), ganar_queso(cheddar, 0, N)).

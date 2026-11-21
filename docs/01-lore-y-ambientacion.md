@@ -267,6 +267,8 @@ Este documento solo sugiere ids y encajes; el documento de contratos decide deta
 
 Las recompensas son las escaladas del documento 04 (D-09): con 12 cheddar iniciales y 4 de comida al día, las recompensas van de 4 a 40 quesos (en la mínima: 9, 7, 14 y 40; valores confirmados por el autor el 2 de noviembre de 2026 tras el recálculo de 04 §9.2). El queso de recompensa entra siempre como cheddar fresco salvo que se indique otro tipo.
 
+> **Actualización (20 de noviembre de 2026).** Tras medir la economía con un simulador, las recompensas de los tres primeros contratos ya no son números escritos a mano: se **derivan** de lo que cuesta hacerlos (`pago = max(12, 6 + 3 × días de ruta + 1 × enemigos)`), y salen 14, 12 y 21 quesos; el jefe sigue en 40. Ver [11-balance.md](11-balance.md). Los números de las tablas de abajo son los históricos.
+
 | id contrato | Versión | Zona | Resumen | Quién lo da | Requisito de ejemplo | Recompensa |
 |---|---|---|---|---|---|---|
 | `ratas_del_granero` | mínima | `aldea` | Echar a las ratas queseras del granero. | `alcaldesa_nata` | Ninguno (tutorial). | 9 quesos y 1 `pocion` (X-46: sin tienda, la poción llega por recompensa). |
