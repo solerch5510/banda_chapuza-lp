@@ -70,7 +70,7 @@ test(quien_hace_cada_opcion_es_de_la_compania) :-
 
 test(los_efectos_usan_solo_el_vocabulario_conocido) :-
     forall(( charlas:opcion_charla(_, _, _, _, Efs), member(E, Efs) ),
-           assertion(( E = ganar_queso(_) ; E = perder_queso(_) ; E = moral(_, _) ; E = saber(_) ))).
+           assertion(( E = ganar_queso(_) ; E = perder_queso(_) ; E = objeto(_) ; E = moral(_, _) ; E = saber(_) ))).
 
 test(cada_personaje_tiene_nombre_quien_es_y_frase_de_apertura) :-
     forall(charlas:personaje_de_charla(Npc),

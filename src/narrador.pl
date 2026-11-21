@@ -146,7 +146,7 @@ frase(suceso(charla_elige(alcaldesa_nata, ojear_el_registro)), ambos,
 frase(suceso(charla_abre(ricota)), ambos,
       'Ricota, el tendero, os enseña su estante con una sonrisa de oferta permanente. «¡Hoy todo a mitad de precio! Bueno, hoy y siempre. Aquí no se vende queso, ya lo sabéis, pero se hace buen negocio con el aire».').
 frase(suceso(charla_elige(ricota, cantar_el_anuncio)), ambos,
-      'Rufino compone «Oferta eterna» en tres minutos. Ricota, emocionado, le paga con un queso: el primer pago por música de la historia de la aldea.').
+      'Rufino compone «Oferta eterna» en tres minutos. Ricota, emocionado, le paga con una poción «de muestra»: el primer pago por música de la historia de la aldea.').
 frase(suceso(charla_elige(ricota, regatear)), ambos,
       'Tuerca regatea tan bien que Ricota le da dos quesos para que se vaya. Pero ahora lo miran mal en la aldea y Tuerca pierde ánimo.').
 frase(suceso(charla_elige(ricota, preguntar_por_los_precios)), ambos,
@@ -214,6 +214,8 @@ frase(suceso(aturdido(A)), ambos,
       '~w pierde el turno, aturdido de pies a cabeza. Mira las estrellas, que hoy están muy cerca.'-[A]).
 frase(suceso(pasa(E)), ambos,
       '~w no sabe qué hacer y se queda mirando. Es su mejor táctica.'-[E]).
+frase(suceso(usa_objeto(O, M, N)), ambos,
+      'Gasto de botiquín: ~w para ~w (+~w de vida). Sabe a medicina de queso.'-[O, M, N]).
 frase(suceso(se_cura(E, N)), ambos,
       '~w se bebe lo que lleva encima y recupera ~w de vida. Hasta los malos tienen botiquín.'-[E, N]).
 frase(suceso(invoca_moho(E)), ambos,
@@ -800,6 +802,12 @@ texto_error(contrato_desconocido(C), Texto) :-
 texto_error(no_puede_aceptar(C), Texto) :-
     nombre_visible(C, Nombre),
     format(atom(Texto), 'El contrato «~w» os mira, mira a la Banda y decide que no. Ahora mismo no podéis aceptarlo: pregunta por_que_no(aceptar(~w)).', [Nombre, C]).
+texto_error(no_se_usa(Objeto), Texto) :-
+    nombre_visible(Objeto, N),
+    format(atom(Texto), '~w no se puede usar: solo sirven los objetos que curan (la poción).', [N]).
+texto_error(no_puede_usar(Objeto, Miembro), Texto) :-
+    nombre_visible(Objeto, O), nombre_visible(Miembro, M),
+    format(atom(Texto), 'No se puede usar ~w en ~w ahora mismo. Pregunta por_que_no(usar(~w, ~w)) para ver por qué.', [O, M, Objeto, Miembro]).
 texto_error(no_hay_evento, 'No hay ningún evento abierto (ni charla): no hay nada que elegir.').
 texto_error(personaje_desconocido(Npc), Texto) :-
     format(atom(Texto), 'No conozco a nadie que se llame ~w. hablar. enseña con quién puedes hablar aquí.', [Npc]).
@@ -876,6 +884,7 @@ ayuda_de(descansar, Texto) :-
 ayuda_de(pagar, 'pagar.         solo en la taberna: paga los sueldos pendientes con lo más rancio').
 ayuda_de(elegir, 'elegir(Opcion). elige una opción del evento abierto (su número o su nombre)').
 ayuda_de(hablar, 'hablar.        quién hay aquí hoy; hablar(Nombre). abre su escena (una sola vez) y se elige con elegir(Opcion).').
+ayuda_de(usar, 'usar(Objeto, Miembro). gasta un objeto de la compañía: usar(pocion, tuerca). cura a un miembro herido (en combate gasta su turno)').
 ayuda_de(diario, 'diario.        lo que ya sabéis del Gran Rancio, según lo que cuenta la gente').
 ayuda_de(contratos, 'contratos.     el tablón: los contratos a la vista y si se pueden aceptar').
 ayuda_de(aceptar, 'aceptar(Contrato). acepta un contrato (en la taberna o donde lo ofrecen)').

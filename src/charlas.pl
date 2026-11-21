@@ -45,7 +45,7 @@ escena_de(el_eco,           lo_que_repites).
 
 % opcion_charla(Escena, Opcion, Quien, Condiciones, Efectos):
 %   Quien la hace (tiene que estar en pie); Condiciones: en_pie(Id), queso_min(N);
-%   Efectos: ganar_queso(N), perder_queso(N), moral(grupo|Id, N), saber(Marca).
+%   Efectos: ganar_queso(N), perder_queso(N), objeto(O), moral(grupo|Id, N), saber(Marca).
 opcion_charla(la_cuenta, jurar_honor, baldomero,
               [en_pie(baldomero)],
               [moral(grupo, 1)]).
@@ -78,7 +78,7 @@ opcion_charla(las_quejas, ojear_el_registro, tuerca,
 
 opcion_charla(la_oferta, cantar_el_anuncio, rufino,
               [en_pie(rufino)],
-              [ganar_queso(1)]).
+              [objeto(pocion)]).
 opcion_charla(la_oferta, regatear, tuerca,
               [en_pie(tuerca)],
               [ganar_queso(2), moral(tuerca, -1)]).
@@ -245,3 +245,4 @@ expandir(moral(grupo, N), Efs) :-
 expandir(moral(Id, N), [mod_moral(Id, N)]) :-
     Id \== grupo.
 expandir(saber(M), [marcar(sabe(M))]).
+expandir(objeto(O), [ganar_objeto(compania, O, 1)]).

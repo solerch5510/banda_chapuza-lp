@@ -499,6 +499,9 @@ candidata(Fase, Cmd, Familia) :-
         ;   charlas:presentes(Ids), member(Id, Ids), Cmd = hablar(Id), Familia = hablar
         ;   mundo:zona(Z, _), once(estado:en_zona(Aqui)), mundo:adyacente(Aqui, Z), Cmd = ir(Z), Familia = ir
         )
+    ;   estado:lleva(compania, Objeto, N), N > 0, mundo:curacion(Objeto, _),
+        compania:activo(Miembro), economia:puede_usar(Objeto, Miembro),
+        Cmd = usar(Objeto, Miembro), Familia = usar
     ;   Fase == combate,
         (   Cmd = defender, Familia = defender
         ;   enemigos_vivos(Tipos), member(T, Tipos), Cmd = atacar(T), Familia = atacar
@@ -566,6 +569,8 @@ etiqueta_de(Cmd, Etiqueta) :-
     ->  Etiqueta = 'Habilidad'
     ;   Cmd = hablar(Npc)
     ->  narrador:nombre_visible(Npc, N), format(atom(Etiqueta), 'Hablar con ~w', [N])
+    ;   Cmd = usar(Objeto, Miembro)
+    ->  narrador:nombre_visible(Objeto, O), nombre_corto(Miembro, M), format(atom(Etiqueta), 'Usar ~w en ~w', [O, M])
     ;   functor(Cmd, F, _), bonito(F, Etiqueta)
     ).
 

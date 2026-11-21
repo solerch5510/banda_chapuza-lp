@@ -726,13 +726,13 @@
   }
 
   // ---- la barra de acciones y la linea de ordenes ----
-  var ETIQUETAS = { mirar: "Mirar", ir: "Ir a…", inventario: "Inventario", contratos: "Contratos", compania: "Compañía", pagar: "Pagar", descansar: "Descansar", hablar: "Hablar", diario: "Diario",
+  var ETIQUETAS = { mirar: "Mirar", ir: "Ir a…", inventario: "Inventario", contratos: "Contratos", compania: "Compañía", pagar: "Pagar", descansar: "Descansar", hablar: "Hablar", diario: "Diario", usar: "Usar objeto",
     atacar: "Atacar", defender: "Defender", habilidad: "Habilidad" };
 
   function accionesRapidas() {
     var e = S.estado, combate = e.fase === "combate", fam = {};
     e.acciones.forEach(function (a) { (fam[a.familia] = fam[a.familia] || []).push(a); });
-    var orden = combate ? ["atacar", "defender", "habilidad"] : ["mirar", "ir", "hablar", "diario", "inventario", "contratos", "compania", "pagar", "descansar"];
+    var orden = combate ? ["atacar", "defender", "habilidad", "usar"] : ["mirar", "ir", "hablar", "diario", "usar", "inventario", "contratos", "compania", "pagar", "descansar"];
     var botones = orden.filter(function (f) { return fam[f]; }).map(function (f) {
       var todas = fam[f], ok = todas.filter(function (a) { return a.habilitada; });
       var etq = ETIQUETAS[f];
@@ -749,10 +749,10 @@
 
   // ChoiceMenu del diseno: selector de zona, objetivo de ataque y objetivo de habilidad.
   var SELECTORES = {
-    ir: ["Ir a…", "Elige una zona conectada"], hablar: ["Hablar con…", "Elige con quién"], atacar: ["Atacar a…", "Elige un objetivo"], habilidad: ["Habilidad sobre…", "Elige un objetivo"]
+    ir: ["Ir a…", "Elige una zona conectada"], hablar: ["Hablar con…", "Elige con quién"], usar: ["Usar objeto…", "Elige a quién curar"], atacar: ["Atacar a…", "Elige un objetivo"], habilidad: ["Habilidad sobre…", "Elige un objetivo"]
   };
 
-  function nombreDe(a) { return String(a.etiqueta).replace(/^(Ir a|Atacar a|Habilidad contra|Hablar con) /, ""); }
+  function nombreDe(a) { return String(a.etiqueta).replace(/^(Ir a|Atacar a|Habilidad contra|Hablar con|Usar) /, ""); }
 
   function razonDe(a) {
     if (!a.habilitada) return a.motivo || "No disponible";

@@ -221,6 +221,8 @@ efectos_accion(A, habilidad(B), Efectos) :-
 efectos_accion(E, curarse, [gastar_objeto(E, Objeto, 1), curar(E, Cura), mensaje(se_cura, [E, Cura])]) :-
     curativos_de(E, [Objeto|_]),
     mundo:curacion(Objeto, Cura).
+efectos_accion(_, usar(Objeto, Miembro), Efectos) :-          % un objeto de la compania en el turno de un miembro
+    economia:efectos_usar(Objeto, Miembro, Efectos).
 efectos_accion(E, invocar_moho, [invocar(moho_saltarin), mensaje(invoca_moho, [E])]) :-
     debe_invocar_moho(E).
 efectos_accion(E, robar_queso, [gastar_queso(Tipo, Edad, 1), contar(quesos_robados, 1), mensaje(roba_queso, [E])]) :-

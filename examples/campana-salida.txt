@@ -22,6 +22,7 @@ Comandos disponibles ahora:
   elegir(Opcion). elige una opción del evento abierto (su número o su nombre)
   hablar.        quién hay aquí hoy; hablar(Nombre). abre su escena (una sola vez) y se elige con elegir(Opcion).
   diario.        lo que ya sabéis del Gran Rancio, según lo que cuenta la gente
+  usar(Objeto, Miembro). gasta un objeto de la compañía: usar(pocion, tuerca). cura a un miembro herido (en combate gasta su turno)
   descansar.     solo en la taberna: cuesta 2 quesos, cura a todos y pasa un día
   pagar.         solo en la taberna: paga los sueldos pendientes con lo más rancio
   compania.      muestra a los miembros, su vida, su moral y su estado

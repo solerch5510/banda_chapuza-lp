@@ -106,6 +106,8 @@ Pruebas en `tests/hablar.pl` (la regla `puede_hablar`, la presencia por día, ca
 
 ## 10. Estado (20 de noviembre de 2026)
 
+> **Actualización:** ya existe `usar(Objeto, Miembro)` (nota 44). Cantar el anuncio a Ricota da ahora **una poción** en vez de un queso, así que el objeto tiene dónde nacer y para qué servir.
+
 **Hecho** (el autor eligió «motor + 8 escenas» y «sobre todo información»):
 
 - El comando `hablar`, `hablar(Nombre)` y `diario`, la regla `puede_hablar/1`, las escenas con opciones y el diario (`src/charlas.pl`; los textos, en `narrador.pl`).
@@ -118,5 +120,5 @@ Pruebas en `tests/hablar.pl` (la regla `puede_hablar`, la presencia por día, ca
 **Pendiente:**
 
 - Los 10 personajes que faltan (los rotativos del grupo B y los del grupo A de bosque, camino real, castillo y cuevas) y los dos fragmentos que cierran el hilo (Eustaquio y la Inspectora), con la frase final del diario cuando estén los seis.
-- `usar` para los objetos (poción, cataplasma).
+- Más objetos que se puedan usar: hoy solo cura la poción; una cataplasma o un objeto de moral serían datos nuevos (`mundo:curacion/2` y la regla de `usar`).
 - Añadir contenido ya no necesita tocar código: basta con filas en `presente/4`, `escena_de/2`, `opcion_charla/5`, `saber/1` y sus textos; el validador avisa si falta algo.

@@ -50,6 +50,7 @@ comando(elegir,     1).
 comando(hablar,     0).
 comando(hablar,     1).
 comando(diario,     0).
+comando(usar,       2).
 comando(salir,      0).
 
 validar_comando(T, Res) :-
@@ -67,9 +68,9 @@ validar_comando(T, Res) :-
 % ---------------------------------------------------------------------------
 % Que comandos se pueden usar en cada fase (la fase se deriva en estado:fase/1).
 % ---------------------------------------------------------------------------
-permitidos(exploracion, [ayuda, mirar, ir, contratos, aceptar, elegir, hablar, diario, compania, inventario, explicar, por_que_no, nivel, salir]).
-permitidos(taberna,     [ayuda, mirar, ir, contratos, aceptar, elegir, hablar, diario, descansar, pagar, compania, inventario, explicar, por_que_no, nivel, salir]).
-permitidos(combate,     [ayuda, mirar, atacar, defender, habilidad, compania, inventario, explicar, por_que_no, nivel, salir]).
+permitidos(exploracion, [ayuda, mirar, ir, contratos, aceptar, elegir, hablar, diario, usar, compania, inventario, explicar, por_que_no, nivel, salir]).
+permitidos(taberna,     [ayuda, mirar, ir, contratos, aceptar, elegir, hablar, diario, usar, descansar, pagar, compania, inventario, explicar, por_que_no, nivel, salir]).
+permitidos(combate,     [ayuda, mirar, atacar, defender, habilidad, usar, compania, inventario, explicar, por_que_no, nivel, salir]).
 permitidos(fin,         [ayuda, diario, explicar, por_que_no, nivel, salir]).
 
 permitido(Fase, Nombre) :-
@@ -92,6 +93,7 @@ objetivo_de_accion(elegir(Escrito), charlas:puede_elegir(Npc, Opcion)) :-
     charlas:charla_abierta(Npc),
     charlas:resolver_opcion(Npc, Escrito, Opcion).
 objetivo_de_accion(hablar(Npc), charlas:puede_hablar(Npc)).
+objetivo_de_accion(usar(Objeto, Miembro), economia:puede_usar(Objeto, Miembro)).
 % atacar(Objetivo) y atacar(Actor, Objetivo): el Objetivo puede ser un tipo (bandido_torpe) o una
 % instancia (e(bandido_torpe, 1)); el actor del primero es a quien le toca el turno.
 objetivo_de_accion(atacar(Actor, Objetivo), (combate:puede_atacar(Actor, B), combate:dano(Actor, B, _))) :-
@@ -374,6 +376,23 @@ ejecutar_en_fase(hablar(Npc), _, Items) :-
         etapa([guardar_prueba(hablar(Npc), Prueba)|Efectos], I1),
         mostrar_charla(Npc, I2),
         append(I1, I2, Items)
+    ).
+% usar(Objeto, Miembro) : una pocion cura a un miembro herido. Fuera de combate no pasa el tiempo; en combate
+% es la accion del miembro al que le toca (y pasa el turno). La prueba de la regla se guarda antes de aplicar.
+ejecutar_en_fase(usar(Objeto, Miembro), Fase, Items) :-
+    (   \+ mundo:curacion(Objeto, _)
+    ->  Items = [error(no_se_usa(Objeto))]
+    ;   \+ economia:puede_usar(Objeto, Miembro)
+    ->  Items = [error(no_puede_usar(Objeto, Miembro))]
+    ;   Fase == combate
+    ->  (   actor_del_turno(Actor)
+        ->  accion_de_turno(usar(Actor, Objeto, Miembro), Actor, usar(Objeto, Miembro),
+                            economia:puede_usar(Objeto, Miembro), Items)
+        ;   Items = [error(no_es_tu_turno)]
+        )
+    ;   once(explicar:solve(economia:puede_usar(Objeto, Miembro), Prueba)),
+        economia:efectos_usar(Objeto, Miembro, Efectos),
+        etapa([guardar_prueba(usar(Objeto, Miembro), Prueba)|Efectos], Items)
     ).
 % diario. : lo que ya se sabe del Gran Rancio.
 ejecutar_en_fase(diario, _, [vista(diario, Marcas)]) :-

@@ -11,7 +11,8 @@
                      puede_descansar/0, efectos_racion/1, efectos_descanso/1,
                      total_sueldos/1, puede_pagar_sueldos/0, efectos_sueldos/1,
                      efectos_perdida/2, racion_diaria/1, dias_de_comida/1, riesgo_de_gasto/2,
-                     dias_de_ayuno/1, derrota_por_hambre/0, efectos_ayuno/2]).
+                     dias_de_ayuno/1, derrota_por_hambre/0, efectos_ayuno/2,
+                     puede_usar/2, efectos_usar/3]).
 :- use_module(mundo).
 :- use_module(estado).
 :- use_module(compania).
@@ -259,6 +260,28 @@ efectos_ayuno(EfectosRacion, Efectos) :-
     ->  Efectos = [contar(dias_de_ayuno, 1)]
     ;   Efectos = [borrar_contador(dias_de_ayuno)]
     ).
+
+% ---------------------------------------------------------------------------
+% Usar un objeto (comando usar/2): una pocion cura a un miembro herido. El objeto sale del inventario comun de la
+% compania y la cura nunca pasa de la vida maxima. Fuera de combate no cuesta tiempo; en combate es la accion del
+% turno (ver juego:ejecutar_en_fase/3).
+% ---------------------------------------------------------------------------
+% puede_usar(?Objeto, ?Miembro): la compania lo lleva, cura, y el miembro esta vivo y herido (la regla que explica `usar`).
+puede_usar(Objeto, Miembro) :-
+    mundo:curacion(Objeto, _),
+    estado:lleva(compania, Objeto, N), N > 0,
+    compania:activo(Miembro),
+    estado:vida(Miembro, Vida),
+    estado:tope_vida(Miembro, Maximo),
+    Vida < Maximo.
+
+% efectos_usar(+Objeto, +Miembro, -Efectos): gasta el objeto y cura lo que cura (sin pasar del maximo).
+efectos_usar(Objeto, Miembro, [gastar_objeto(compania, Objeto, 1), curar(Miembro, Cura), mensaje(usa_objeto, [Objeto, Miembro, Cura])]) :-
+    puede_usar(Objeto, Miembro),
+    mundo:curacion(Objeto, Total),
+    estado:vida(Miembro, Vida),
+    estado:tope_vida(Miembro, Maximo),
+    Cura is min(Total, Maximo - Vida).
 
 % efectos_perdida(+N, -Efectos): se pierden N quesos (los mas rancios primero) o todos si hay menos.
 efectos_perdida(N, Efectos) :-
