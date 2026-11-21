@@ -19,7 +19,7 @@
 :- multifile modulo_juego/1.
 modulo_juego(estado).    modulo_juego(mundo).     modulo_juego(compania).
 modulo_juego(economia).  modulo_juego(contratos). modulo_juego(combate).
-modulo_juego(eventos).
+modulo_juego(eventos).  modulo_juego(charlas).
 
 solve(Meta, Prueba) :- solve(Meta, Prueba, []).
 

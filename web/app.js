@@ -139,6 +139,15 @@
           S.tab = "Contratos";
           if (esMovil()) S.movilTab = "panel";
           break;
+        case "presentes":
+          S.log.push({ t: "presentes", ps: it.personajes });
+          break;
+        case "charla":
+          S.log.push({ t: "charla", nombre: it.nombre, opciones: it.opciones });
+          break;
+        case "diario":
+          S.log.push({ t: "diario", saberes: it.saberes });
+          break;
         case "evento":
           S.log.push({ t: "evento", d: it.descripcion, opciones: it.opciones, quedan: it.quedan, zona: resp.estado ? resp.estado.zona.nombre : "" });
           break;
@@ -192,7 +201,7 @@
     if (!texto || S.ocupado) return Promise.resolve();
     S.ocupado = true; S.error = null; S.pop = null; S.menu = false;
     if (!opciones.silencioso) {
-      S.log.forEach(function (e) { if (e.t === "evento") e.viejo = true; });     // un evento ya contestado no se vuelve a elegir
+      S.log.forEach(function (e) { if (e.t === "evento" || e.t === "charla") e.viejo = true; });     // un evento ya contestado no se vuelve a elegir
       S.log.push({ t: "cmd", texto: texto.replace(/\.$/, "") });
       if (S.hist[S.hist.length - 1] !== texto) S.hist.push(texto);
       S.hpos = S.hist.length;
@@ -570,6 +579,35 @@
       '<div class="event-options">' + opciones + "</div>" + (e.viejo ? "" : '<div class="attempts"><span>Intentos que quedan</span><strong>' + e.quedan + "</strong>" + marcas + "</div>") + "</section>";
   }
 
+  // Hablar con la gente: quien hay aqui, la escena con sus opciones y el diario.
+  function presentesHTML(e) {
+    if (!e.ps.length) return '<div class="narration-line system"><span class="line-mark">◆</span><p>Aquí no hay nadie con quien hablar.</p></div>';
+    return '<section class="event-choice"><p class="panel-kicker">GENTE</p><h2>Con quién hablar</h2><div class="event-options">' + e.ps.map(function (p) {
+      var hecha = p.estado === "hecha";
+      return '<button class="' + (hecha ? "disabled" : "") + '" data-cmd="hablar(' + esc(p.id) + ')"><span><strong>' + esc(mayus(p.nombre)) + "</strong><small>" + esc(p.quien) +
+        (hecha ? " · ya hablado" : p.estado === "abierta" ? " · a medias" : "") + "</small></span></button>";
+    }).join("") + "</div></section>";
+  }
+
+  function charlaHTML(e) {
+    var opciones = e.opciones.map(function (o) {
+      if (e.viejo) {
+        return '<button class="disabled" disabled><kbd>' + o.numero + "</kbd><span><strong>" + esc(o.texto) + "</strong><small>" + esc(o.quien) + " · ya resuelto</small></span></button>";
+      }
+      var cmd = o.disponible ? "elegir(" + o.numero + ")" : "por_que_no(elegir(" + o.numero + "))";
+      return '<button class="' + (o.disponible ? "" : "disabled") + '" data-cmd="' + esc(cmd) + '"><kbd>' + o.numero + "</kbd><span><strong>" + esc(o.texto) + "</strong><small>" +
+        esc(o.quien) + " · " + (o.disponible ? "Disponible" : "No disponible") + "</small>" + (o.disponible ? "" : "<u>¿por qué no?</u>") + "</span></button>";
+    }).join("");
+    return '<section class="event-choice"><p class="panel-kicker">CHARLA · ' + esc(String(e.nombre || "").toUpperCase()) + "</p><h2>¿Qué hace la banda?</h2>" +
+      '<div class="event-options">' + opciones + "</div></section>";
+  }
+
+  function diarioHTML(e) {
+    if (!e.saberes.length) return '<div class="narration-line system"><span class="line-mark">◆</span><p>El diario está en blanco: todavía no sabéis nada del Gran Rancio. Hablad con la gente.</p></div>';
+    return '<section class="event-choice diario"><p class="panel-kicker">DIARIO DE LA BANDA</p><h2>Lo que sabéis del Gran Rancio</h2><ul>' +
+      e.saberes.map(function (s) { return "<li>" + esc(s.texto) + "</li>"; }).join("") + "</ul></section>";
+  }
+
   // La despensa completa (PantryFull del diseno).
   function despensaCompletaHTML(d) {
     var lotes = d.lotes.map(function (l) {
@@ -644,6 +682,9 @@
       case "inventario": return despensaCompletaHTML(e.d);
       case "contratos": return '<div class="narration-line system"><span class="line-mark">◆</span><p>El tablón de contratos está en el panel de la derecha.</p></div>';
       case "evento": return eventoHTML(e);
+      case "presentes": return presentesHTML(e);
+      case "charla": return charlaHTML(e);
+      case "diario": return diarioHTML(e);
       case "ayuda": return ayudaHTML(e.comandos, e.consejo);
       case "escenas":
         return '<div class="log-opciones">' + e.escenas.map(function (s) {
@@ -685,13 +726,13 @@
   }
 
   // ---- la barra de acciones y la linea de ordenes ----
-  var ETIQUETAS = { mirar: "Mirar", ir: "Ir a…", inventario: "Inventario", contratos: "Contratos", compania: "Compañía", pagar: "Pagar", descansar: "Descansar",
+  var ETIQUETAS = { mirar: "Mirar", ir: "Ir a…", inventario: "Inventario", contratos: "Contratos", compania: "Compañía", pagar: "Pagar", descansar: "Descansar", hablar: "Hablar", diario: "Diario",
     atacar: "Atacar", defender: "Defender", habilidad: "Habilidad" };
 
   function accionesRapidas() {
     var e = S.estado, combate = e.fase === "combate", fam = {};
     e.acciones.forEach(function (a) { (fam[a.familia] = fam[a.familia] || []).push(a); });
-    var orden = combate ? ["atacar", "defender", "habilidad"] : ["mirar", "ir", "inventario", "contratos", "compania", "pagar", "descansar"];
+    var orden = combate ? ["atacar", "defender", "habilidad"] : ["mirar", "ir", "hablar", "diario", "inventario", "contratos", "compania", "pagar", "descansar"];
     var botones = orden.filter(function (f) { return fam[f]; }).map(function (f) {
       var todas = fam[f], ok = todas.filter(function (a) { return a.habilitada; });
       var etq = ETIQUETAS[f];
@@ -708,10 +749,10 @@
 
   // ChoiceMenu del diseno: selector de zona, objetivo de ataque y objetivo de habilidad.
   var SELECTORES = {
-    ir: ["Ir a…", "Elige una zona conectada"], atacar: ["Atacar a…", "Elige un objetivo"], habilidad: ["Habilidad sobre…", "Elige un objetivo"]
+    ir: ["Ir a…", "Elige una zona conectada"], hablar: ["Hablar con…", "Elige con quién"], atacar: ["Atacar a…", "Elige un objetivo"], habilidad: ["Habilidad sobre…", "Elige un objetivo"]
   };
 
-  function nombreDe(a) { return String(a.etiqueta).replace(/^(Ir a|Atacar a|Habilidad contra) /, ""); }
+  function nombreDe(a) { return String(a.etiqueta).replace(/^(Ir a|Atacar a|Habilidad contra|Hablar con) /, ""); }
 
   function razonDe(a) {
     if (!a.habilitada) return a.motivo || "No disponible";

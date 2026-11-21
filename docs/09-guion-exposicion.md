@@ -149,7 +149,7 @@ En la segunda pestaña lanzo las pruebas (unos 20 segundos):
 swipl -q -s tests/todas -g "run_tests,halt" -t "halt(1)"
 ```
 
-Se ve: «33 suites en verde, 0 con fallos; 1934 pruebas declaradas» y «TODO EN VERDE».
+Se ve: «34 suites en verde, 0 con fallos; 2007 pruebas declaradas» y «TODO EN VERDE».
 
 > Para terminar: la verificación fue tan importante como el código. Veintiocho suites, más de mil setecientas pruebas, pruebas de mutación —rompo el código a propósito y compruebo que alguna prueba falla— y la prueba de equivalencia del meta-intérprete que les contaba.
 >
@@ -168,7 +168,7 @@ Se ve: «33 suites en verde, 0 con fallos; 1934 pruebas declaradas» y «TODO EN
 | 4 | **Negación como fallo** y **corte** | `por_que_no` (el miedo de Baldomero); `accion_enemigo/2` y su gemela sin corte |
 | 5 | Aritmética | daño, sueldos, ración, maduración del queso |
 | 6 | Metaprogramación y `clause/3` | `explicar.pl`: `solve/2` y `por_que_no/2` |
-| 6 | Base de datos dinámica, módulos | `estado.pl` (único escritor); 15 módulos |
+| 6 | Base de datos dinámica, módulos | `estado.pl` (único escritor); 16 módulos |
 
 ## 5. Plan B (qué hago si algo falla)
 

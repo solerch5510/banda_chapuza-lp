@@ -7,6 +7,7 @@
 ## Qué incluye
 
 - **Compañía de mercenarios** (Sir Baldomero, Madame Pimentina, Rufino y Tuerca) con rasgos que modifican las reglas: Baldomero teme a los caballos, Rufino cobra por callar...
+- **Gente con la que hablar:** cada zona tiene personajes (`hablar.`), unos fijos y otros que solo están ciertos días. Cada uno ofrece una escena con opciones que hace un miembro de la Banda (`elegir`) y que da cosas pequeñas o **información**; el `diario.` junta los fragmentos de la historia del Gran Rancio que se van averiguando ([docs/12-npcs.md](docs/12-npcs.md)).
 - **Economía del queso:** es la única moneda y también la comida. Madura (fresco, curado, rancio), hay ración diaria, sueldos (`pagar`) y moral; con la moral baja, un miembro se pone en huelga. Quedarse sin queso no acaba la partida en el acto: la Banda aguanta dos días seguidos sin comer. Al ganar un combate, los enemigos sueltan queso con una probabilidad (una tirada con la semilla del juego, reproducible). Lo que paga cada contrato se **deriva** de lo que cuesta hacerlo (días de viaje y enemigos; [docs/11-balance.md](docs/11-balance.md)).
 - **Contratos** con recompensa y consecuencias, y **eventos** con opciones.
 - **Combate por turnos** con filas (frente y retaguardia), habilidades y enemigos con IA por reglas (con prioridad y corte).
@@ -165,7 +166,7 @@ Cada suite corre en su propio proceso (así ninguna contagia a otra), se escribe
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/combate -g "run_tests,halt" -t "halt(1)"
 ```
 
-Suites actuales (33 suites, 1934 pruebas):
+Suites actuales (34 suites, 2007 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -185,6 +186,7 @@ Suites actuales (33 suites, 1934 pruebas):
 | `tests/todas.pl` | El agregador: corre todas las suites en procesos separados y devuelve 0 o 1. |
 | `tests/api.pl` (97) | El adaptador JSON y el servidor: el árbol como nodos (profundidad, estado, tipo, pliegue), todos los items con su JSON, `ejecutar_orden/2` (errores como la consola, nunca falla), estado y acciones habilitadas ciertos y sin tocar la partida, **lo que cuenta la web es lo que cuenta la consola**, y el servidor HTTP real (GET, POST, UTF-8, estáticos, 404, rutas fuera de `web/`, cerrojo). |
 | `tests/agregador.pl` (4) | Vigila a `tests/todas.pl`: una suite buena da verde, una que falla da código 1, **también si falla con `assertion/1`** (en 5.10.4 eso abre el depurador y el proceso sale con 0). |
+| `tests/hablar.pl` (73) | Hablar con los NPC: el **validador de contenido** (cada personaje tiene escena, cada opción su texto y su frase, cada fragmento del diario sale de una opción, y **el queso que se puede sacar hablando tiene techo**), quién está y cuándo según el día, el flujo `hablar` → `elegir` (se hace una vez, queda a medias si te vas, un evento de contrato manda sobre la charla), los efectos de cada opción, los errores, el diario, la consola, la API y la web, y que **el jugador que habla con todos no gana menos ni se hace rico** (simulador). |
 | `tests/botin.pl` (26) | El botín tras el combate: la tabla de datos `mundo:botin/3`, la regla pura `combate:botin_de/5` (una tirada por enemigo con la semilla del juego, la cantidad, el límite exacto de la probabilidad, la frecuencia en una racha larga), los efectos al ganar (el mensaje de lo que cae o de que no cae nada, y la semilla guardada), un combate de verdad y que **la misma semilla da el mismo botín**. Es el primer azar del juego. |
 | `tests/ayuno.pl` (31) | La regla de hambre más justa: el contador de días seguidos sin comer y sus efectos, cuándo es derrota (queso a cero, nada por cobrar y ayuno agotado), el paso de los días (comerse la última ración ya no acaba la partida, un día alimentado pone la cuenta a cero, cobrar a tiempo salva), los avisos (`a_cero` suave y `hambre_mortal`), la consola, la API y la web, y lo que mide el simulador. |
 | `tests/pago.pl` (28) | El pago de los contratos derivado de lo que cuestan: la distancia entre zonas, los días de ruta y los enemigos de cada contrato, la fórmula con otros números (cada término, el mínimo, monotonía), lo que paga el catálogo (14 / 12 / 21 y el jefe en 40), **que cada contrato compensa su viaje**, que el marcador `quesos(pago)` nunca llega al tablón y que el juego sigue siendo ganable (con el simulador). |
@@ -212,7 +214,7 @@ Se ejecutan en procesos distintos porque los módulos de juguete del spike expor
 banda_chapuza-lp/
 ├─ README.md
 ├─ docs/            documentación de diseño
-├─ src/             código fuente (15 módulos)
+├─ src/             código fuente (16 módulos)
 ├─ tests/           pruebas (plunit)
 ├─ web/             frontend web opcional (HTML, CSS y JavaScript sin dependencias)
 ├─ scripts/         verificar-entrega.ps1: la lista de verificación de la entrega, automatizada
@@ -220,7 +222,7 @@ banda_chapuza-lp/
 └─ examples/        partidas y explicaciones de ejemplo
 ```
 
-Los 15 módulos de `src/`:
+Los 16 módulos de `src/`:
 
 | Módulo | Función |
 |---|---|
@@ -234,6 +236,7 @@ Los 15 módulos de `src/`:
 | `contratos.pl` | Contratos y sus reglas. |
 | `combate.pl` | Turnos, filas, daño e IA enemiga. |
 | `eventos.pl` | Eventos cómicos. |
+| `charlas.pl` | Hablar con la gente (`hablar`, `diario`): quién está en cada zona según el día, sus escenas con opciones y el diario del Gran Rancio. Datos y reglas puras; los textos viven en `narrador.pl`. |
 | `explicar.pl` | Meta-intérprete, árbol de derivación y modo explicar. |
 | `narrador.pl` | Frases del narrador. |
 | `ui.pl` | Entrada y salida por consola (único módulo con E/S). |
@@ -256,6 +259,7 @@ Documentos en `docs/`:
 | [09-guion-exposicion.md](docs/09-guion-exposicion.md) | Guion de la exposición, plan B y preguntas probables. |
 | [guia-rapida.md](docs/guia-rapida.md) | Guía rápida para jugar en cinco minutos. |
 | [10-checklist-entrega.md](docs/10-checklist-entrega.md) | Lista de verificación de la entrega y etiquetas propuestas. |
+| [12-npcs.md](docs/12-npcs.md) | Hablar con los NPC: el diseño (reparto por zonas y días, hilo de historia, balance) y qué hay ya hecho. |
 | [11-balance.md](docs/11-balance.md) | Balance de la economía del queso medido con el simulador: qué se midió, variantes de pagos y qué sigue. |
 
 ## Contexto académico

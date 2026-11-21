@@ -23,6 +23,7 @@
 :- use_module(combate).
 :- use_module(contratos).
 :- use_module(eventos).
+:- use_module(charlas, []).      % sus nombres (opciones_de/2...) chocan con los de eventos: se llama siempre con charlas:
 :- use_module(explicar).
 
 % ---------------------------------------------------------------------------
@@ -46,6 +47,9 @@ comando(habilidad,  1).
 comando(contratos,  0).
 comando(aceptar,    1).
 comando(elegir,     1).
+comando(hablar,     0).
+comando(hablar,     1).
+comando(diario,     0).
 comando(salir,      0).
 
 validar_comando(T, Res) :-
@@ -63,10 +67,10 @@ validar_comando(T, Res) :-
 % ---------------------------------------------------------------------------
 % Que comandos se pueden usar en cada fase (la fase se deriva en estado:fase/1).
 % ---------------------------------------------------------------------------
-permitidos(exploracion, [ayuda, mirar, ir, contratos, aceptar, elegir, compania, inventario, explicar, por_que_no, nivel, salir]).
-permitidos(taberna,     [ayuda, mirar, ir, contratos, aceptar, elegir, descansar, pagar, compania, inventario, explicar, por_que_no, nivel, salir]).
+permitidos(exploracion, [ayuda, mirar, ir, contratos, aceptar, elegir, hablar, diario, compania, inventario, explicar, por_que_no, nivel, salir]).
+permitidos(taberna,     [ayuda, mirar, ir, contratos, aceptar, elegir, hablar, diario, descansar, pagar, compania, inventario, explicar, por_que_no, nivel, salir]).
 permitidos(combate,     [ayuda, mirar, atacar, defender, habilidad, compania, inventario, explicar, por_que_no, nivel, salir]).
-permitidos(fin,         [ayuda, explicar, por_que_no, nivel, salir]).
+permitidos(fin,         [ayuda, diario, explicar, por_que_no, nivel, salir]).
 
 permitido(Fase, Nombre) :-
     permitidos(Fase, Lista),
@@ -79,10 +83,15 @@ objetivo_de_accion(ir(Zona),  compania:puede_viajar(Zona)).
 objetivo_de_accion(descansar, economia:puede_descansar).
 objetivo_de_accion(pagar,     economia:puede_pagar_sueldos).
 objetivo_de_accion(aceptar(C), contratos:puede_aceptar(C)).
-% elegir(Opcion): el numero de la opcion o su nombre; el evento es el que esta abierto.
+% elegir(Opcion): el numero de la opcion o su nombre; el evento es el que esta abierto (o, si no hay ninguno, la charla).
 objetivo_de_accion(elegir(Escrito), eventos:puede_elegir(E, Opcion)) :-
     eventos:evento_abierto(E),
     eventos:resolver_opcion(E, Escrito, Opcion).
+objetivo_de_accion(elegir(Escrito), charlas:puede_elegir(Npc, Opcion)) :-
+    \+ eventos:evento_abierto(_),
+    charlas:charla_abierta(Npc),
+    charlas:resolver_opcion(Npc, Escrito, Opcion).
+objetivo_de_accion(hablar(Npc), charlas:puede_hablar(Npc)).
 % atacar(Objetivo) y atacar(Actor, Objetivo): el Objetivo puede ser un tipo (bandido_torpe) o una
 % instancia (e(bandido_torpe, 1)); el actor del primero es a quien le toca el turno.
 objetivo_de_accion(atacar(Actor, Objetivo), (combate:puede_atacar(Actor, B), combate:dano(Actor, B, _))) :-
@@ -325,7 +334,10 @@ ejecutar_en_fase(aceptar(C), _, Items) :-
 % eventos:puede_elegir/2, cuya prueba se guarda ANTES de aplicar los efectos. Si la opcion acaba el
 % evento, el contrato se resuelve con las marcas que dejo.
 ejecutar_en_fase(elegir(Escrito), _, Items) :-
-    (   \+ eventos:evento_abierto(_)
+    (   \+ eventos:evento_abierto(_), charlas:charla_abierta(_)
+    ->  once(charlas:charla_abierta(Npc)),
+        elegir_en_charla(Npc, Escrito, Items)
+    ;   \+ eventos:evento_abierto(_)
     ->  Items = [error(no_hay_evento)]
     ;   once(eventos:evento_abierto(E)),
         (   \+ eventos:resolver_opcion(E, Escrito, _)
@@ -337,6 +349,35 @@ ejecutar_en_fase(elegir(Escrito), _, Items) :-
             elegir_opcion(E, Opcion, Items)
         )
     ).
+
+% hablar. : quien hay aqui hoy. hablar(Npc). : abre su escena (una sola vez); luego se elige con elegir/1.
+ejecutar_en_fase(hablar, _, [vista(presentes, Presentes)]) :-
+    charlas:presentes(Ids),
+    findall(presente(Id, Estado),
+            (   member(Id, Ids),
+                (   charlas:charla_hecha(Id) -> Estado = hecha
+                ;   charlas:charla_abierta(Id) -> Estado = abierta
+                ;   Estado = nueva )
+            ),
+            Presentes).
+ejecutar_en_fase(hablar(Npc), _, Items) :-
+    (   \+ charlas:personaje_de_charla(Npc)
+    ->  Items = [error(personaje_desconocido(Npc))]
+    ;   \+ charlas:puede_hablar(Npc)
+    ->  Items = [error(no_esta_aqui(Npc))]
+    ;   charlas:charla_hecha(Npc)
+    ->  Items = [msg(charla_repite, [Npc], 0)]
+    ;   charlas:charla_abierta(Npc)
+    ->  mostrar_charla(Npc, Items)
+    ;   once(explicar:solve(charlas:puede_hablar(Npc), Prueba)),
+        charlas:efectos_apertura(Npc, Efectos),
+        etapa([guardar_prueba(hablar(Npc), Prueba)|Efectos], I1),
+        mostrar_charla(Npc, I2),
+        append(I1, I2, Items)
+    ).
+% diario. : lo que ya se sabe del Gran Rancio.
+ejecutar_en_fase(diario, _, [vista(diario, Marcas)]) :-
+    charlas:saberes(Marcas).
 
 % explicar. : la prueba de lo ultimo que se hizo. explicar(Accion). : la de esa accion;
 % si es la ultima, la guardada (el estado ya cambio); si no, se resuelve ahora, en hipotetico.
@@ -669,6 +710,24 @@ siguiente_objetivo(Items) :-
 mostrar_evento(E, [vista(evento, E, Quedan, Opciones)]) :-
     eventos:intentos_restantes(E, Quedan),
     eventos:opciones_de(E, Opciones).
+
+% mostrar_charla(+Npc, -Items): la vista de la charla con sus opciones.
+mostrar_charla(Npc, [vista(charla, Npc, Opciones)]) :-
+    charlas:opciones_de(Npc, Opciones).
+
+% elegir_en_charla(+Npc, +Escrito, -Items): elegir una opcion de la charla abierta; la prueba de la regla se guarda ANTES
+% de aplicar los efectos (para explicar), como en los eventos.
+elegir_en_charla(Npc, Escrito, Items) :-
+    (   \+ charlas:resolver_opcion(Npc, Escrito, _)
+    ->  Items = [error(opcion_desconocida(Escrito))]
+    ;   charlas:resolver_opcion(Npc, Escrito, Opcion),
+        \+ charlas:puede_elegir(Npc, Opcion)
+    ->  Items = [error(opcion_no_disponible(Opcion))]
+    ;   charlas:resolver_opcion(Npc, Escrito, Opcion),
+        once(explicar:solve(charlas:puede_elegir(Npc, Opcion), Prueba)),
+        once(charlas:efectos_eleccion(Npc, Opcion, Efectos)),
+        etapa([guardar_prueba(elegir(Opcion), Prueba)|Efectos], Items)
+    ).
 
 elegir_opcion(E, Opcion, Items) :-
     once(explicar:solve(eventos:puede_elegir(E, Opcion), Prueba)),

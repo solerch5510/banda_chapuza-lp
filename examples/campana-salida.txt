@@ -20,6 +20,8 @@ Comandos disponibles ahora:
   contratos.     el tablón: los contratos a la vista y si se pueden aceptar
   aceptar(Contrato). acepta un contrato (en la taberna o donde lo ofrecen)
   elegir(Opcion). elige una opción del evento abierto (su número o su nombre)
+  hablar.        quién hay aquí hoy; hablar(Nombre). abre su escena (una sola vez) y se elige con elegir(Opcion).
+  diario.        lo que ya sabéis del Gran Rancio, según lo que cuenta la gente
   descansar.     solo en la taberna: cuesta 2 quesos, cura a todos y pasa un día
   pagar.         solo en la taberna: paga los sueldos pendientes con lo más rancio
   compania.      muestra a los miembros, su vida, su moral y su estado

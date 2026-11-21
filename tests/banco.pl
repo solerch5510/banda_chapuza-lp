@@ -56,6 +56,9 @@ larga_a_proposito(suceso(final(_))).
 larga_a_proposito(suceso(derrota_combate)).
 larga_a_proposito(suceso(fin_hambre)).
 larga_a_proposito(suceso(evento_abre(_))).
+larga_a_proposito(suceso(charla_abre(_))).
+larga_a_proposito(suceso(charla_elige(_, _))).
+larga_a_proposito(suceso(saber_nuevo(_))).
 
 nivel_fijo(Nivel) :-
     aplicar_efecto(ajustar(nivel_explicacion, Nivel)).
@@ -158,6 +161,9 @@ conocido(A) :- mundo:enemigo(A, _, _, _).
 conocido(A) :- contratos:contrato(A, _, _, _, _).
 conocido(A) :- mundo:habilidad_de(_, A).
 conocido(A) :- mundo:rasgo(_, A).
+conocido(A) :- charlas:presente(A, _, _, _).
+conocido(A) :- charlas:opcion_charla(_, A, _, _, _).
+conocido(A) :- charlas:saber(A).
 conocido(A) :- member(A, [taberna, caballo, ok, nada, exito, a_medias, fracaso, chapuza, resumido, detallado,
                           fallo, hecho, negacion, predefinido, regla, sin_fallo, sin_prueba,
                           ninguno, curarse, robar_queso, invocar_moho, embestir, atacar, defender,
@@ -169,7 +175,7 @@ functor_valido(F) :-
     member(F, [suceso, generica, falla, impide,
                % mensajes
                llegada, descanso, sin_comida, come_rancio, pago, impago, fin_hambre, final, golpe, cae,
-               evento_abre, evento_elige, intento_fallido, objetivo, contrato_resuelto, cobra, acepta, contrato_nuevo, sin_botin, aparece,
+               evento_abre, evento_elige, intento_fallido, objetivo, contrato_resuelto, cobra, acepta, contrato_nuevo, sin_botin, charla_abre, charla_elige, charla_repite, saber_nuevo, aparece,
                victoria, botin, derrota_combate, aturdido, pasa, se_cura, invoca_moho, roba_queso, embiste,
                defiende, carga_heroica, fondue, balada, rebuscar, nivel, golpea_a_clotilde, dia_nuevo,
                % reglas

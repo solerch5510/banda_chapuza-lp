@@ -16,7 +16,7 @@
 % entre ellas con Uso mod N. Si varias claves encajan, gana la mas especifica (menos variables).
 % Texto provisional: el banco con todo el humor (docs/05-comedia-y-narracion.md) crece despues.
 
-:- module(narrador, [frase/3, texto/4, texto_error/2, ayuda_de/2, bienvenida/1, consejo_de_ayuda/2, texto_riesgo/2, texto_objetivo/3,
+:- module(narrador, [frase/3, texto/4, texto_error/2, ayuda_de/2, bienvenida/1, consejo_de_ayuda/2, texto_riesgo/2, texto_objetivo/3, texto_saber/2, descripcion_personaje/2, descripcion_opcion_charla/3,
                      comentario/4, comentario_prueba/4, nombre_visible/2, texto_recompensa/2,
                      descripcion_evento/2, descripcion_opcion/3,
                      claves_de_diag/2, clave_de_diag/2, comentario_diag/4,
@@ -112,6 +112,98 @@ frase(suceso(victoria), ambos,
       'Victoria. Nadie la esperaba, y menos que nadie la propia Banda.').
 frase(suceso(sin_botin), ambos,
       'Registráis los restos con todo el cuidado de un recaudador: ni una corteza. Hoy los bolsillos de esta gente estaban de huelga.').
+% --- hablar con la gente (docs/12-npcs.md): lo que dice cada personaje al abrir su escena, lo que pasa al elegir y el diario ---
+frase(suceso(charla_repite(Npc)), ambos,
+      'Ya habéis hablado con ~w. «Ya os lo he dicho», responde, con cara de quien no piensa repetirlo.'-[Npc]).
+
+frase(suceso(charla_abre(mantecosa)), ambos,
+      'Doña Mantecosa seca una jarra con el mismo trapo con el que limpia la mesa. «El moho. Lo huelo desde hace tres inviernos, desde que el rey me compró queso y lo devolvió "para afinarlo". Ahora sale por mis desagües. Yo no digo nada, pero la sopa ya no es de ayer: es de anteayer».').
+frase(suceso(charla_elige(mantecosa, jurar_honor)), ambos,
+      'Baldomero jura con la mano en el pecho. Doña Mantecosa asiente: «El honor no paga la cuenta, pero queda bien en la pared.» La Banda se siente un poco más importante.').
+frase(suceso(charla_elige(mantecosa, invitar_al_caldo)), ambos,
+      'Pimentina paga el caldo. Doña Mantecosa, ablandada por exactamente un queso, suelta lo que sabía: el moho empezó en la despensa del rey.').
+frase(suceso(charla_elige(mantecosa, mirar_los_desagues)), ambos,
+      'Tuerca vuelve de los desagües con un queso y cara de haberse equivocado de oficio. Rufino ha tenido que olerlo y su ánimo se resiente.').
+
+frase(suceso(charla_abre(gruyere)), ambos,
+      'Gruyère, un viajante con el sombrero en la mano, mira su jarra vacía. «Perdí la carreta en el Camino Real. Eran cuatro bandidos, y uno venía a caballo: ese ni lo vi, solo lo oí. Nadie me cree.» Suspira con todo el cuerpo.').
+frase(suceso(charla_elige(gruyere, vengar_al_viajante)), ambos,
+      'Baldomero se hincha de honor y Gruyère le cuenta con detalle lo de los jinetes del camino. A Baldomero se le va el color: acaba de enterarse de que hay caballos.').
+frase(suceso(charla_elige(gruyere, consolar_con_una_balada)), ambos,
+      'La balada es mala, pero larga. Gruyère llora, se suena con el sombrero y jura que ya no se siente solo. La Banda sale animada.').
+frase(suceso(charla_elige(gruyere, ayudarle_a_recoger)), ambos,
+      'Tuerca recoge el petate con tanta eficacia que le sobra un queso. Gruyère no se da cuenta: sigue mirando la jarra.').
+
+frase(suceso(charla_abre(alcaldesa_nata)), ambos,
+      'La alcaldesa Nata despliega una lista de quejas que llega al suelo. «Las vacas dan leche con vetas azules desde hace semanas, el rodillo del panadero se oxida y nadie me pregunta nada. ¿Les importa si empiezo por el principio?» Y empieza por el principio.').
+frase(suceso(charla_elige(alcaldesa_nata, escuchar_la_lista)), ambos,
+      'Baldomero escucha la lista entera. Le duele el honor a partir de la queja noventa, pero la alcaldesa se desahoga y cuenta que la leche sale azul desde que empezó el moho.').
+frase(suceso(charla_elige(alcaldesa_nata, curar_las_vacas)), ambos,
+      'El remedio de Pimentina no cura a las vacas, pero alegra a la alcaldesa, que deja dos quesos «para la causa». El saldo, a favor.').
+frase(suceso(charla_elige(alcaldesa_nata, ojear_el_registro)), ambos,
+      'Tuerca no encuentra nada valioso, pero descubre su propia queja en la lista (la 212: «el ladrón»). Se siente visto y, extrañamente, orgulloso.').
+
+frase(suceso(charla_abre(ricota)), ambos,
+      'Ricota, el tendero, os enseña su estante con una sonrisa de oferta permanente. «¡Hoy todo a mitad de precio! Bueno, hoy y siempre. Aquí no se vende queso, ya lo sabéis, pero se hace buen negocio con el aire».').
+frase(suceso(charla_elige(ricota, cantar_el_anuncio)), ambos,
+      'Rufino compone «Oferta eterna» en tres minutos. Ricota, emocionado, le paga con un queso: el primer pago por música de la historia de la aldea.').
+frase(suceso(charla_elige(ricota, regatear)), ambos,
+      'Tuerca regatea tan bien que Ricota le da dos quesos para que se vaya. Pero ahora lo miran mal en la aldea y Tuerca pierde ánimo.').
+frase(suceso(charla_elige(ricota, preguntar_por_los_precios)), ambos,
+      'Pimentina anota los precios con interés profesional. No saca nada, pero se siente muy informada y de buen humor.').
+
+frase(suceso(charla_abre(penicilio)), ambos,
+      'El Hermano Penicilio levanta la vista de una seta con la que discutía. «No lo llaméis plaga. El moho no es malo: tiene hambre. Viene de abajo, de las cuevas, y come lo que encuentra. Si nadie le da otra cosa...», suspira.').
+frase(suceso(charla_elige(penicilio, hablar_con_el_moho)), ambos,
+      'Pimentina se arrodilla junto a la seta y entiende dos palabras: «queso» y «ya». El Hermano asiente: el moho viene de las cuevas y tiene hambre de verdad.').
+frase(suceso(charla_elige(penicilio, amenazar_con_fuego)), ambos,
+      'Baldomero blande la espada. Penicilio no se inmuta; la seta sí: se esconde. Baldomero se siente mal por haber asustado a una seta y su ánimo baja.').
+frase(suceso(charla_elige(penicilio, cantarle_al_moho)), ambos,
+      'La nana de Rufino hace brotar un hongo que baila. Penicilio llora de gusto y cuenta lo del hambre. Rufino sale encantado de sí mismo.').
+
+frase(suceso(charla_abre(ganso_recaudador)), ambos,
+      'Un ganso con tricornio y libro de cuentas corta el camino. «Peaje. Un queso por Banda. Si no se paga, se discute, y se discute siempre.» Detrás, una carreta del Gremio pasa sin detenerse ni pagar.').
+frase(suceso(charla_elige(ganso_recaudador, discutir_el_peaje)), ambos,
+      'Baldomero discute media hora sobre el concepto de peaje. El ganso gana por cansancio. La Banda pasa, pero el honor ha sufrido.').
+frase(suceso(charla_elige(ganso_recaudador, pagar_el_peaje)), ambos,
+      'Pimentina paga con una sonrisa. El ganso, enternecido, murmura que el Gremio nunca paga peaje: «Ellos tienen sello».').
+frase(suceso(charla_elige(ganso_recaudador, esquivar_al_ganso)), ambos,
+      'Tuerca se cuela por la cuneta sin pagar y sin que el ganso mueva el cuello. Se siente un artista.').
+
+frase(suceso(charla_abre(rey_brieto)), ambos,
+      'El rey Brieto IV os recibe con las manos juntas y un pañuelo perfumado. «¡Mis queridos mercenarios! Disculpad la peste: mi despensa tiene... carácter. Todo empezó cuando firmé aquello de las cuevas. ¿Qué firmé? Pues no lo sé: la letra era pequeña».').
+frase(suceso(charla_elige(rey_brieto, hacer_la_reverencia)), ambos,
+      'Baldomero se inclina tanto que se oye una vértebra. El rey aplaude, los cortesanos suspiran de alivio y la Banda sale con la cabeza más alta.').
+frase(suceso(charla_elige(rey_brieto, preguntar_por_la_despensa)), ambos,
+      'Pimentina pregunta con mucho tacto. El rey, abochornado, confiesa que firmó el permiso para «afinar» el queso en las cuevas sin leer la letra pequeña.').
+frase(suceso(charla_elige(rey_brieto, registrar_los_bolsillos_reales)), ambos,
+      'Tuerca vacía dos quesos del manto real sin que nadie se dé cuenta. Baldomero sí, y le pesa en la conciencia. Su ánimo baja.').
+
+frase(suceso(charla_abre(el_eco)), ambos,
+      'En el fondo de la cueva algo repite cada una de vuestras palabras, un segundo tarde y con otra voz. «Eco... eco...», dice. Luego, más bajo y sin que nadie le haya preguntado: «...cuánto tiempo...».').
+frase(suceso(charla_elige(el_eco, cantar_a_la_cueva)), ambos,
+      'La cueva devuelve la canción con una armonía que Rufino no había escrito. Nadie sabe quién canta la tercera voz, pero la Banda sale con ánimo.').
+frase(suceso(charla_elige(el_eco, gritarle_al_eco)), ambos,
+      'Baldomero grita «¡Soy Baldomero!». La cueva responde, con calma: «...sí, ya lo sé...». No le gusta que le contesten y su ánimo baja.').
+frase(suceso(charla_elige(el_eco, susurrar_una_pregunta)), ambos,
+      'Tuerca susurra «¿hay tesoro?». Tras una pausa larga, la cueva contesta: «...no. Hay hambre... y alguien que lleva siglos hablando solo...».').
+
+% El diario: una linea por cada fragmento averiguado (texto_saber/2 usa estas mismas frases).
+frase(suceso(saber_nuevo(moho_en_la_despensa)), ambos,
+      'Diario: el moho empezó hace tres inviernos en la despensa del rey.').
+frase(suceso(saber_nuevo(moho_con_hambre)), ambos,
+      'Diario: el moho no es malo: tiene hambre, y viene de las cuevas.').
+frase(suceso(saber_nuevo(brieto_firmo)), ambos,
+      'Diario: el rey firmó el permiso para afinar queso en las cuevas sin leer la letra pequeña.').
+frase(suceso(saber_nuevo(el_eco_habla_solo)), ambos,
+      'Diario: el eco de las cuevas no repite: contesta con la voz de alguien que lleva siglos hablando solo.').
+frase(suceso(saber_nuevo(gremio_sin_peaje)), ambos,
+      'Diario: el Gremio cruza el Camino Real sin pagar peaje: tiene sello.').
+frase(suceso(saber_nuevo(vacas_azules)), ambos,
+      'Diario: en la aldea la leche sale con vetas azules desde que empezó el moho.').
+frase(suceso(saber_nuevo(bandidos_a_caballo)), ambos,
+      'Diario: en el Camino Real hay bandidos a caballo, y a Baldomero los caballos le dan pavor.').
+
 frase(suceso(botin(1)), ambos,
       'Botín: 1 queso fresco. Lo guardaba «para emergencias». Esto lo era.').
 frase(suceso(botin(N)), ambos,
@@ -343,6 +435,14 @@ nombre(bandido_torpe,   'el Bandido Torpe').
 nombre(moho_saltarin,   'el Moho Saltarín').
 nombre(bandido_montado, 'el Bandido Montado').
 nombre(gran_roquefort,  'el Gran Roquefort').
+nombre(mantecosa,        'Doña Mantecosa').
+nombre(gruyere,          'Gruyère').
+nombre(alcaldesa_nata,   'la Alcaldesa Nata').
+nombre(ricota,           'Ricota').
+nombre(penicilio,        'el Hermano Penicilio').
+nombre(ganso_recaudador, 'el Ganso Recaudador').
+nombre(rey_brieto,       'el Rey Brieto IV').
+nombre(el_eco,           'el Eco').
 
 % nombre_visible(+Id, -Texto): los numeros y lo desconocido pasan tal cual.
 nombre_visible(Id, Texto) :-
@@ -614,6 +714,50 @@ descripcion_contrato(gato_en_el_arbol,  'Su Excelencia Bigotes lleva tres días 
 descripcion_contrato(gallina_noble,     'Lady Clotilde exige palanquín, escolta y que nadie cante a su alrededor: «Si canta, picoteo».').
 descripcion_contrato(despensa_real,     'El rey contrata a los peores porque los buenos no cobran en promesas de cobro.').
 
+% descripcion_personaje(+Npc, -Texto): quien es, para la lista de `hablar.`
+descripcion_personaje(mantecosa,        'La dueña del Cuajo Torcido: cobra todo y no perdona nada.').
+descripcion_personaje(gruyere,          'Un viajante sin carreta, con el sombrero en la mano y la mirada en otra parte.').
+descripcion_personaje(alcaldesa_nata,   'La máxima autoridad de la aldea, con una lista de quejas más larga que el pueblo.').
+descripcion_personaje(ricota,           'El tendero risueño, convencido de que todo se arregla con una oferta.').
+descripcion_personaje(penicilio,        'Un ex-afinador que vive en el bosque y habla con los hongos.').
+descripcion_personaje(ganso_recaudador, 'Un ganso con permiso de cobro y muy pocas ganas de discutir.').
+descripcion_personaje(rey_brieto,       'Brieto IV «el Mal Curado»: rey amable, ingenuo y bastante pegajoso.').
+descripcion_personaje(el_eco,           'Una voz que repite lo que dices, pero no siempre con tus palabras.').
+
+% descripcion_opcion_charla(+Npc, +Opcion, -Texto): lo que ensena cada opcion de la charla.
+descripcion_opcion_charla(mantecosa, jurar_honor,        'Sir Baldomero jura por su honor que la Banda arreglará el asunto').
+descripcion_opcion_charla(mantecosa, invitar_al_caldo,   'Madame Pimentina invita a una ronda de caldo (cuesta 1 queso)').
+descripcion_opcion_charla(mantecosa, mirar_los_desagues, 'Tuerca se ofrece a «echar un vistazo» a los desagües').
+descripcion_opcion_charla(gruyere, vengar_al_viajante,        'Sir Baldomero promete vengar su carreta (y lo del caballo, mejor no pensarlo)').
+descripcion_opcion_charla(gruyere, consolar_con_una_balada,   'Rufino le canta una balada de consuelo').
+descripcion_opcion_charla(gruyere, ayudarle_a_recoger,        'Tuerca le ayuda a recoger lo que se le cayó del petate').
+descripcion_opcion_charla(alcaldesa_nata, escuchar_la_lista,  'Sir Baldomero escucha la lista entera, con educación').
+descripcion_opcion_charla(alcaldesa_nata, curar_las_vacas,    'Madame Pimentina propone un remedio para las vacas (cuesta 1 queso)').
+descripcion_opcion_charla(alcaldesa_nata, ojear_el_registro,  'Tuerca ojea el registro de quejas «por si hay algo valioso»').
+descripcion_opcion_charla(ricota, cantar_el_anuncio,          'Rufino canta el anuncio de la tienda').
+descripcion_opcion_charla(ricota, regatear,                   'Tuerca regatea (y se lleva lo que puede)').
+descripcion_opcion_charla(ricota, preguntar_por_los_precios,  'Madame Pimentina pregunta por los precios').
+descripcion_opcion_charla(penicilio, hablar_con_el_moho,      'Madame Pimentina intenta hablar con el moho').
+descripcion_opcion_charla(penicilio, amenazar_con_fuego,      'Sir Baldomero amenaza con quemarlo todo').
+descripcion_opcion_charla(penicilio, cantarle_al_moho,        'Rufino le canta al moho una nana').
+descripcion_opcion_charla(ganso_recaudador, discutir_el_peaje, 'Sir Baldomero discute el peaje por principios').
+descripcion_opcion_charla(ganso_recaudador, pagar_el_peaje,    'Madame Pimentina paga el peaje (cuesta 1 queso)').
+descripcion_opcion_charla(ganso_recaudador, esquivar_al_ganso, 'Tuerca esquiva al ganso por la cuneta').
+descripcion_opcion_charla(rey_brieto, hacer_la_reverencia,             'Sir Baldomero hace una reverencia impecable').
+descripcion_opcion_charla(rey_brieto, preguntar_por_la_despensa,       'Madame Pimentina pregunta por la despensa y por «aquello de las cuevas»').
+descripcion_opcion_charla(rey_brieto, registrar_los_bolsillos_reales,  'Tuerca registra los bolsillos reales mientras el rey habla').
+descripcion_opcion_charla(el_eco, cantar_a_la_cueva,          'Rufino canta a la cueva').
+descripcion_opcion_charla(el_eco, gritarle_al_eco,            'Sir Baldomero le grita al eco').
+descripcion_opcion_charla(el_eco, susurrar_una_pregunta,      'Tuerca susurra una pregunta al eco').
+
+% texto_saber(+Marca, -Texto): la linea del diario (la misma frase con la que se anuncia al averiguarlo).
+texto_saber(Marca, Texto) :-
+    texto(saber_nuevo, [Marca], 0, Crudo),
+    (   atom_concat('Diario: ', Resto, Crudo)
+    ->  mayuscula_inicial(Resto, Texto)
+    ;   Texto = Crudo
+    ).
+
 % texto_recompensa(+Premios, -Texto): "9 quesos, poción" a partir de [quesos(9), objeto(pocion)].
 texto_recompensa(Premios, Texto) :-
     maplist(texto_premio, Premios, Textos),
@@ -656,7 +800,12 @@ texto_error(contrato_desconocido(C), Texto) :-
 texto_error(no_puede_aceptar(C), Texto) :-
     nombre_visible(C, Nombre),
     format(atom(Texto), 'El contrato «~w» os mira, mira a la Banda y decide que no. Ahora mismo no podéis aceptarlo: pregunta por_que_no(aceptar(~w)).', [Nombre, C]).
-texto_error(no_hay_evento, 'No hay ningún evento abierto: no hay nada que elegir.').
+texto_error(no_hay_evento, 'No hay ningún evento abierto (ni charla): no hay nada que elegir.').
+texto_error(personaje_desconocido(Npc), Texto) :-
+    format(atom(Texto), 'No conozco a nadie que se llame ~w. hablar. enseña con quién puedes hablar aquí.', [Npc]).
+texto_error(no_esta_aqui(Npc), Texto) :-
+    nombre_visible(Npc, Nombre),
+    format(atom(Texto), '~w no está aquí hoy. hablar. enseña con quién puedes hablar. Pregunta por_que_no(hablar(~w)) para ver por qué.', [Nombre, Npc]).
 texto_error(opcion_desconocida(X), Texto) :-
     como_texto(X, Dicho),
     format(atom(Texto), 'No existe la opción "~w". Escribe mirar. para ver las que hay.', [Dicho]).
@@ -726,6 +875,8 @@ ayuda_de(descansar, Texto) :-
            'descansar.     solo en la taberna: cuesta ~w quesos, cura a todos y pasa un día', [Coste]).
 ayuda_de(pagar, 'pagar.         solo en la taberna: paga los sueldos pendientes con lo más rancio').
 ayuda_de(elegir, 'elegir(Opcion). elige una opción del evento abierto (su número o su nombre)').
+ayuda_de(hablar, 'hablar.        quién hay aquí hoy; hablar(Nombre). abre su escena (una sola vez) y se elige con elegir(Opcion).').
+ayuda_de(diario, 'diario.        lo que ya sabéis del Gran Rancio, según lo que cuenta la gente').
 ayuda_de(contratos, 'contratos.     el tablón: los contratos a la vista y si se pueden aceptar').
 ayuda_de(aceptar, 'aceptar(Contrato). acepta un contrato (en la taberna o donde lo ofrecen)').
 ayuda_de(atacar, 'atacar(Objetivo). solo en combate: golpea a un enemigo (un tipo o e(Tipo, N))').

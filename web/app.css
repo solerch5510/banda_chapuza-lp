@@ -92,6 +92,8 @@ body[data-tema="light"] { background: #f8edcd; }
 .narration-line.objetivo { border-left: 3px solid var(--cheddar); background: color-mix(in srgb, var(--cheddar) 9%, transparent); padding-left: 8px; }
 .narration-line.objetivo .line-mark { color: var(--cheddar); }
 .narration-line.objetivo.nuevo { font-weight: 600; }
+.event-choice.diario ul { margin: 6px 0 0; padding-left: 18px; }
+.event-choice.diario li { margin: 6px 0; line-height: 1.4; }
 .objetivo-actual { margin: 0 0 10px; padding: 8px 10px; border-left: 3px solid var(--cheddar); background: color-mix(in srgb, var(--cheddar) 9%, transparent); font-size: 14px; line-height: 1.4; }
 
 /* La ficha de un personaje */

@@ -223,6 +223,24 @@ item(vista(evento, E, Quedan, Opciones), json([tipo=evento, descripcion=D, opcio
                 bool(Si == si, Disp)
             ),
             Os).
+item(vista(presentes, Presentes), json([tipo=presentes, personajes=Js])) :-
+    findall(json([id=Id, nombre=N, quien=Q, estado=Estado]),
+            (   member(presente(Id, Estado), Presentes),
+                narrador:nombre_visible(Id, N),
+                narrador:descripcion_personaje(Id, Q)
+            ),
+            Js).
+item(vista(charla, Npc, Opciones), json([tipo=charla, personaje=Npc, nombre=N, opciones=Os])) :-
+    narrador:nombre_visible(Npc, N),
+    findall(json([numero=Num, nombre=Op, texto=T, quien=Q, disponible=Disp]),
+            (   member(opcion(Num, Op, Quien, Si), Opciones),
+                narrador:descripcion_opcion_charla(Npc, Op, T),
+                nombre_corto(Quien, Q),
+                bool(Si == si, Disp)
+            ),
+            Os).
+item(vista(diario, Marcas), json([tipo=diario, saberes=Js])) :-
+    findall(json([marca=M, texto=T]), ( member(M, Marcas), narrador:texto_saber(M, T) ), Js).
 item(vista(prueba, Accion, Prueba),
      json([tipo=prueba, accion=A, nivel=Nivel, nodos=Nodos, narrador=Comentario, notas=Notas])) :-
     nivel_actual(Nivel),
@@ -477,6 +495,8 @@ candidata(Fase, Cmd, Familia) :-
         (   Cmd = contratos, Familia = contratos
         ;   Cmd = pagar, Familia = pagar
         ;   Cmd = descansar, Familia = descansar
+        ;   Cmd = diario, Familia = diario
+        ;   charlas:presentes(Ids), member(Id, Ids), Cmd = hablar(Id), Familia = hablar
         ;   mundo:zona(Z, _), once(estado:en_zona(Aqui)), mundo:adyacente(Aqui, Z), Cmd = ir(Z), Familia = ir
         )
     ;   Fase == combate,
@@ -544,6 +564,8 @@ etiqueta_de(Cmd, Etiqueta) :-
     ->  nombre_corto(T, N), format(atom(Etiqueta), 'Habilidad contra ~w', [N])
     ;   Cmd = habilidad
     ->  Etiqueta = 'Habilidad'
+    ;   Cmd = hablar(Npc)
+    ->  narrador:nombre_visible(Npc, N), format(atom(Etiqueta), 'Hablar con ~w', [N])
     ;   functor(Cmd, F, _), bonito(F, Etiqueta)
     ).
 

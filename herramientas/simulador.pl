@@ -25,6 +25,8 @@
 :- use_module('../src/combate').
 :- use_module('../src/contratos').
 :- use_module('../src/juego').
+:- use_module('../src/eventos').
+:- use_module('../src/charlas', []).
 :- use_module('../src/main').
 
 % ---------------------------------------------------------------------------
@@ -100,6 +102,44 @@ pasos(Pol, N, Max, Resumen) :-
 
 orden_de(azar, Cmd) :- !, elegir_orden(Cmd).
 orden_de(plan(Eps, Lote), Cmd) :- orden_con_plan(Eps, Lote, Cmd).
+orden_de(plan_hablador(Eps, Lote), Cmd) :- orden_hablador(Eps, Lote, Cmd).
+
+% plan_hablador(Eps, Lote): el jugador con plan que ademas habla con todo el mundo y, en cada charla, elige la opcion
+% que mas queso da (el peor caso para el balance: aprovecha todo lo que ofrece hablar).
+orden_hablador(Eps, Lote, Cmd) :-
+    (   charla_pendiente(Cmd0),
+        azar(100, K), K >= Eps
+    ->  Cmd = Cmd0
+    ;   orden_con_plan(Eps, Lote, Cmd)
+    ).
+
+charla_pendiente(elegir(N)) :-
+    \+ estado:en_combate(_),
+    \+ eventos:evento_abierto(_),
+    charlas:charla_abierta(Npc),
+    mejor_opcion(Npc, N), !.
+charla_pendiente(hablar(Npc)) :-
+    \+ estado:en_combate(_),
+    \+ eventos:evento_abierto(_),
+    charlas:presentes(Ps),
+    member(Npc, Ps),
+    \+ charlas:charla_hecha(Npc),
+    \+ charlas:charla_abierta(Npc), !.
+
+% mejor_opcion(+Npc, -N): la opcion disponible con mayor ganancia neta de queso.
+mejor_opcion(Npc, N) :-
+    charlas:opciones_de(Npc, Lista),
+    charlas:escena_de(Npc, Escena),
+    findall(Neto-Num, ( member(opcion(Num, Op, _, si), Lista), neto_de(Escena, Op, Neto) ), Pares),
+    Pares = [_|_],
+    keysort(Pares, Orden),
+    last(Orden, _-N).
+
+neto_de(Escena, Opcion, Neto) :-
+    charlas:opcion_charla(Escena, Opcion, _, _, Efectos),
+    findall(G, member(ganar_queso(G), Efectos), Gs), sumlist(Gs, Ganado),
+    findall(P, member(perder_queso(P), Efectos), Ps), sumlist(Ps, Perdido),
+    Neto is Ganado - Perdido.
 
 % orden_con_plan(+Eps, +Lote, -Cmd): la siguiente orden de un jugador con plan.
 orden_con_plan(Eps, Lote, Cmd) :-
@@ -210,7 +250,7 @@ informe(N, Semilla) :-
     ruta_separada(Sep), jugar_ruta(Sep, RS),
     format("REF campana ~q~n", [RC]),
     format("REF separada ~q~n", [RS]),
-    forall(member(Pol, [azar, plan(10, 1), plan(10, 2), plan(10, 3)]),
+    forall(member(Pol, [azar, plan(10, 1), plan(10, 2), plan(10, 3), plan_hablador(10, 2)]),
            (   findall(R, ( between(1, N, I), S is Semilla * 1000 + I, episodio(Pol, S, 400, R) ), Rs),
                format("POLITICA ~q~n", [Pol]),
                resumir(Rs, N) )).

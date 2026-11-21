@@ -92,6 +92,33 @@ mostrar_conocido(vista(zona, Datos)) :-
 mostrar_conocido(vista(objetivo, Paso, Faltas)) :-
     narrador:texto_objetivo(Paso, Faltas, Texto),
     format("~w~n", [Texto]).
+mostrar_conocido(vista(presentes, Presentes)) :-
+    (   Presentes == []
+    ->  format("Aquí no hay nadie con quien hablar.~n", [])
+    ;   format("Aquí hay con quien hablar (hablar(Nombre).):~n", []),
+        forall(member(presente(Id, Estado), Presentes),
+               (   narrador:nombre_visible(Id, Nombre),
+                   narrador:descripcion_personaje(Id, Quien),
+                   (   Estado == hecha -> Marca = ' [ya hablado]' ; Estado == abierta -> Marca = ' [a medias]' ; Marca = '' ),
+                   format("  ~w: ~w~w~n", [Id, Nombre, Marca]),
+                   format("      ~w~n", [Quien])
+               ))
+    ).
+mostrar_conocido(vista(charla, Npc, Opciones)) :-
+    forall(member(opcion(N, Opcion, Quien, Disponible), Opciones),
+           (   narrador:descripcion_opcion_charla(Npc, Opcion, Texto),
+               narrador:nombre_visible(Quien, NombreQuien),
+               (   Disponible == si -> Marca = '' ; Marca = ' [no disponible]' ),
+               format("  ~w. ~w (~w)~w~n", [N, Texto, NombreQuien, Marca])
+           )),
+    format("Elige con elegir(Opcion). (el número o el nombre).~n", []).
+mostrar_conocido(vista(diario, Marcas)) :-
+    (   Marcas == []
+    ->  format("El diario está en blanco: todavía no sabéis nada del Gran Rancio. Hablad con la gente (hablar.).~n", [])
+    ;   format("El diario de la Banda (lo que sabéis del Gran Rancio):~n", []),
+        forall(member(M, Marcas),
+               (   narrador:texto_saber(M, Texto), format("  - ~w~n", [Texto]) ))
+    ).
 mostrar_conocido(vista(comida, Riesgo)) :-
     narrador:texto_riesgo(Riesgo, Texto),
     format("~w~n", [Texto]).
