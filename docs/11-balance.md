@@ -150,6 +150,20 @@ Tres contratos más (peaje del ganso, fantasma charlatán, paz del moho) pagan p
 
 Lectura: el jugador que hace **todos** los contratos acaba con muchísimo queso (52) porque cada uno paga más de lo que cuesta; el que va **directo al jefe** (siete días) sigue en la economía ajustada de antes. Las derrotas de ahora (5 a 10 %) son **de combate**, no de hambre: el jugador simulado pelea con todo sin descansar ni usar pociones. Es lo que cabe esperar de contenido opcional bien pagado, y es **el punto de partida para el farmeo**: si se quiere que lo opcional sea obligatorio, hacen falta niveles y enemigos que lo exijan (`docs/13-ampliacion.md` §10).
 
+## Con los encuentros al llegar a una zona
+
+Probabilidades de 30 % (bosque y Camino Real) y 25 % (cuevas), con 2 o 3 grupos por zona. Cien partidas por política, semilla 1; entre paréntesis, la prueba con 50 / 50 / 45 %:
+
+| Jugador | Victorias sin encuentros | con encuentros | (50 / 50 / 45) | Queso final (sin → con) |
+|---|---|---|---|---|
+| plan, 10 % de errores, lote 1 | 82 | 93 | (94) | 29,4 → 28,1 |
+| plan, 10 % de errores, lote 2 | 91 | 83 | (90) | 37,7 → 40,5 |
+| plan, 10 % de errores, lote 3 | 93 | 95 | (94) | 39,9 → 40,3 |
+| plan con charlas | 98 | 96 | (95) | 40,2 → 41,8 |
+| azar razonable | 5 | 7 | (8) | 16,8 → 17,7 |
+
+Lectura: **no cambia el equilibrio**. Las diferencias están dentro del ruido de cien partidas (unos cinco puntos): cada encuentro cuesta vida, pero el botín (los bandidos lo sueltan siempre) y la moral de la victoria lo compensan, y la Banda se cura en la taberna. Son **variedad con riesgo y premio**, no un freno. Si se quiere que obliguen a prepararse, el camino es el de `docs/13-ampliacion.md` §10: niveles y enemigos por zona. Con la partida actual, subir las probabilidades solo da más queso.
+
 ## Qué sigue (en este orden, cada paso con el simulador)
 
 1. ~~Pago según distancia y enemigos~~ (hecho).

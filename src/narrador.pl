@@ -120,6 +120,14 @@ frase(suceso(acepta(C)), ambos,
       'Contrato aceptado: «~w». Todos asienten con convicción; nadie ha leído la letra pequeña.'-[C]).
 frase(suceso(aparece(T)), ambos,
       '~w se interpone en tu camino. Nadie ha preguntado si tenía permiso.'-[T]).
+% Encuentros al llegar a una zona (docs/13-ampliacion.md, 5): lo que se cuenta al salir y, abajo, el comentario de explicar.
+frase(suceso(encuentro(bosque)), ambos,
+      'No habéis dado ni diez pasos cuando algo se mueve entre las setas. Sin aviso, sin permiso y sin pelusilla de cortesía.').
+frase(suceso(encuentro(camino_real)), ambos,
+      'En un recodo del Camino Real os sale al paso alguien con muchas ganas de cobraros una tasa que acaba de inventar.').
+frase(suceso(encuentro(cuevas)), ambos,
+      'El goteo se detiene de golpe. En las cuevas el silencio nunca es buena señal, y esta vez tampoco.').
+frase(suceso(encuentro(Z)), ambos, 'Algo os corta el paso en ~w.'-[Z]).
 frase(suceso(victoria), ambos,
       'Victoria. Nadie la esperaba, y menos que nadie la propia Banda.').
 frase(suceso(sin_botin), ambos,
@@ -464,6 +472,8 @@ frase(suceso(defiende(A)), ambos,
 % --- comentario de explicar: la clave es la meta que se ha demostrado ---
 frase(puede_viajar(Z), ambos,
       'Hay camino hasta ~w, y tan pegajoso que cuesta un día entero. Ley de la Ruta Pegajosa.'-[Z]).
+frase(sale_encuentro(Z, T, _, _), ambos,
+      'En ~w el dado salió ~w, por debajo de la probabilidad de la zona: sale el encuentro. Misma semilla, mismo susto.'-[Z, T]).
 frase(puede_descansar, ambos,
       'Las camas del Cuajo Torcido aceptan clientes. Han visto cosas y siguen aceptando.').
 frase(puede_pagar_sueldos, ambos,

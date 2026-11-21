@@ -24,7 +24,8 @@
                     efectos_accion/3, puede_defender/1, efectos_inicio_turno/2,
                     accion_enemigo/2, accion_enemigo_sin_corte/2, regla_ia/3, fin_combate/1, efectos_fin/2,
                     vida_baja/1, tiene_curativo/1, objetivo_mas_debil/2,
-                    efectos_inicio/2, efectos_ronda/1]).
+                    efectos_inicio/2, efectos_ronda/1,
+                    encuentros_activos/0, tirar_encuentro/5, sale_encuentro/4]).
 :- use_module(mundo).
 :- use_module(estado).
 :- use_module(compania).
@@ -390,6 +391,33 @@ botin_de([Tipo|Tipos], S0, S, Quesos, Tiradas) :-
     botin_de(Tipos, S1, S, Quesos1, Tiradas1),
     Quesos is Quesos1 + Suyos,
     Tiradas is Tiradas1 + Hechas.
+
+% ---------------------------------------------------------------------------
+% Encuentros al llegar a una zona. Dos dados con la semilla del juego (como el botin): el primero (0 a 99) dice si
+% sale algo (si es menor que la probabilidad de la zona) y el segundo cual de los grupos de la zona. Reglas puras:
+% juego.pl guarda la semilla nueva con el efecto fijar_semilla y la prueba de sale_encuentro/4 para `explicar`.
+% ---------------------------------------------------------------------------
+% encuentros_activos: el interruptor `banda_encuentros` del sistema (por defecto, si; las pruebas que no tratan de
+% los encuentros lo apagan para que un viaje no se convierta en un combate).
+encuentros_activos :-
+    \+ current_prolog_flag(banda_encuentros, false).
+
+% tirar_encuentro(+Zona, +S0, -Tirada, -Indice, -S): los dos dados. Falla si la zona no tiene encuentros o estan apagados
+% (entonces la semilla no se toca).
+tirar_encuentro(Zona, S0, Tirada, Indice, S) :-
+    encuentros_activos,
+    mundo:probabilidad_de_encuentro(Zona, _),
+    findall(G, mundo:encuentro(Zona, G), Grupos),
+    length(Grupos, N), N > 0,
+    estado:tirada(100, S0, Tirada, S1),
+    estado:tirada(N, S1, Indice, S).
+
+% sale_encuentro(+Zona, +Tirada, +Indice, -Grupo): con esas tiradas, en esa zona sale ese grupo.
+sale_encuentro(Zona, Tirada, Indice, Grupo) :-
+    mundo:probabilidad_de_encuentro(Zona, Probabilidad),
+    Tirada < Probabilidad,
+    findall(G, mundo:encuentro(Zona, G), Grupos),
+    nth0(Indice, Grupos, Grupo).
 
 % ---------------------------------------------------------------------------
 % Efectos que abren el combate y cada ronda (se devuelven como datos; los aplica estado).

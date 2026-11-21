@@ -6,6 +6,8 @@
 %   swipl -q -s tests/pagos -g "run_tests,halt" -t "halt(1)"
 
 :- encoding(utf8).
+% Los encuentros al llegar a una zona (docs/13, 5) se apagan: aqui un viaje es un viaje. Solo tests/encuentros los enciende.
+:- create_prolog_flag(banda_encuentros, false, []).
 
 :- use_module(library(plunit)).
 :- use_module('../src/mundo').

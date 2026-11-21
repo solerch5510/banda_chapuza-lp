@@ -5,7 +5,8 @@
 ## 0. Estado (20 de noviembre de 2026)
 
 - **Hecho:** los **sucesos de zona** (§4), con cinco sucesos (bosque, aldea, Camino Real, castillo y cuevas), y **contratos y enemigos nuevos** (§3): el peaje del ganso, el fantasma charlatán y la paz del moho; el ganso del peaje y la seta belicosa. El jefe exige ahora dos contratos concretos (la escolta y el peaje). Etiqueta `v1.0-rc2` marcada antes de empezar como punto de vuelta atrás.
-- **Pendiente:** encuentros al moverse (§5), el paquete D de niveles y experiencia (§10) y, si el autor lo decide el 27 de noviembre, el paquete C (§6).
+- **Hecho también:** los **encuentros al moverse** (§5): el bosque, el Camino Real y las cuevas, con azar reproducible y `explicar`. Sin huida; el contrato de la zona empieza al terminar el encuentro.
+- **Pendiente:** el paquete D de niveles y experiencia (§10) y, si el autor lo decide el 27 de noviembre, el paquete C (§6).
 
 ## 1. Resumen
 
@@ -44,6 +45,8 @@ Hoy es 20 de noviembre; la congelación del código propuesta es el **4 de dicie
 - **Riesgo:** bajo. La única decisión: abrirse al llegar (se nota más) o con un comando (menos intrusivo).
 
 ## 5. Encuentros al moverse (paquete B)
+
+**Hecho (21 de noviembre de 2026).** Tablas `probabilidad_de_encuentro/2` y `encuentro/2` en `mundo.pl` (bosque 30 %, Camino Real 30 %, cuevas 25 %; la aldea, el castillo y la taberna son tranquilos), reglas puras `combate:tirar_encuentro/5` y `combate:sale_encuentro/4` (dos dados con la semilla: si sale y cuál) y el paso `iniciar_encuentro` al llegar. Se decidió **no añadir huida**, que un encuentro **no cuenta como contrato** y que el contrato de la zona **empieza al terminar el encuentro**. El simulador dice que, con estas cifras, no cambia el equilibrio (`docs/11-balance.md`). El interruptor `banda_encuentros` (bandera de SWI-Prolog, por defecto activo) lo apagan las demás suites de pruebas para que un viaje sea solo un viaje. La propuesta original queda abajo.
 
 **Idea:** algunas zonas tienen una probabilidad de que, al llegar, aparezca un grupo de enemigos antes del trayecto normal.
 

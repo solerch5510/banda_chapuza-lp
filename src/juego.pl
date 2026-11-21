@@ -258,9 +258,10 @@ ejecutar_en_fase(ir(Zona), _, Items) :-
         llegada(Zona, I3),
         cobrar_contratos(Zona, I3b),
         comprobar_fin(I4),
+        iniciar_encuentro(Zona, I4b),
         iniciar_objetivo(Zona, I5),
         iniciar_suceso(I6),
-        append([I0, I1, I2, I3, I3b, I4, I5, I6], Items)
+        append([I0, I1, I2, I3, I3b, I4, I4b, I5, I6], Items)
     ;   Items = [error(no_puede_viajar(Zona))]
     ).
 ejecutar_en_fase(descansar, _, Items) :-
@@ -722,6 +723,8 @@ cobrar_contratos(Zona, Items) :-
 iniciar_objetivo(Zona, Items) :-
     (   estado:fin_partida(_)
     ->  Items = []
+    ;   estado:en_combate(_)                                % un encuentro en marcha: el objetivo espera a que termine
+    ->  Items = []
     ;   contratos:objetivo_pendiente(Zona, C, Grupo)
     ->  contratos:efectos_inicio_objetivo(C, Efectos),
         etapa(Efectos, I1),
@@ -748,6 +751,23 @@ iniciar_suceso(Items) :-
             etapa(Efectos, I1),
             mostrar_charla(Id, I2),
             append(I1, I2, Items)
+        )
+    ;   Items = []
+    ).
+
+% iniciar_encuentro(+Zona, -Items): al llegar a una zona con encuentros se tiran los dos dados con la semilla del juego. Si
+% sale un grupo empieza el combate (antes que el objetivo del contrato de la zona, que espera a que termine); la prueba
+% de por que salio se guarda para `explicar`. Con la partida acabada no se tira.
+iniciar_encuentro(Zona, Items) :-
+    (   \+ estado:fin_partida(_), \+ estado:en_combate(_),
+        (   estado:semilla(S0) -> true ; S0 = 0 ),
+        combate:tirar_encuentro(Zona, S0, Tirada, Indice, S)
+    ->  (   combate:sale_encuentro(Zona, Tirada, Indice, Grupo)
+        ->  once(explicar:solve(combate:sale_encuentro(Zona, Tirada, Indice, Grupo), Prueba)),
+            etapa([fijar_semilla(S), guardar_prueba(encuentro(Zona), Prueba), mensaje(encuentro, [Zona])], I1),
+            comenzar_combate(Grupo, I2),
+            append(I1, I2, Items)
+        ;   etapa([fijar_semilla(S)], Items)
         )
     ;   Items = []
     ).
@@ -800,6 +820,10 @@ cerrar_contrato(Resultado, Items) :-
     (   Resultado == victoria,
         estado:marca(combate_de(C))
     ->  resolver_contrato(C, Items)
+    ;   Resultado == victoria
+    ->  siguiente_objetivo(I1),                         % un encuentro: lo que esperaba en la zona empieza ahora
+        iniciar_suceso(I2),
+        append(I1, I2, Items)
     ;   Items = []
     ).
 

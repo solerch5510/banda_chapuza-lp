@@ -10,6 +10,8 @@
 %   swipl -q -s tests/banco -g "run_tests,halt" -t "halt(1)"
 
 :- encoding(utf8).
+% Los encuentros al llegar a una zona (docs/13, 5) se apagan: aqui un viaje es un viaje. Solo tests/encuentros los enciende.
+:- create_prolog_flag(banda_encuentros, false, []).
 
 :- use_module(library(plunit)).
 :- use_module('../src/mundo').
@@ -187,7 +189,7 @@ functor_valido(F) :-
                puede_viajar, puede_descansar, puede_pagar_sueldos, puede_atacar, dano, puede_habilidad,
                puede_aceptar, ignora_miedo, en_fila_alcanzable, vivo, modificador, queso_total,
                accion_enemigo, golpea_a_clotilde, teme, esta_en_huelga, rasgo, marca, contrato_activo,
-               contrato_cumplido, contratos_cumplidos_min, visita, moral_media_min, miembros_en_pie_min,
+               contrato_cumplido, contratos_cumplidos_min, sale_encuentro, encuentro, visita, moral_media_min, miembros_en_pie_min,
                disponible, e, (<), atacar, embestir, hay_queso_para]).
 
 atomos_de(T, As) :-

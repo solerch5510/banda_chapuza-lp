@@ -9,6 +9,7 @@
                   personaje/7, fila_preferida/2, alcance/2, rasgo/2,
                   habilidad_de/2, coste_queso/2,
                   enemigo/4, clase/2, lleva_queso/1, botin/3, numerar_grupo/2,
+                  probabilidad_de_encuentro/2, encuentro/2,
                   curacion/2, lleva_inicial/3,
                   tipo_queso/2, parametro/2, inicio/1]).
 
@@ -162,6 +163,21 @@ botin(bandido_montado, 1, 100).
 botin(rata_quesera,    1,  60).
 botin(ganso_de_peaje,  1, 100).        % el peaje que habia cobrado
 botin(seta_belicosa,   1,  50).
+
+% Encuentros al llegar a una zona (docs/13-ampliacion.md, 5): probabilidad_de_encuentro(Zona, Porcentaje) y, de las
+% encuentro(Zona, Grupo) de esa zona, un grupo que sale (el segundo dado elige cual). Las zonas sin probabilidad
+% (la taberna, la aldea y el castillo) son tranquilas. Es una tabla: una zona nueva peligrosa son unas filas.
+probabilidad_de_encuentro(bosque,      30).
+probabilidad_de_encuentro(camino_real, 30).
+probabilidad_de_encuentro(cuevas,      25).
+
+encuentro(bosque,      [seta_belicosa]).
+encuentro(bosque,      [rata_quesera, moho_saltarin]).
+encuentro(camino_real, [bandido_torpe]).
+encuentro(camino_real, [bandido_torpe, rata_quesera]).
+encuentro(camino_real, [bandido_montado]).
+encuentro(cuevas,      [rata_quesera, rata_quesera]).
+encuentro(cuevas,      [moho_saltarin, rata_quesera]).
 
 % numerar_grupo(+Tipos, -Ids): un grupo de enemigos [rata_quesera, rata_quesera, bandido_torpe]
 % pasa a instancias numeradas por tipo: [e(rata_quesera,1), e(rata_quesera,2), e(bandido_torpe,1)].

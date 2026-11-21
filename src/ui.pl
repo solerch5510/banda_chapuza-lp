@@ -218,7 +218,8 @@ mostrar_conocido(vista(decision, E, Prueba, Descartes)) :-
 mostrar_conocido(vista(prueba, Accion, Prueba)) :-
     nivel_actual(Nivel),
     explicar:lineas_de_prueba(Prueba, Nivel, Lineas),
-    format("Por qué se pudo ~w:~n", [Accion]),
+    titulo_de_prueba(Accion, Titulo),
+    format("~w:~n", [Titulo]),
     escribir_lineas(Lineas),
     narrador:comentarios_de_nodo(Prueba, Nivel, 0, Notas),          % solo en el nivel detallado
     forall(member(Nota, Notas), format("  · ~w~n", [Nota])),
@@ -256,3 +257,10 @@ escribir_salidas([S|Ss]) :-
             Textos),
     atomic_list_concat(Textos, ', ', Unidos),
     format("Salidas: ~w~n", [Unidos]).
+
+% titulo_de_prueba(+Accion, -Titulo): la cabecera de explicar. Un encuentro no es una orden del jugador: se dice aparte.
+titulo_de_prueba(encuentro(Zona), Titulo) :-
+    !,
+    format(atom(Titulo), "Por qué os salió un encuentro en ~w", [Zona]).
+titulo_de_prueba(Accion, Titulo) :-
+    format(atom(Titulo), "Por qué se pudo ~w", [Accion]).
