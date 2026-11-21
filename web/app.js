@@ -143,7 +143,7 @@
           S.log.push({ t: "presentes", ps: it.personajes });
           break;
         case "charla":
-          S.log.push({ t: "charla", nombre: it.nombre, opciones: it.opciones });
+          S.log.push({ t: "charla", nombre: it.nombre, suceso: it.suceso, opciones: it.opciones });
           break;
         case "diario":
           S.log.push({ t: "diario", saberes: it.saberes });
@@ -598,7 +598,7 @@
       return '<button class="' + (o.disponible ? "" : "disabled") + '" data-cmd="' + esc(cmd) + '"><kbd>' + o.numero + "</kbd><span><strong>" + esc(o.texto) + "</strong><small>" +
         esc(o.quien) + " · " + (o.disponible ? "Disponible" : "No disponible") + "</small>" + (o.disponible ? "" : "<u>¿por qué no?</u>") + "</span></button>";
     }).join("");
-    return '<section class="event-choice"><p class="panel-kicker">CHARLA · ' + esc(String(e.nombre || "").toUpperCase()) + "</p><h2>¿Qué hace la banda?</h2>" +
+    return '<section class="event-choice"><p class="panel-kicker">' + (e.suceso ? "SUCESO" : "CHARLA") + ' · ' + esc(String(e.nombre || "").toUpperCase()) + "</p><h2>¿Qué hace la banda?</h2>" +
       '<div class="event-options">' + opciones + "</div></section>";
   }
 
@@ -727,13 +727,13 @@
   }
 
   // ---- la barra de acciones y la linea de ordenes ----
-  var ETIQUETAS = { mirar: "Mirar", ir: "Ir a…", inventario: "Inventario", contratos: "Contratos", compania: "Compañía", pagar: "Pagar", descansar: "Descansar", hablar: "Hablar", diario: "Diario", usar: "Usar objeto",
+  var ETIQUETAS = { mirar: "Mirar", ir: "Ir a…", inventario: "Inventario", contratos: "Contratos", compania: "Compañía", pagar: "Pagar", descansar: "Descansar", hablar: "Hablar", diario: "Diario", usar: "Usar objeto", explorar: "Explorar",
     atacar: "Atacar", defender: "Defender", habilidad: "Habilidad" };
 
   function accionesRapidas() {
     var e = S.estado, combate = e.fase === "combate", fam = {};
     e.acciones.forEach(function (a) { (fam[a.familia] = fam[a.familia] || []).push(a); });
-    var orden = combate ? ["atacar", "defender", "habilidad", "usar"] : ["mirar", "ir", "hablar", "diario", "usar", "inventario", "contratos", "compania", "pagar", "descansar"];
+    var orden = combate ? ["atacar", "defender", "habilidad", "usar"] : ["mirar", "ir", "hablar", "diario", "usar", "explorar", "inventario", "contratos", "compania", "pagar", "descansar"];
     var botones = orden.filter(function (f) { return fam[f]; }).map(function (f) {
       var todas = fam[f], ok = todas.filter(function (a) { return a.habilitada; });
       var etq = ETIQUETAS[f];

@@ -165,6 +165,7 @@ conocido(A) :- mundo:rasgo(_, A).
 conocido(A) :- charlas:presente(A, _, _, _).
 conocido(A) :- charlas:opcion_charla(_, A, _, _, _).
 conocido(A) :- charlas:saber(A).
+conocido(A) :- charlas:suceso(A, _, _).
 conocido(A) :- member(A, [taberna, caballo, ok, nada, exito, a_medias, fracaso, chapuza, resumido, detallado,
                           fallo, hecho, negacion, predefinido, regla, sin_fallo, sin_prueba,
                           ninguno, curarse, robar_queso, invocar_moho, embestir, atacar, defender,

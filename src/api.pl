@@ -230,8 +230,9 @@ item(vista(presentes, Presentes), json([tipo=presentes, personajes=Js])) :-
                 narrador:descripcion_personaje(Id, Q)
             ),
             Js).
-item(vista(charla, Npc, Opciones), json([tipo=charla, personaje=Npc, nombre=N, opciones=Os])) :-
+item(vista(charla, Npc, Opciones), json([tipo=charla, personaje=Npc, nombre=N, suceso=Suceso, opciones=Os])) :-
     narrador:nombre_visible(Npc, N),
+    (   charlas:suceso(Npc, _, _) -> Suceso = @(true) ; Suceso = @(false) ),
     findall(json([numero=Num, nombre=Op, texto=T, quien=Q, disponible=Disp]),
             (   member(opcion(Num, Op, Quien, Si), Opciones),
                 narrador:descripcion_opcion_charla(Npc, Op, T),
@@ -500,6 +501,7 @@ candidata(Fase, Cmd, Familia) :-
         ;   Cmd = pagar, Familia = pagar
         ;   Cmd = descansar, Familia = descansar
         ;   Cmd = diario, Familia = diario
+        ;   Cmd = explorar, charlas:suceso_pendiente(_), \+ eventos:evento_abierto(_), Familia = explorar
         ;   charlas:presentes(Ids), member(Id, Ids), Cmd = hablar(Id), Familia = hablar
         ;   mundo:zona(Z, _), once(estado:en_zona(Aqui)), mundo:adyacente(Aqui, Z), Cmd = ir(Z), Familia = ir
         )

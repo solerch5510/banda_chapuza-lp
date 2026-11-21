@@ -51,11 +51,21 @@ Sueldos pagados: 5 quesos. Doña Mantecosa asiente; los mercenarios también, y 
 > ir(aldea)
 Día 13. Los quesos maduran y las deudas también. La ración de hoy: 4 quesos.
 Aldea Requesón: casitas blancas, leche tibia y vecinos preguntando cuándo se les paga.
+En el centro de la aldea hay un pozo con un cartel torcido: «Pozo de los deseos. Se admiten monedas, quesos y quejas». Del fondo sube un frescor extraño y, de vez en cuando, un eco que dice «gracias».
+  1. Sir Baldomero saca agua del pozo para toda la Banda (Sir Baldomero)
+  2. Rufino canta hacia el fondo (Rufino)
+  3. Madame Pimentina pide un deseo de queso (cuesta 1 queso) (Madame Pimentina)
+Elige con elegir(Opcion). (el número o el nombre).
 Ojo: otro día así y te quedaría menos de un día de ración.
 
 > ir(bosque)
 Amanece el día 14. Alguien tiene hambre y alguien más, una cuenta pendiente. Ración: 4 quesos.
 El Bosque del Moho te recibe con pelusilla. Hasta la sombra tiene moho; las setas opinan de tu forma de caminar.
+Un puente de setas cruza un barranco del bosque. Las setas se mecen un poco, como si respiraran, y un cartel clavado en una de ellas dice: «Cruzar bajo su propia responsabilidad. Las setas no se hacen cargo de nada». Por abajo, el barranco hace plop.
+  1. Tuerca cruza de puntillas (Tuerca)
+  2. Madame Pimentina endurece el puente con queso curado (cuesta 1 queso) (Madame Pimentina)
+  3. Sir Baldomero cruza con la armadura puesta (Sir Baldomero)
+Elige con elegir(Opcion). (el número o el nombre).
 Ojo: otro día así y os quedáis sin queso. Sin comida y sin nada por cobrar solo se aguantan unos días antes de perder por hambre.
 
 > inventario
@@ -209,6 +219,7 @@ Para probar:
 Un camino empedrado con corteza de queso viejo que se pega a las botas, con un peaje cada cien pasos. Lo recorren carretas, gansos con permiso de cobro y bandidos con más ambición que puntería.
 Salidas: bosque (Bosque del Moho), castillo (Castillo Camembert), cuevas (Cuevas del Roquefort), taberna (Taberna del Cuajo Torcido)
 Día 1 · Queso en la despensa: 12 · ración 4 al día (te alcanza para 3)
+Aquí hay algo especial que explorar (explorar.).
 Objetivo: acepta un contrato en el tablón de la taberna.
 
 > contratos
@@ -278,6 +289,7 @@ Para probar:
 Un camino empedrado con corteza de queso viejo que se pega a las botas, con un peaje cada cien pasos. Lo recorren carretas, gansos con permiso de cobro y bandidos con más ambición que puntería.
 Salidas: bosque (Bosque del Moho), castillo (Castillo Camembert), cuevas (Cuevas del Roquefort), taberna (Taberna del Cuajo Torcido)
 Día 1 · Queso en la despensa: 12 · ración 4 al día (te alcanza para 3)
+Aquí hay algo especial que explorar (explorar.).
 Objetivo: acepta un contrato en el tablón de la taberna.
 
 > por_que_no(aceptar(gallina_noble))

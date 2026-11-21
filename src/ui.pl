@@ -81,6 +81,10 @@ mostrar_conocido(vista(zona, Datos)) :-
     ->  format("~w~n", [Aviso])
     ;   true
     ),
+    (   memberchk(por_explorar(si), Datos)
+    ->  format("Aquí hay algo especial que explorar (explorar.).~n", [])
+    ;   true
+    ),
     (   memberchk(ayuno(Dias, Max), Datos), Dias > 0
     ->  format("Ayuno: llevas ~w de ~w días seguidos sin comer; al llegar al límite sin nada por cobrar, la partida se pierde.~n", [Dias, Max])
     ;   true

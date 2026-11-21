@@ -27,6 +27,7 @@ Para probar:
 Un camino empedrado con corteza de queso viejo que se pega a las botas, con un peaje cada cien pasos. Lo recorren carretas, gansos con permiso de cobro y bandidos con más ambición que puntería.
 Salidas: bosque (Bosque del Moho), castillo (Castillo Camembert), cuevas (Cuevas del Roquefort), taberna (Taberna del Cuajo Torcido)
 Día 1 · Queso en la despensa: 12 · ración 4 al día (te alcanza para 3)
+Aquí hay algo especial que explorar (explorar.).
 Objetivo: acepta un contrato en el tablón de la taberna.
 
 > nivel(detallado)

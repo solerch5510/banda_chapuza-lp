@@ -12,10 +12,11 @@
 % por cada fragmento averiguado.
 
 :- module(charlas, [presente/4, escena_de/2, opcion_charla/5, saber/1, personaje_de_charla/1, hilo/1, hilo_completo/0,
+                    suceso/3, suceso_aqui/1, suceso_pendiente/1,
                     presentes/1, puede_hablar/1, charla_abierta/1, charla_hecha/1,
                     opciones_de/2, puede_elegir/2, resolver_opcion/3,
                     efectos_apertura/2, efectos_eleccion/3, saberes/1, sabe/1]).
-:- discontiguous presente/4, escena_de/2, opcion_charla/5.
+:- discontiguous presente/4, escena_de/2, opcion_charla/5, suceso/3.
 :- use_module(mundo).
 :- use_module(estado).
 :- use_module(compania).
@@ -46,7 +47,7 @@ escena_de(el_eco,           lo_que_repites).
 
 % opcion_charla(Escena, Opcion, Quien, Condiciones, Efectos):
 %   Quien la hace (tiene que estar en pie); Condiciones: en_pie(Id), queso_min(N);
-%   Efectos: ganar_queso(N), perder_queso(N), objeto(O), moral(grupo|Id, N), saber(Marca).
+%   Efectos: ganar_queso(N), perder_queso(N), objeto(O), curar(grupo, N), moral(grupo|Id, N), saber(Marca).
 opcion_charla(la_cuenta, jurar_honor, baldomero,
               [en_pie(baldomero)],
               [moral(grupo, 1)]).
@@ -251,6 +252,70 @@ opcion_charla(los_chillidos, ofrecerle_queso_azul, pimentina,
               [en_pie(pimentina), queso_min(1)],
               [perder_queso(1), moral(pimentina, 1)]).
 
+% --- los sucesos de zona (docs/13-ampliacion.md §4): escenas unicas de un lugar, no de un personaje ---
+% suceso(Id, Zona, Condiciones): se abren solos la primera vez que se llega o con `explorar`.
+suceso(el_puente_de_setas,    bosque,      []).
+suceso(el_pozo_de_los_deseos, aldea,       []).
+suceso(la_carreta_del_gremio, camino_real, []).
+suceso(la_bodega_del_rey,     castillo,    []).
+suceso(el_altar_del_moho,     cuevas,      [sabe(moho_con_hambre)]).
+
+escena_de(el_puente_de_setas,    el_puente_de_setas).
+escena_de(el_pozo_de_los_deseos, el_pozo_de_los_deseos).
+escena_de(la_carreta_del_gremio, la_carreta_del_gremio).
+escena_de(la_bodega_del_rey,     la_bodega_del_rey).
+escena_de(el_altar_del_moho,     el_altar_del_moho).
+
+opcion_charla(el_puente_de_setas, cruzar_de_puntillas, tuerca,
+              [en_pie(tuerca)],
+              [ganar_queso(1)]).
+opcion_charla(el_puente_de_setas, endurecer_el_puente, pimentina,
+              [en_pie(pimentina), queso_min(1)],
+              [perder_queso(1), moral(grupo, 1)]).
+opcion_charla(el_puente_de_setas, cruzar_con_la_armadura, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, -1)]).
+
+opcion_charla(el_pozo_de_los_deseos, sacar_agua_para_todos, baldomero,
+              [en_pie(baldomero)],
+              [curar(grupo, 5)]).
+opcion_charla(el_pozo_de_los_deseos, cantarle_al_fondo, rufino,
+              [en_pie(rufino)],
+              [moral(rufino, 1)]).
+opcion_charla(el_pozo_de_los_deseos, pedir_un_deseo_de_queso, pimentina,
+              [en_pie(pimentina), queso_min(1)],
+              [perder_queso(1), moral(grupo, 1)]).
+
+opcion_charla(la_carreta_del_gremio, colarse_en_la_carreta, tuerca,
+              [en_pie(tuerca)],
+              [ganar_queso(1)]).
+opcion_charla(la_carreta_del_gremio, cantar_a_los_carreteros, rufino,
+              [en_pie(rufino)],
+              [moral(rufino, 1)]).
+opcion_charla(la_carreta_del_gremio, hacerse_pasar_por_el_gremio, pimentina,
+              [en_pie(pimentina), sabe(gremio_sin_peaje)],
+              [objeto(pocion)]).
+
+opcion_charla(la_bodega_del_rey, husmear_la_despensa, tuerca,
+              [en_pie(tuerca)],
+              [ganar_queso(1)]).
+opcion_charla(la_bodega_del_rey, catar_el_queso_del_rey, pimentina,
+              [en_pie(pimentina)],
+              [moral(pimentina, -1)]).
+opcion_charla(la_bodega_del_rey, bajar_a_la_bodega, baldomero,
+              [en_pie(baldomero), sabe(moho_en_la_despensa)],
+              [moral(baldomero, 1), saber(moho_en_la_bodega)]).
+
+opcion_charla(el_altar_del_moho, dejarle_un_queso_al_moho, pimentina,
+              [en_pie(pimentina), queso_min(1)],
+              [perder_queso(1), moral(grupo, 1), saber(altar_alimentado)]).
+opcion_charla(el_altar_del_moho, cantarle_una_nana_al_altar, rufino,
+              [en_pie(rufino)],
+              [moral(rufino, 1)]).
+opcion_charla(el_altar_del_moho, tocar_el_moho, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, -1)]).
+
 % saber(Marca): los fragmentos de historia, en el orden en que los ensena el diario: primero las seis piezas
 % del hilo del Gran Rancio y despues los de ambientacion.
 saber(moho_en_la_despensa).
@@ -265,6 +330,8 @@ saber(bandidos_a_caballo).
 saber(pecorino_celoso).
 saber(ratas_huyen_de_abajo).
 saber(sumiller_del_principe).
+saber(moho_en_la_bodega).
+saber(altar_alimentado).
 
 % hilo(Marcas): las seis piezas con las que se entiende al Gran Roquefort. Con las seis, el diario cuenta la historia.
 hilo([moho_en_la_despensa, moho_con_hambre, principe_madura, el_eco_habla_solo, gremio_oculta, brieto_firmo]).
@@ -276,6 +343,7 @@ hilo_completo :-
 
 % personaje_de_charla(?Npc): los que tienen escena.
 personaje_de_charla(Npc) :-
+    presente(Npc, _, _, _),
     escena_de(Npc, _).
 
 % ---------------------------------------------------------------------------
@@ -300,7 +368,26 @@ charla_hecha(Npc) :-
 % charla_abierta(?Npc): se empezo, no se ha resuelto y sigue aqui.
 charla_abierta(Npc) :-
     estado:marca(charla_abierta(Npc)),
-    puede_hablar(Npc).
+    (   puede_hablar(Npc) ; suceso_aqui(Npc) ),
+    !.
+
+% ---------------------------------------------------------------------------
+% Los sucesos de zona: escenas unicas que pertenecen a un LUGAR y no a un personaje. Se abren solas la primera vez
+% que se llega (si no hay otra cosa en marcha) o con `explorar`, y se resuelven con elegir/1 como una charla. Usan el
+% mismo motor: sus opciones son opcion_charla/5 con el id del suceso en lugar del de un personaje.
+%   suceso(Id, Zona, Condiciones): Condiciones del mismo vocabulario que las de las opciones (sabe(Marca), en_pie...).
+% ---------------------------------------------------------------------------
+% suceso_aqui(?Id): hay un suceso de esta zona cuyas condiciones se cumplen (se haya hecho o no).
+suceso_aqui(Id) :-
+    estado:en_zona(Zona),
+    suceso(Id, Zona, Condiciones),
+    cumple_condiciones(Condiciones).
+
+% suceso_pendiente(?Id): esta aqui y aun no se ha resuelto (puede estar abierto a medias).
+suceso_pendiente(Id) :-
+    suceso_aqui(Id),
+    escena_de(Id, _),
+    \+ estado:marca(charla_hecha(Id)).
 
 % sabe(?Marca): ya se ha averiguado.
 sabe(Marca) :-
@@ -338,6 +425,7 @@ cumple_condiciones([C|Resto]) :-
 
 condicion_ok(en_pie(Id))   :- compania:en_pie(Id).
 condicion_ok(queso_min(N)) :- economia:hay_queso_para(N).
+condicion_ok(sabe(Marca))  :- sabe(Marca).                    % una opcion o suceso que solo existe si ya se sabe algo
 
 % puede_elegir(?Npc, ?Opcion): la regla que explica `elegir` en una charla: esta abierta y la opcion se puede.
 puede_elegir(Npc, Opcion) :-
@@ -384,4 +472,6 @@ expandir(moral(grupo, N), Efs) :-
 expandir(moral(Id, N), [mod_moral(Id, N)]) :-
     Id \== grupo.
 expandir(saber(M), [marcar(sabe(M))]).
+expandir(curar(grupo, N), Efs) :-
+    findall(curar(Id, N), compania:activo(Id), Efs).
 expandir(objeto(O), [ganar_objeto(compania, O, 1)]).

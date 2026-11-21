@@ -2,6 +2,11 @@
 
 *Propuesta del autor (20 de noviembre de 2026): más contratos, más enemigos, encuentros al moverse por ciertas zonas, más zonas con más tabernas (para no tener que deshacer diez nodos para recuperarse), poder pasar a otro reino pagando peaje y eventos únicos en algunas zonas. Este documento mide **cuánto cuesta cada cosa en este código**, qué riesgos tiene y en qué orden convendría hacerlas. No se ha programado nada de esto todavía.*
 
+## 0. Estado (20 de noviembre de 2026)
+
+- **Hecho:** los **sucesos de zona** (§4), con cinco sucesos (bosque, aldea, Camino Real, castillo y cuevas). Etiqueta `v1.0-rc2` marcada antes de empezar como punto de vuelta atrás.
+- **Pendiente:** contratos y enemigos nuevos (§3), encuentros al moverse (§5) y, si el autor lo decide el 27 de noviembre, el paquete C (§6).
+
 ## 1. Resumen
 
 **Se puede meter todo, pero no a la vez y no con el mismo riesgo.** Las seis ideas se agrupan en tres paquetes:

@@ -70,7 +70,7 @@ test(quien_hace_cada_opcion_es_de_la_compania) :-
 
 test(los_efectos_usan_solo_el_vocabulario_conocido) :-
     forall(( charlas:opcion_charla(_, _, _, _, Efs), member(E, Efs) ),
-           assertion(( E = ganar_queso(_) ; E = perder_queso(_) ; E = objeto(_) ; E = moral(_, _) ; E = saber(_) ))).
+           assertion(( E = ganar_queso(_) ; E = perder_queso(_) ; E = objeto(_) ; E = curar(grupo, _) ; E = moral(_, _) ; E = saber(_) ))).
 
 test(cada_personaje_tiene_nombre_quien_es_y_frase_de_apertura) :-
     forall(charlas:personaje_de_charla(Npc),
@@ -121,10 +121,10 @@ test(las_piezas_del_hilo_se_pueden_conseguir_a_partir_del_dia_seis) :-
            assertion(( charlas:opcion_charla(Escena, _, _, _, Efs), memberchk(saber(P), Efs),
                        charlas:escena_de(Npc, Escena), charlas:presente(Npc, _, D, H), D =< 6, H >= 6 ))).
 
-test(el_total_de_queso_de_todas_las_charlas_no_pasa_de_ocho) :-
+test(el_total_de_queso_de_todas_las_charlas_con_personajes_no_pasa_de_ocho) :-
     % la regla de oro del balance (docs/12 §4): hablar no arregla la economia
     findall(Mejor,
-            (   charlas:escena_de(_, Escena),
+            (   charlas:escena_de(Npc, Escena), charlas:presente(Npc, _, _, _),
                 findall(Neto, ( charlas:opcion_charla(Escena, _, _, _, Efs),
                                 findall(G, member(ganar_queso(G), Efs), Gs), sumlist(Gs, Ganado),
                                 findall(P, member(perder_queso(P), Efs), Ps), sumlist(Ps, Perdido),
@@ -548,7 +548,7 @@ test(hablar_da_queso_pero_con_un_techo) :-
     findall(Q, ( between(1, 10, I), S is 7100 + I, episodio(plan_hablador(0, 2), S, 400, r(victoria, _, Q, _)) ), Qb),
     sumlist(Qa, Ta), sumlist(Qb, Tb),
     Extra is (Tb - Ta) / 10,
-    assertion(Extra > 0), assertion(Extra =< 9).
+    assertion(Extra > 0), assertion(Extra =< 11).      % 8 de los personajes y 3 de los sucesos de zona
 
 test(el_hablador_realmente_habla_con_alguien) :-
     episodio(plan_hablador(0, 2), 7101, 400, r(victoria, _, _, _)),

@@ -23,6 +23,7 @@ Comandos disponibles ahora:
   hablar.        quién hay aquí hoy; hablar(Nombre). abre su escena (una sola vez) y se elige con elegir(Opcion).
   diario.        lo que ya sabéis del Gran Rancio, según lo que cuenta la gente
   usar(Objeto, Miembro). gasta un objeto de la compañía: usar(pocion, tuerca). cura a un miembro herido (en combate gasta su turno)
+  explorar.      abre el suceso especial de este lugar, si lo hay (se abre solo al llegar si no hay otra cosa en marcha)
   descansar.     solo en la taberna: cuesta 2 quesos, cura a todos y pasa un día
   pagar.         solo en la taberna: paga los sueldos pendientes con lo más rancio
   compania.      muestra a los miembros, su vida, su moral y su estado
@@ -115,6 +116,11 @@ La compañía:
 > ir(camino_real)
 Día 4 de la Banda Chapuza. El Registro de Compañías sigue donde estaba: abajo. Ración: 4 quesos.
 Camino Real: un peaje cada cien pasos, corteza vieja pegada a las suelas y bandidos con más ambición que puntería.
+Una carreta del Gremio de Afinadores cruza el Camino Real sin parar, con el sello bien visible y un cargamento tapado con lonas. Los carreteros miran al frente con la cara de quien no tiene que dar explicaciones. Nadie les cobra peaje. Nadie les pregunta nada.
+  1. Tuerca se cuela entre las lonas (Tuerca)
+  2. Rufino canta junto a la carreta (Rufino)
+  3. Madame Pimentina se hace pasar por una inspectora del Gremio (si sabéis lo del sello) (Madame Pimentina) [no disponible]
+Elige con elegir(Opcion). (el número o el nombre).
 
 > aceptar(gallina_noble)
 Contrato aceptado: «Lady Clotilde Plumífera». Todos asienten con convicción; nadie ha leído la letra pequeña.
@@ -203,6 +209,11 @@ Objetivo: vuelve a la taberna a cobrar lo que has resuelto.
 > ir(castillo)
 Día 5. Los quesos maduran y las deudas también. La ración de hoy: 4 quesos.
 El Castillo Camembert se hunde un poquito cada año, pero los guardias saludan con una rigidez ejemplar.
+Una puerta baja del castillo, con el cartel «Bodega Real. Prohibido el paso a quien tenga olfato», da a una escalera que huele a otoño, a sótano y a decisiones tomadas hace tres inviernos. Un guardia dormita sentado con la lanza en equilibrio.
+  1. Tuerca husmea la despensa mientras el guardia duerme (Tuerca)
+  2. Madame Pimentina prueba el queso del rey (Madame Pimentina)
+  3. Sir Baldomero baja a la bodega (si sabéis lo del moho del rey) (Sir Baldomero) [no disponible]
+Elige con elegir(Opcion). (el número o el nombre).
 Corre la voz: el rey Brieto busca a los peores contra el Gran Roquefort. Nuevo contrato final en el tablón: «La Despensa Real».
 
 > aceptar(despensa_real)
@@ -211,6 +222,10 @@ Contrato aceptado: «La Despensa Real». Todos asienten con convicción; nadie h
 > ir(camino_real)
 Amanece el día 6. Alguien tiene hambre y alguien más, una cuenta pendiente. Ración: 4 quesos.
 El Camino Real está empedrado con corteza de queso viejo. Se te pega a las botas y a la conversación.
+  1. Tuerca se cuela entre las lonas (Tuerca)
+  2. Rufino canta junto a la carreta (Rufino)
+  3. Madame Pimentina se hace pasar por una inspectora del Gremio (si sabéis lo del sello) (Madame Pimentina) [no disponible]
+Elige con elegir(Opcion). (el número o el nombre).
 
 > ir(cuevas)
 Día 7 de la Banda Chapuza. El Registro de Compañías sigue donde estaba: abajo. Ración: 4 quesos.

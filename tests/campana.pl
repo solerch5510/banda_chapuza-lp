@@ -189,7 +189,7 @@ test(los_comandos_de_la_version_minima, [setup(nueva_partida)]) :-
     findall(N, ( member(Fase, [taberna, exploracion, combate, fin]), comandos_disponibles(Fase, Cs), member(N, Cs) ), Ns0),
     sort(Ns0, Ns),
     Ns == [aceptar, atacar, ayuda, compania, contratos, defender, descansar, diario, elegir, explicar,
-           habilidad, hablar, inventario, ir, mirar, nivel, pagar, por_que_no, salir, usar].
+           explorar, habilidad, hablar, inventario, ir, mirar, nivel, pagar, por_que_no, salir, usar].
 
 :- end_tests(pelear_ya_no_existe).
 

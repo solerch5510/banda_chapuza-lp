@@ -311,6 +311,57 @@ frase(suceso(saber_nuevo(sumiller_del_principe)), ambos,
 frase(suceso(diario_completo), ambos,
       'Última página del diario: el príncipe Roque de Fort se retiró a las cuevas a «madurar»; el moho que sale de allí solo tiene hambre; el Gremio lo supo y lo calló; el rey firmó el permiso sin leerlo y su despensa se pudre. El Gran Roquefort no es un monstruo: es un príncipe al que nadie fue a buscar.').
 
+% --- los sucesos de zona: lo que se ve al llegar y lo que pasa al elegir ---
+frase(suceso(charla_abre(el_puente_de_setas)), ambos,
+      'Un puente de setas cruza un barranco del bosque. Las setas se mecen un poco, como si respiraran, y un cartel clavado en una de ellas dice: «Cruzar bajo su propia responsabilidad. Las setas no se hacen cargo de nada». Por abajo, el barranco hace plop.').
+frase(suceso(charla_elige(el_puente_de_setas, cruzar_de_puntillas)), ambos,
+      'Tuerca cruza de puntillas, salta la última seta y aterriza junto a un alijo olvidado por otro viajero menos ligero. Hay un queso dentro. Se lo guarda con tanta naturalidad que casi parece suyo.').
+frase(suceso(charla_elige(el_puente_de_setas, endurecer_el_puente)), ambos,
+      'Pimentina frota el puente con un trozo de queso curado y las setas se endurecen hasta sostener a un caballo. Cruzáis con la sensación de haber hecho ingeniería, que es mejor que cruzar con miedo.').
+frase(suceso(charla_elige(el_puente_de_setas, cruzar_con_la_armadura)), ambos,
+      'Baldomero cruza con la armadura puesta, por honor. A mitad de camino una seta cede y se oye un plop que todos prefieren no comentar. Llega empapado de moho y de dignidad herida.').
+
+frase(suceso(charla_abre(el_pozo_de_los_deseos)), ambos,
+      'En el centro de la aldea hay un pozo con un cartel torcido: «Pozo de los deseos. Se admiten monedas, quesos y quejas». Del fondo sube un frescor extraño y, de vez en cuando, un eco que dice «gracias».').
+frase(suceso(charla_elige(el_pozo_de_los_deseos, sacar_agua_para_todos)), ambos,
+      'Baldomero baja el cubo con ceremonia y sube agua tan fría que todos se reaniman. Beben por turnos y la Banda recupera algo de vida. Nadie pregunta de quién es el pozo.').
+frase(suceso(charla_elige(el_pozo_de_los_deseos, cantarle_al_fondo)), ambos,
+      'Rufino canta hacia el fondo y el fondo canta de vuelta, un poco peor. Rufino lo toma como una colaboración y sale con el ánimo alto.').
+frase(suceso(charla_elige(el_pozo_de_los_deseos, pedir_un_deseo_de_queso)), ambos,
+      'Pimentina tira un queso al pozo y pide un deseo. El pozo no responde, pero la aldea entera aplaude desde las ventanas: alguien ha pagado un deseo. La Banda se anima aunque no sepa por qué.').
+
+frase(suceso(charla_abre(la_carreta_del_gremio)), ambos,
+      'Una carreta del Gremio de Afinadores cruza el Camino Real sin parar, con el sello bien visible y un cargamento tapado con lonas. Los carreteros miran al frente con la cara de quien no tiene que dar explicaciones. Nadie les cobra peaje. Nadie les pregunta nada.').
+frase(suceso(charla_elige(la_carreta_del_gremio, colarse_en_la_carreta)), ambos,
+      'Tuerca se cuela entre las lonas mientras la carreta pasa y sale con un queso envuelto en paño. Los carreteros no se enteran: el Gremio no suele mirar atrás.').
+frase(suceso(charla_elige(la_carreta_del_gremio, cantar_a_los_carreteros)), ambos,
+      'Rufino canta junto a la carreta. Los carreteros no lo miran, pero aprietan el paso: es el mejor aplauso que ha recibido de gente sin sentido del humor.').
+frase(suceso(charla_elige(la_carreta_del_gremio, hacerse_pasar_por_el_gremio)), ambos,
+      'Pimentina, que sabe que el Gremio pasa sin pagar porque tiene sello, se acerca con tono de inspectora y pide una muestra «para el control». Los carreteros, asustados, le dan una poción de repuesto. Ni siquiera piden el sello.').
+
+frase(suceso(charla_abre(la_bodega_del_rey)), ambos,
+      'Una puerta baja del castillo, con el cartel «Bodega Real. Prohibido el paso a quien tenga olfato», da a una escalera que huele a otoño, a sótano y a decisiones tomadas hace tres inviernos. Un guardia dormita sentado con la lanza en equilibrio.').
+frase(suceso(charla_elige(la_bodega_del_rey, husmear_la_despensa)), ambos,
+      'Tuerca husmea en la despensa contigua mientras el guardia ronca y se lleva un queso que no echarán de menos: el rey lleva tres inviernos devolviéndolos al fondo.').
+frase(suceso(charla_elige(la_bodega_del_rey, catar_el_queso_del_rey)), ambos,
+      'Pimentina prueba un queso de la despensa real con la curiosidad de una experta. Tarda un rato en recuperar la cara: sabe a moho con ideas propias. Anota la receta por si acaso.').
+frase(suceso(charla_elige(la_bodega_del_rey, bajar_a_la_bodega)), ambos,
+      'Baldomero baja a la bodega, de puntillas y por honor, y ve el moho: forma anillos azules en el suelo y todos apuntan hacia las cuevas. Vuelve serio y con la certeza de que alguien tiene que acabar con esto.').
+
+frase(suceso(charla_abre(el_altar_del_moho)), ambos,
+      'En una oquedad de las cuevas hay un altar de piedra cubierto de un moho azul tan antiguo que casi parece pintado. Alguien ha dejado en él restos de queso, de siglos distintos. Sabéis que el moho tiene hambre: ahora entendéis por qué hay un altar.').
+frase(suceso(charla_elige(el_altar_del_moho, dejarle_un_queso_al_moho)), ambos,
+      'Pimentina deja un queso sobre el altar con ceremonia. El moho no se mueve, pero el aire cambia: huele menos a amenaza y más a gratitud. La Banda siente que ha hecho algo que debía haberse hecho hace trescientos años.').
+frase(suceso(charla_elige(el_altar_del_moho, cantarle_una_nana_al_altar)), ambos,
+      'Rufino le canta una nana al altar. El moho vibra un poco, como si recordara una canción de cuna olvidada. Rufino sale con un nudo en la garganta, que en su caso es buena señal.').
+frase(suceso(charla_elige(el_altar_del_moho, tocar_el_moho)), ambos,
+      'Baldomero pone la mano sobre el moho por pura curiosidad. Está frío, húmedo y, de algún modo, triste. Retira la mano con un escalofrío y su ánimo baja.').
+
+frase(suceso(saber_nuevo(moho_en_la_bodega)), ambos,
+      'Diario: en la bodega real el moho forma anillos azules que apuntan hacia las cuevas.').
+frase(suceso(saber_nuevo(altar_alimentado)), ambos,
+      'Diario: en las cuevas hay un altar de moho al que alguien lleva siglos dejando queso.').
+
 frase(suceso(botin(1)), ambos,
       'Botín: 1 queso fresco. Lo guardaba «para emergencias». Esto lo era.').
 frase(suceso(botin(N)), ambos,
@@ -562,6 +613,11 @@ nombre(lord_tapanarices,    'Lord Tapanarices').
 nombre(reina_viuda,         'la Reina Viuda Nata Doble').
 nombre(rata_exiliada,       'la Rata Exiliada').
 nombre(murcielago_azul,     'el Murciélago Azul').
+nombre(el_puente_de_setas,    'el Puente de Setas').
+nombre(el_pozo_de_los_deseos, 'el Pozo de los Deseos').
+nombre(la_carreta_del_gremio, 'la Carreta del Gremio').
+nombre(la_bodega_del_rey,     'la Bodega Real').
+nombre(el_altar_del_moho,     'el Altar del Moho').
 
 % nombre_visible(+Id, -Texto): los numeros y lo desconocido pasan tal cual.
 nombre_visible(Id, Texto) :-
@@ -913,6 +969,22 @@ descripcion_opcion_charla(murcielago_azul, escuchar_los_chillidos,    'Rufino in
 descripcion_opcion_charla(murcielago_azul, espantarlo_con_la_espada,  'Sir Baldomero lo espanta con la espada').
 descripcion_opcion_charla(murcielago_azul, ofrecerle_queso_azul,      'Madame Pimentina le ofrece un trocito de queso (cuesta 1 queso)').
 
+descripcion_opcion_charla(el_puente_de_setas, cruzar_de_puntillas,     'Tuerca cruza de puntillas').
+descripcion_opcion_charla(el_puente_de_setas, endurecer_el_puente,     'Madame Pimentina endurece el puente con queso curado (cuesta 1 queso)').
+descripcion_opcion_charla(el_puente_de_setas, cruzar_con_la_armadura,  'Sir Baldomero cruza con la armadura puesta').
+descripcion_opcion_charla(el_pozo_de_los_deseos, sacar_agua_para_todos,  'Sir Baldomero saca agua del pozo para toda la Banda').
+descripcion_opcion_charla(el_pozo_de_los_deseos, cantarle_al_fondo,      'Rufino canta hacia el fondo').
+descripcion_opcion_charla(el_pozo_de_los_deseos, pedir_un_deseo_de_queso, 'Madame Pimentina pide un deseo de queso (cuesta 1 queso)').
+descripcion_opcion_charla(la_carreta_del_gremio, colarse_en_la_carreta,      'Tuerca se cuela entre las lonas').
+descripcion_opcion_charla(la_carreta_del_gremio, cantar_a_los_carreteros,    'Rufino canta junto a la carreta').
+descripcion_opcion_charla(la_carreta_del_gremio, hacerse_pasar_por_el_gremio, 'Madame Pimentina se hace pasar por una inspectora del Gremio (si sabéis lo del sello)').
+descripcion_opcion_charla(la_bodega_del_rey, husmear_la_despensa,   'Tuerca husmea la despensa mientras el guardia duerme').
+descripcion_opcion_charla(la_bodega_del_rey, catar_el_queso_del_rey, 'Madame Pimentina prueba el queso del rey').
+descripcion_opcion_charla(la_bodega_del_rey, bajar_a_la_bodega,      'Sir Baldomero baja a la bodega (si sabéis lo del moho del rey)').
+descripcion_opcion_charla(el_altar_del_moho, dejarle_un_queso_al_moho,    'Madame Pimentina deja un queso sobre el altar (cuesta 1 queso)').
+descripcion_opcion_charla(el_altar_del_moho, cantarle_una_nana_al_altar,  'Rufino le canta una nana al altar').
+descripcion_opcion_charla(el_altar_del_moho, tocar_el_moho,               'Sir Baldomero toca el moho').
+
 % texto_saber(+Marca, -Texto): la linea del diario (la misma frase con la que se anuncia al averiguarlo).
 texto_saber(Marca, Texto) :-
     texto(saber_nuevo, [Marca], 0, Crudo),
@@ -969,6 +1041,8 @@ texto_error(no_se_usa(Objeto), Texto) :-
 texto_error(no_puede_usar(Objeto, Miembro), Texto) :-
     nombre_visible(Objeto, O), nombre_visible(Miembro, M),
     format(atom(Texto), 'No se puede usar ~w en ~w ahora mismo. Pregunta por_que_no(usar(~w, ~w)) para ver por qué.', [O, M, Objeto, Miembro]).
+texto_error(nada_que_explorar, 'No hay nada especial que explorar aquí (o ya lo habéis hecho).').
+texto_error(termina_el_evento, 'Hay un evento sin resolver: elige primero con elegir(Opcion).').
 texto_error(no_hay_evento, 'No hay ningún evento abierto (ni charla): no hay nada que elegir.').
 texto_error(personaje_desconocido(Npc), Texto) :-
     format(atom(Texto), 'No conozco a nadie que se llame ~w. hablar. enseña con quién puedes hablar aquí.', [Npc]).
@@ -1046,6 +1120,7 @@ ayuda_de(pagar, 'pagar.         solo en la taberna: paga los sueldos pendientes 
 ayuda_de(elegir, 'elegir(Opcion). elige una opción del evento abierto (su número o su nombre)').
 ayuda_de(hablar, 'hablar.        quién hay aquí hoy; hablar(Nombre). abre su escena (una sola vez) y se elige con elegir(Opcion).').
 ayuda_de(usar, 'usar(Objeto, Miembro). gasta un objeto de la compañía: usar(pocion, tuerca). cura a un miembro herido (en combate gasta su turno)').
+ayuda_de(explorar, 'explorar.      abre el suceso especial de este lugar, si lo hay (se abre solo al llegar si no hay otra cosa en marcha)').
 ayuda_de(diario, 'diario.        lo que ya sabéis del Gran Rancio, según lo que cuenta la gente').
 ayuda_de(contratos, 'contratos.     el tablón: los contratos a la vista y si se pueden aceptar').
 ayuda_de(aceptar, 'aceptar(Contrato). acepta un contrato (en la taberna o donde lo ofrecen)').

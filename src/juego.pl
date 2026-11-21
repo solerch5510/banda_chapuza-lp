@@ -51,6 +51,7 @@ comando(hablar,     0).
 comando(hablar,     1).
 comando(diario,     0).
 comando(usar,       2).
+comando(explorar,   0).
 comando(salir,      0).
 
 validar_comando(T, Res) :-
@@ -68,8 +69,8 @@ validar_comando(T, Res) :-
 % ---------------------------------------------------------------------------
 % Que comandos se pueden usar en cada fase (la fase se deriva en estado:fase/1).
 % ---------------------------------------------------------------------------
-permitidos(exploracion, [ayuda, mirar, ir, contratos, aceptar, elegir, hablar, diario, usar, compania, inventario, explicar, por_que_no, nivel, salir]).
-permitidos(taberna,     [ayuda, mirar, ir, contratos, aceptar, elegir, hablar, diario, usar, descansar, pagar, compania, inventario, explicar, por_que_no, nivel, salir]).
+permitidos(exploracion, [ayuda, mirar, ir, contratos, aceptar, elegir, hablar, diario, usar, explorar, compania, inventario, explicar, por_que_no, nivel, salir]).
+permitidos(taberna,     [ayuda, mirar, ir, contratos, aceptar, elegir, hablar, diario, usar, explorar, descansar, pagar, compania, inventario, explicar, por_que_no, nivel, salir]).
 permitidos(combate,     [ayuda, mirar, atacar, defender, habilidad, usar, compania, inventario, explicar, por_que_no, nivel, salir]).
 permitidos(fin,         [ayuda, diario, explicar, por_que_no, nivel, salir]).
 
@@ -93,6 +94,7 @@ objetivo_de_accion(elegir(Escrito), charlas:puede_elegir(Npc, Opcion)) :-
     charlas:charla_abierta(Npc),
     charlas:resolver_opcion(Npc, Escrito, Opcion).
 objetivo_de_accion(hablar(Npc), charlas:puede_hablar(Npc)).
+objetivo_de_accion(explorar, charlas:suceso_pendiente(_)).
 objetivo_de_accion(usar(Objeto, Miembro), economia:puede_usar(Objeto, Miembro)).
 % atacar(Objetivo) y atacar(Actor, Objetivo): el Objetivo puede ser un tipo (bandido_torpe) o una
 % instancia (e(bandido_torpe, 1)); el actor del primero es a quien le toca el turno.
@@ -257,7 +259,8 @@ ejecutar_en_fase(ir(Zona), _, Items) :-
         cobrar_contratos(Zona, I3b),
         comprobar_fin(I4),
         iniciar_objetivo(Zona, I5),
-        append([I0, I1, I2, I3, I3b, I4, I5], Items)
+        iniciar_suceso(I6),
+        append([I0, I1, I2, I3, I3b, I4, I5, I6], Items)
     ;   Items = [error(no_puede_viajar(Zona))]
     ).
 ejecutar_en_fase(descansar, _, Items) :-
@@ -393,6 +396,21 @@ ejecutar_en_fase(usar(Objeto, Miembro), Fase, Items) :-
     ;   once(explicar:solve(economia:puede_usar(Objeto, Miembro), Prueba)),
         economia:efectos_usar(Objeto, Miembro, Efectos),
         etapa([guardar_prueba(usar(Objeto, Miembro), Prueba)|Efectos], Items)
+    ).
+% explorar. : abre el suceso especial de esta zona (una escena unica, con opciones que se eligen con elegir/1). Se abre
+% solo al llegar si no hay nada en marcha; explorar sirve para abrirlo despues o para volver a verlo si quedo a medias.
+ejecutar_en_fase(explorar, _, Items) :-
+    (   eventos:evento_abierto(_)
+    ->  Items = [error(termina_el_evento)]
+    ;   charlas:suceso_pendiente(Id)
+    ->  (   charlas:charla_abierta(Id)
+        ->  mostrar_charla(Id, Items)
+        ;   charlas:efectos_apertura(Id, Efectos),
+            etapa(Efectos, I1),
+            mostrar_charla(Id, I2),
+            append(I1, I2, Items)
+        )
+    ;   Items = [error(nada_que_explorar)]
     ).
 % diario. : lo que ya se sabe del Gran Rancio.
 ejecutar_en_fase(diario, _, [vista(diario, Marcas)]) :-
@@ -634,7 +652,7 @@ datos_de_combate(combate(Ronda, Turno, Enemigos)) :-
 % mirar: los datos de la zona donde estas.
 % ---------------------------------------------------------------------------
 datos_de_zona([nombre(Nombre), descripcion(Texto), salidas(Salidas), dia(Dia), queso(Queso),
-               racion(Racion), dias(Dias), riesgo(Riesgo), ayuno(Ayuno, AyunoMax), objetivo(Paso, Faltas)]) :-
+               racion(Racion), dias(Dias), riesgo(Riesgo), ayuno(Ayuno, AyunoMax), objetivo(Paso, Faltas), por_explorar(Explorar)]) :-
     once(estado:en_zona(Zona)),
     mundo:zona(Zona, Nombre),
     mundo:descripcion_zona(Zona, Texto),
@@ -649,6 +667,7 @@ datos_de_zona([nombre(Nombre), descripcion(Texto), salidas(Salidas), dia(Dia), q
     economia:riesgo_de_gasto(0, Riesgo),
     economia:dias_de_ayuno(Ayuno),
     mundo:parametro(dias_de_ayuno_max, AyunoMax),
+    (   charlas:suceso_pendiente(_) -> Explorar = si ; Explorar = no ),
     (   contratos:objetivo_actual(Paso0, Faltas0) -> Paso = Paso0, Faltas = Faltas0 ; Paso = ninguno, Faltas = [] ).
 
 % ---------------------------------------------------------------------------
@@ -715,6 +734,21 @@ iniciar_objetivo(Zona, Items) :-
         append(I1, I2, Items)
     ;   eventos:evento_abierto(E)
     ->  mostrar_evento(E, Items)
+    ;   Items = []
+    ).
+
+% iniciar_suceso(-Items): al llegar a una zona con un suceso sin resolver se abre solo, si no hay otra cosa en marcha
+% (partida acabada, combate o evento de contrato). Si hay algo en marcha, queda pendiente: `explorar` lo abre despues.
+iniciar_suceso(Items) :-
+    (   \+ estado:fin_partida(_), \+ estado:en_combate(_), \+ eventos:evento_abierto(_),
+        once(charlas:suceso_pendiente(Id))
+    ->  (   charlas:charla_abierta(Id)
+        ->  mostrar_charla(Id, Items)                  % se quedo a medias: se vuelve a ensenar, sin repetir la apertura
+        ;   charlas:efectos_apertura(Id, Efectos),
+            etapa(Efectos, I1),
+            mostrar_charla(Id, I2),
+            append(I1, I2, Items)
+        )
     ;   Items = []
     ).
 

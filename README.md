@@ -7,6 +7,7 @@
 ## Qué incluye
 
 - **Compañía de mercenarios** (Sir Baldomero, Madame Pimentina, Rufino y Tuerca) con rasgos que modifican las reglas: Baldomero teme a los caballos, Rufino cobra por callar...
+- **Sucesos de zona:** algunos lugares guardan una escena única que se abre sola al llegar (o con `explorar.`): un pozo que cura, un puente de setas, una carreta del Gremio, la bodega del rey o un altar de moho. Algunas opciones —o el suceso entero— solo existen si ya sabéis algo del diario.
 - **Objetos:** `usar(pocion, tuerca).` cura a un miembro herido; fuera de combate no cuesta tiempo y en combate gasta el turno. Las pociones salen de contratos y de algunas charlas.
 - **Gente con la que hablar:** cada zona tiene personajes (`hablar.`), unos fijos y otros que solo están ciertos días. Cada uno ofrece una escena con opciones que hace un miembro de la Banda (`elegir`) y que da cosas pequeñas o **información**; el `diario.` junta los fragmentos de la historia del Gran Rancio que se van averiguando ([docs/12-npcs.md](docs/12-npcs.md)).
 - **Economía del queso:** es la única moneda y también la comida. Madura (fresco, curado, rancio), hay ración diaria, sueldos (`pagar`) y moral; con la moral baja, un miembro se pone en huelga. Quedarse sin queso no acaba la partida en el acto: la Banda aguanta dos días seguidos sin comer. Al ganar un combate, los enemigos sueltan queso con una probabilidad (una tirada con la semilla del juego, reproducible). Lo que paga cada contrato se **deriva** de lo que cuesta hacerlo (días de viaje y enemigos; [docs/11-balance.md](docs/11-balance.md)).
@@ -167,7 +168,7 @@ Cada suite corre en su propio proceso (así ninguna contagia a otra), se escribe
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/combate -g "run_tests,halt" -t "halt(1)"
 ```
 
-Suites actuales (35 suites, 2059 pruebas):
+Suites actuales (36 suites, 2110 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -187,6 +188,7 @@ Suites actuales (35 suites, 2059 pruebas):
 | `tests/todas.pl` | El agregador: corre todas las suites en procesos separados y devuelve 0 o 1. |
 | `tests/api.pl` (97) | El adaptador JSON y el servidor: el árbol como nodos (profundidad, estado, tipo, pliegue), todos los items con su JSON, `ejecutar_orden/2` (errores como la consola, nunca falla), estado y acciones habilitadas ciertos y sin tocar la partida, **lo que cuenta la web es lo que cuenta la consola**, y el servidor HTTP real (GET, POST, UTF-8, estáticos, 404, rutas fuera de `web/`, cerrojo). |
 | `tests/agregador.pl` (4) | Vigila a `tests/todas.pl`: una suite buena da verde, una que falla da código 1, **también si falla con `assertion/1`** (en 5.10.4 eso abre el depurador y el proceso sale con 0). |
+| `tests/sucesos.pl` (51) | Los sucesos de zona (escenas únicas de un lugar): el validador de datos y del techo de queso, cuándo hay suceso (el altar solo si sabes que el moho tiene hambre), que **se abre solo al llegar** salvo que haya combate o evento de contrato, `explorar`, los efectos (el pozo cura a toda la Banda, **hay opciones que solo existen si ya sabes algo del diario**), los errores, la consola, la API y la web, y el balance. |
 | `tests/usar.pl` (41) | Usar objetos: la regla `economia:puede_usar/2` (una poción, un miembro vivo y herido), la cura sin pasar de la vida máxima, `usar` fuera de combate (no pasa el tiempo) y **en combate (gasta el turno)**, los errores y `por_que_no`, la consola, la API (botón solo si hay poción y herido) y la web, y de dónde salen las pociones (contrato de las ratas y la charla con Ricota). |
 | `tests/hablar.pl` (84) | Hablar con los NPC: el **validador de contenido** (cada personaje tiene escena, cada opción su texto y su frase, cada fragmento del diario sale de una opción, y **el queso que se puede sacar hablando tiene techo**), quién está y cuándo según el día, el flujo `hablar` → `elegir` (se hace una vez, queda a medias si te vas, un evento de contrato manda sobre la charla), los efectos de cada opción, los errores, el diario, la consola, la API y la web, y que **el jugador que habla con todos no gana menos ni se hace rico** (simulador). |
 | `tests/botin.pl` (26) | El botín tras el combate: la tabla de datos `mundo:botin/3`, la regla pura `combate:botin_de/5` (una tirada por enemigo con la semilla del juego, la cantidad, el límite exacto de la probabilidad, la frecuencia en una racha larga), los efectos al ganar (el mensaje de lo que cae o de que no cae nada, y la semilla guardada), un combate de verdad y que **la misma semilla da el mismo botín**. Es el primer azar del juego. |
