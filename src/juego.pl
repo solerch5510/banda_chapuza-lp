@@ -91,7 +91,7 @@ objetivo_de_accion(elegir(Escrito), eventos:puede_elegir(E, Opcion)) :-
     eventos:resolver_opcion(E, Escrito, Opcion).
 objetivo_de_accion(elegir(Escrito), charlas:puede_elegir(Npc, Opcion)) :-
     \+ eventos:evento_abierto(_),
-    charlas:charla_abierta(Npc),
+    charlas:charla_elegida(Npc),
     charlas:resolver_opcion(Npc, Escrito, Opcion).
 objetivo_de_accion(hablar(Npc), charlas:puede_hablar(Npc)).
 objetivo_de_accion(explorar, charlas:suceso_pendiente(_)).
@@ -341,9 +341,8 @@ ejecutar_en_fase(aceptar(C), _, Items) :-
 % eventos:puede_elegir/2, cuya prueba se guarda ANTES de aplicar los efectos. Si la opcion acaba el
 % evento, el contrato se resuelve con las marcas que dejo.
 ejecutar_en_fase(elegir(Escrito), _, Items) :-
-    (   \+ eventos:evento_abierto(_), charlas:charla_abierta(_)
-    ->  once(charlas:charla_abierta(Npc)),
-        elegir_en_charla(Npc, Escrito, Items)
+    (   \+ eventos:evento_abierto(_), charlas:charla_elegida(Npc)
+    ->  elegir_en_charla(Npc, Escrito, Items)
     ;   \+ eventos:evento_abierto(_)
     ->  Items = [error(no_hay_evento)]
     ;   once(eventos:evento_abierto(E)),
@@ -805,8 +804,10 @@ mostrar_evento(E, [vista(evento, E, Quedan, Opciones)]) :-
     eventos:intentos_restantes(E, Quedan),
     eventos:opciones_de(E, Opciones).
 
-% mostrar_charla(+Npc, -Items): la vista de la charla con sus opciones.
+% mostrar_charla(+Npc, -Items): la vista de la charla con sus opciones. La que se enseña pasa a ser la charla en curso:
+% a ella va el siguiente elegir/1 aunque haya otra abierta (charlas:charla_elegida/1).
 mostrar_charla(Npc, [vista(charla, Npc, Opciones)]) :-
+    etapa([desmarcar(charla_en_curso(_)), marcar(charla_en_curso(Npc))], _),
     charlas:opciones_de(Npc, Opciones).
 
 % elegir_en_charla(+Npc, +Escrito, -Items): elegir una opcion de la charla abierta; la prueba de la regla se guarda ANTES

@@ -350,3 +350,36 @@ test(el_hablador_que_ademas_aprovecha_los_sucesos_no_pierde_mas) :-
     length(A, NA), length(B, NB), assertion(NB >= NA - 3).
 
 :- end_tests(balance).
+
+% Dos escenas abiertas a la vez (un suceso de la zona y la charla de un personaje): elegir/1 va a la ULTIMA que se enseño.
+% (Un fallo encontrado jugando: en el Camino Real, tras hablar con el ganso, elegir(3) iba a la carreta del Gremio.)
+:- begin_tests(dos_escenas_abiertas).
+
+test(tras_hablar_con_el_ganso_elegir_va_a_su_charla_y_no_al_suceso) :-
+    nueva_partida, orden(ir(camino_real), _),
+    assertion(charlas:charla_abierta(la_carreta_del_gremio)),
+    orden(hablar(ganso_recaudador), _),
+    assertion(charlas:charla_elegida(ganso_recaudador)),
+    orden(elegir(3), Items),
+    assertion(\+ memberchk(error(_), Items)),
+    assertion(charlas:charla_hecha(ganso_recaudador)),
+    assertion(\+ charlas:charla_hecha(la_carreta_del_gremio)).
+
+test(por_que_no_explica_la_opcion_de_la_charla_en_curso) :-
+    nueva_partida, orden(ir(camino_real), _), orden(hablar(ganso_recaudador), _),
+    juego:objetivo_de_accion(elegir(3), Meta),
+    assertion(Meta = charlas:puede_elegir(ganso_recaudador, esquivar_al_ganso)).
+
+test(cerrada_la_del_ganso_elegir_vuelve_al_suceso_que_seguia_abierto) :-
+    nueva_partida, orden(ir(camino_real), _), orden(hablar(ganso_recaudador), _), orden(elegir(3), _),
+    assertion(charlas:charla_elegida(la_carreta_del_gremio)),
+    orden(elegir(1), Items),
+    assertion(\+ memberchk(error(_), Items)),
+    assertion(charlas:charla_hecha(la_carreta_del_gremio)).
+
+test(explorar_devuelve_el_suceso_al_primer_plano) :-
+    nueva_partida, orden(ir(camino_real), _), orden(hablar(ganso_recaudador), _),
+    orden(explorar, _),
+    assertion(charlas:charla_elegida(la_carreta_del_gremio)).
+
+:- end_tests(dos_escenas_abiertas).

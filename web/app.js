@@ -197,19 +197,34 @@
     }
   }
 
+  // Las ordenes que solo consultan: no cambian nada del juego, asi que la escena que habia sigue abierta tal cual.
+  var SOLO_CONSULTA = /^(por_que_no|explicar|mirar|inventario|compania|contratos|diario|ayuda|nivel)\b/;
+
+  // dejaViejasLasEscenas(texto, resp): si las tarjetas de evento o charla que ya se ven pasan a «ya resuelto». Solo cuando
+  // la orden pudo cambiar algo (no una consulta como por_que_no, ni una orden rechazada con error) o cuando la respuesta
+  // trae la escena de nuevo (entonces vale la nueva).
+  function dejaViejasLasEscenas(texto, resp) {
+    var items = resp.items || [];
+    var traeEscena = items.some(function (it) { return it.tipo === "evento" || it.tipo === "charla"; });
+    if (traeEscena) return true;
+    if (SOLO_CONSULTA.test(texto)) return false;
+    return !items.some(function (it) { return it.tipo === "error"; });
+  }
+
   function enviar(texto, opciones) {
     opciones = opciones || {};
     texto = String(texto || "").trim();
     if (!texto || S.ocupado) return Promise.resolve();
     S.ocupado = true; S.error = null; S.pop = null; S.menu = false;
     if (!opciones.silencioso) {
-      S.log.forEach(function (e) { if (e.t === "evento" || e.t === "charla") e.viejo = true; });     // un evento ya contestado no se vuelve a elegir
       S.log.push({ t: "cmd", texto: texto.replace(/\.$/, "") });
       if (S.hist[S.hist.length - 1] !== texto) S.hist.push(texto);
       S.hpos = S.hist.length;
     }
     return api("/api/orden", { orden: texto }).then(function (resp) {
       S.ocupado = false;
+      if (!opciones.silencioso && dejaViejasLasEscenas(texto, resp))
+        S.log.forEach(function (e) { if (e.t === "evento" || e.t === "charla") e.viejo = true; });     // un evento ya contestado no se vuelve a elegir
       procesar(texto.replace(/\.$/, ""), resp, opciones.silencioso);
       render({ bajar: !opciones.silencioso });
     }).catch(fallo);
