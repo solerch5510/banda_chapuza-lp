@@ -170,7 +170,7 @@ Cada suite corre en su propio proceso (así ninguna contagia a otra), se escribe
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/combate -g "run_tests,halt" -t "halt(1)"
 ```
 
-Suites actuales (38 suites, 2191 pruebas):
+Suites actuales (38 suites, 2193 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -188,7 +188,7 @@ Suites actuales (38 suites, 2191 pruebas):
 | `tests/campana.pl` (39) | La partida mínima de principio a fin: los finales (`chapuza`, `derrota_combate`, `derrota_hambre`), la fase final, partidas completas escritas como una lista de comandos (se gana en 7 días y es reproducible) y que `pelear` ya no existe. |
 | `tests/equivalencia.pl` (42) | **La prueba de equivalencia del meta-intérprete**: más de 20 objetivos del juego (compañía, economía, combate, contratos, fase, negación, `->`, aritmética, `findall`, `forall`) × 8 escenarios (inicio, hambre, huelga, combate con rasgos, con venda, el jefe, contratos en marcha, partida acabada): ejecutarlos directamente y con `solve/2` da las **mismas soluciones en el mismo orden**; el oráculo del corte (IA con corte = IA sin corte), la prueba de modo, los casos de error y que demostrar no cambia el estado. |
 | `tests/todas.pl` | El agregador: corre todas las suites en procesos separados y devuelve 0 o 1. |
-| `tests/api.pl` (97) | El adaptador JSON y el servidor: el árbol como nodos (profundidad, estado, tipo, pliegue), todos los items con su JSON, `ejecutar_orden/2` (errores como la consola, nunca falla), estado y acciones habilitadas ciertos y sin tocar la partida, **lo que cuenta la web es lo que cuenta la consola**, y el servidor HTTP real (GET, POST, UTF-8, estáticos, 404, rutas fuera de `web/`, cerrojo). |
+| `tests/api.pl` (99) | El adaptador JSON y el servidor: el árbol como nodos (profundidad, estado, tipo, pliegue), todos los items con su JSON, `ejecutar_orden/2` (errores como la consola, nunca falla), estado y acciones habilitadas ciertos y sin tocar la partida, **lo que cuenta la web es lo que cuenta la consola**, y el servidor HTTP real (GET, POST, UTF-8, estáticos, 404, rutas fuera de `web/`, cerrojo). |
 | `tests/agregador.pl` (4) | Vigila a `tests/todas.pl`: una suite buena da verde, una que falla da código 1, **también si falla con `assertion/1`** (en 5.10.4 eso abre el depurador y el proceso sale con 0). |
 | `tests/contenido.pl` (46) | La ampliación de contenido: un **validador** que revisa todos los contratos y enemigos (zona, quién lo ofrece, resoluciones, consecuencias, textos, eventos con sus opciones y frases, paga que compensa el viaje), los dos enemigos nuevos (ganso del peaje y seta belicosa), los tres contratos nuevos jugados (peaje, fantasma charlatán con su evento, paz del moho) y la regla nueva: **el jefe exige dos contratos concretos**, no tres cualesquiera. |
 | `tests/encuentros.pl` (34) | Los encuentros al llegar a una zona: la tabla (probabilidades, grupos válidos, el jefe y el ganso del contrato no salen, zonas tranquilas), las reglas puras (dos dados que avanzan la semilla, la tirada justo igual a la probabilidad no sale, salen todos los grupos y la frecuencia se parece a la probabilidad), el viaje de verdad (combate al llegar, no es un contrato, mismo viaje con la misma semilla, interruptor apagado), **el contrato de la zona empieza cuando termina el encuentro** y `explicar`. |

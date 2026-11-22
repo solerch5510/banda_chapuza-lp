@@ -404,6 +404,20 @@ test(la_orden_se_devuelve_tal_cual_en_la_respuesta) :-
 % ---------------------------------------------------------------------------
 :- begin_tests(el_estado).
 
+% El motivo del fin llega a la web como TEXTO y la web (web/app.js, pantallaFinal) decide victoria o derrota por su
+% principio: una victoria empieza por «victoria» (el final va dentro: victoria(chapuza)) y una derrota no.
+test(el_motivo_de_una_victoria_empieza_por_victoria) :-
+    nueva_partida, once(contratos:final_de_la_partida(F)),
+    estado:aplicar_efectos([fin(victoria(F))]),
+    estado_json(E), campo(E, fin, json(Fin)), memberchk(motivo=M, Fin),
+    atom(M), assertion(sub_atom(M, 0, _, _, victoria)).
+
+test(el_motivo_de_una_derrota_no_empieza_por_victoria) :-
+    nueva_partida,
+    estado:aplicar_efectos([fin(derrota(derrota_combate))]),
+    estado_json(E), campo(E, fin, json(Fin)), memberchk(motivo=M, Fin),
+    atom(M), assertion(\+ sub_atom(M, 0, _, _, victoria)).
+
 test(la_banda_son_cuatro_con_vida_y_moral) :-
     nueva_partida, estado_json(E), campo(E, banda, B),
     findall(Id, ( member(M, B), campo(M, id, Id) ), Ids),

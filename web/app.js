@@ -108,6 +108,7 @@
     var combate = resp.estado && resp.estado.fase === "combate";
     var hayExplicacion = false;
     var textosFinal = [];
+    var textoDelFinal = null;          // el mensaje que cierra la partida (acaba en «Fin de la partida.»): es lo que se lee en la pantalla final
     items.forEach(function (it) {
       switch (it.tipo) {
         case "zona":
@@ -117,6 +118,7 @@
           if (silencioso) break;
           S.log.push({ t: it.clave === "contrato_nuevo" ? "nuevo" : CLAVES_SISTEMA.test(it.clave) ? "sys" : (combate ? "imp" : "msg"), texto: it.texto });
           if (it.texto.indexOf("Fin de la partida") < 0) textosFinal.push(it.texto);
+          else textoDelFinal = it.texto.replace(/\s*Fin de la partida\.?\s*$/, "");
           break;
         case "objetivo":
           if (silencioso) break;
@@ -181,7 +183,7 @@
       if (resp.estado.combate && !(S.estado && S.estado.combate)) S.inferior = "posiciones";
       S.estado = resp.estado;
       if (resp.estado.fin) {
-        S.textoFinal = textosFinal.join("\n");
+        S.textoFinal = textoDelFinal !== null ? textoDelFinal : textosFinal.join("\n");
         S.vista = "final";
       }
       var dia = resp.estado.dia;
@@ -844,7 +846,7 @@
   }
 
   function pantallaFinal(movil) {
-    var e = S.estado, victoria = String(e.fin.motivo) === "victoria";
+    var e = S.estado, victoria = /^victoria/.test(String(e.fin.motivo));      // el motivo llega como victoria(chapuza)
     var h1 = victoria ? "Una victoria<br>bien curada." : "Hasta aquí llegó<br>la corteza.";
     var texto = (S.textoFinal || "").split("\n").filter(function (l) { return l && l.indexOf("Narrador:") < 0; }).slice(0, 2).join(" ");
     return '<div class="game-frame final-screen ' + S.tema + (movil ? " mobile" : "") + " " + (victoria ? "victory" : "defeat") + '"><header class="game-logo">' + icono("cheese", 30) +
