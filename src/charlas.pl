@@ -13,7 +13,7 @@
 
 :- module(charlas, [presente/4, escena_de/2, opcion_charla/5, saber/1, personaje_de_charla/1, hilo/1, hilo_completo/0,
                     suceso/3, suceso_aqui/1, suceso_pendiente/1,
-                    presentes/1, puede_hablar/1, charla_abierta/1, charla_hecha/1,
+                    presentes/1, puede_hablar/1, charla_abierta/1, charla_hecha/1, charla_elegida/1,
                     opciones_de/2, puede_elegir/2, resolver_opcion/3,
                     efectos_apertura/2, efectos_eleccion/3, saberes/1, sabe/1]).
 :- discontiguous presente/4, escena_de/2, opcion_charla/5, suceso/3.
@@ -369,6 +369,18 @@ charla_hecha(Npc) :-
 charla_abierta(Npc) :-
     estado:marca(charla_abierta(Npc)),
     (   puede_hablar(Npc) ; suceso_aqui(Npc) ),
+    !.
+
+% charla_elegida(-Npc): la charla a la que va elegir/1. Puede haber dos abiertas a la vez (un suceso de la zona y la de
+% un personaje con quien se acaba de hablar): manda la ULTIMA que se enseño (la marca charla_en_curso), si sigue abierta;
+% si no, la primera abierta.
+charla_elegida(Npc) :-
+    estado:marca(charla_en_curso(N)),
+    charla_abierta(N),
+    !,
+    Npc = N.
+charla_elegida(Npc) :-
+    charla_abierta(Npc),
     !.
 
 % ---------------------------------------------------------------------------
