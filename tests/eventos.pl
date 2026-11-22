@@ -297,18 +297,21 @@ test(la_apertura_pone_los_intentos_a_cero_y_marca, [setup(nueva_partida)]) :-
 test(trepar_marca_cierra_y_avisa, [setup(nueva_partida), nondet]) :-
     eventos:efectos_eleccion(rescate_gato, trepar, Efs),
     Efs == [marcar(gato_bajado_con_arte), mensaje(evento_elige, [rescate_gato, trepar]),
-            desmarcar(evento_abierto(rescate_gato))].
+            desmarcar(evento_abierto(rescate_gato)),
+            mensaje(xp_evento, [tuerca, 15]), ganar_xp(tuerca, 15)].             % al primer intento: 15 de experiencia
 
 test(el_hechizo_gasta_un_queso_y_marca, [setup(nueva_partida), nondet]) :-
     eventos:efectos_eleccion(rescate_gato, hechizo_de_raclette, Efs),
     Efs = [gastar_queso(cheddar, 0, 1), marcar(gato_bajado_con_arte),
            mensaje(evento_elige, [rescate_gato, hechizo_de_raclette]),
-           desmarcar(evento_abierto(rescate_gato))].
+           desmarcar(evento_abierto(rescate_gato)),
+           mensaje(xp_evento, [pimentina, 15]), ganar_xp(pimentina, 15)].
 
 test(sacudir_el_arbol_deja_la_marca_a_golpes, [setup(nueva_partida), nondet]) :-
     eventos:efectos_eleccion(rescate_gato, sacudir_arbol, Efs),
     Efs == [marcar(gato_bajado_a_golpes), mensaje(evento_elige, [rescate_gato, sacudir_arbol]),
-            desmarcar(evento_abierto(rescate_gato))].
+            desmarcar(evento_abierto(rescate_gato)),
+            mensaje(xp_evento, [baldomero, 15]), ganar_xp(baldomero, 15)].
 
 test(cantar_con_intentos_de_sobra_solo_cuenta, [setup(nueva_partida)]) :-
     eventos:efectos_eleccion(rescate_gato, cantar, Efs),

@@ -258,10 +258,11 @@ ejecutar_en_fase(ir(Zona), _, Items) :-
         llegada(Zona, I3),
         cobrar_contratos(Zona, I3b),
         comprobar_fin(I4),
+        aviso_de_nivel(Zona, I4a),
         iniciar_encuentro(Zona, I4b),
         iniciar_objetivo(Zona, I5),
         iniciar_suceso(I6),
-        append([I0, I1, I2, I3, I3b, I4, I4b, I5, I6], Items)
+        append([I0, I1, I2, I3, I3b, I4, I4a, I4b, I5, I6], Items)
     ;   Items = [error(no_puede_viajar(Zona))]
     ).
 ejecutar_en_fase(descansar, _, Items) :-
@@ -538,10 +539,15 @@ pasos_de_escena([combate(Tipos)|Resto], Items) :-
 % ---------------------------------------------------------------------------
 % comenzar_combate(+Tipos, -Items): Tipos es la lista de enemigos (p. ej. [rata_quesera, rata_quesera]).
 comenzar_combate(Tipos, Items) :-
+    comenzar_combate(Tipos, 1, Items).
+
+% comenzar_combate(+Tipos, +Nivel, -Items): igual, con los enemigos de ese nivel (los encuentros de una zona con nivel).
+comenzar_combate(Tipos, Nivel, Items) :-
     once(combate:efectos_inicio(Tipos, Efectos)),
+    (   Nivel > 1 -> Subir = [nivelar_enemigos(Nivel), mensaje(enemigos_de_nivel, [Nivel])] ; Subir = [] ),
     sort(Tipos, Distintos),
     findall(mensaje(aparece, [Tipo]), member(Tipo, Distintos), Avisos),
-    append(Efectos, Avisos, Todos),
+    append([Efectos, Subir, Avisos], Todos),
     etapa(Todos, I1),
     avanzar_combate(I2),
     append(I1, I2, Items0),
@@ -643,7 +649,8 @@ datos_de_combate(combate(Ronda, Turno, Enemigos)) :-
     findall(enemigo(E, Vida, Max, Fila),
             (   estado:instancia(E, Tipo),
                 estado:vida(E, Vida),
-                mundo:enemigo(Tipo, vida(Max), _, _),
+                estado:vida_maxima(E, Max),
+                atom(Tipo),
                 estado:fila(E, Fila)
             ),
             Enemigos0),
@@ -653,8 +660,10 @@ datos_de_combate(combate(Ronda, Turno, Enemigos)) :-
 % mirar: los datos de la zona donde estas.
 % ---------------------------------------------------------------------------
 datos_de_zona([nombre(Nombre), descripcion(Texto), salidas(Salidas), dia(Dia), queso(Queso),
-               racion(Racion), dias(Dias), riesgo(Riesgo), ayuno(Ayuno, AyunoMax), objetivo(Paso, Faltas), por_explorar(Explorar)]) :-
+               racion(Racion), dias(Dias), riesgo(Riesgo), ayuno(Ayuno, AyunoMax), objetivo(Paso, Faltas), por_explorar(Explorar),
+               nivel_zona(NivelZona)]) :-
     once(estado:en_zona(Zona)),
+    (   mundo:nivel_de_zona(Zona, NivelZona) -> true ; NivelZona = 1 ),
     mundo:zona(Zona, Nombre),
     mundo:descripcion_zona(Zona, Texto),
     findall(Vecina-NombreVecina,
@@ -755,6 +764,17 @@ iniciar_suceso(Items) :-
     ;   Items = []
     ).
 
+% aviso_de_nivel(+Zona, -Items): al llegar a una zona cuyo nivel supera el de la Banda (la media), se avisa: sus encuentros
+% salen con ese nivel. Con la partida acabada, no.
+aviso_de_nivel(Zona, Items) :-
+    (   \+ estado:fin_partida(_),
+        mundo:nivel_de_zona(Zona, NZ),
+        compania:nivel_medio(NB),
+        NZ > NB
+    ->  etapa([mensaje(aviso_nivel, [Zona, NZ, NB])], Items)
+    ;   Items = []
+    ).
+
 % iniciar_encuentro(+Zona, -Items): al llegar a una zona con encuentros se tiran los dos dados con la semilla del juego. Si
 % sale un grupo empieza el combate (antes que el objetivo del contrato de la zona, que espera a que termine); la prueba
 % de por que salio se guarda para `explicar`. Con la partida acabada no se tira.
@@ -765,7 +785,8 @@ iniciar_encuentro(Zona, Items) :-
     ->  (   combate:sale_encuentro(Zona, Tirada, Indice, Grupo)
         ->  once(explicar:solve(combate:sale_encuentro(Zona, Tirada, Indice, Grupo), Prueba)),
             etapa([fijar_semilla(S), guardar_prueba(encuentro(Zona), Prueba), mensaje(encuentro, [Zona])], I1),
-            comenzar_combate(Grupo, I2),
+            (   mundo:nivel_de_zona(Zona, NZ) -> true ; NZ = 1 ),
+            comenzar_combate(Grupo, NZ, I2),
             append(I1, I2, Items)
         ;   etapa([fijar_semilla(S)], Items)
         )

@@ -61,6 +61,7 @@ Ojo: otro día así y te quedaría menos de un día de ración.
 > ir(bosque)
 Amanece el día 14. Alguien tiene hambre y alguien más, una cuenta pendiente. Ración: 4 quesos.
 El Bosque del Moho te recibe con pelusilla. Hasta la sombra tiene moho; las setas opinan de tu forma de caminar.
+Ojo: en el Bosque del Moho los encuentros son de nivel 2 y la Banda va por el 1. Se puede, pero duele.
 Un puente de setas cruza un barranco del bosque. Las setas se mecen un poco, como si respiraran, y un cartel clavado en una de ellas dice: «Cruzar bajo su propia responsabilidad. Las setas no se hacen cargo de nada». Por abajo, el barranco hace plop.
   1. Tuerca cruza de puntillas (Tuerca)
   2. Madame Pimentina endurece el puente con queso curado (cuesta 1 queso) (Madame Pimentina)
@@ -100,7 +101,7 @@ Por qué se pudo atacar(baldomero,bandido_torpe):
    [ok] \+ aturdido(baldomero)   [no demostrable]
    [ok] \+ (teme(baldomero, A), clase_de(e(bandido_torpe, 1), A))   [no demostrable]
 [ok] dano(baldomero, e(bandido_torpe, 1), 9)   [clausula 1]
-   [ok] ataque(baldomero, 11)   [clausula 1]   [+2 nodos]
+   [ok] ataque(baldomero, 11)   [clausula 1]   [+22 nodos]
    [ok] defensa(e(bandido_torpe, 1), 2)   [clausula 1]   [+9 nodos]
    [ok] modificador(baldomero, e(bandido_torpe, 1), 0)   [clausula 1]   [+17 nodos]
    [ok] 9 is max(1, 11-2+0)   [builtin]
@@ -183,8 +184,7 @@ Las reglas de más prioridad no se aplicaron:
   prioridad 1 (curarse):
     \- [no] vida_baja(e(bandido_torpe, 1))
           |- [ok] vida(e(bandido_torpe, 1), 12)
-          |- [ok] tipo_de(e(bandido_torpe, 1), bandido_torpe)
-          |- [ok] enemigo(bandido_torpe, vida(12), ataque(5), defensa(2))
+          |- [ok] vida_maxima(e(bandido_torpe, 1), 12)
           |- [ok] parametro(umbral_vida_baja, 30)
           \- [no] 12*100=<12*30
                 12*100=<12*30 es falso
@@ -224,6 +224,7 @@ Para probar:
 == Camino Real ==
 Un camino empedrado con corteza de queso viejo que se pega a las botas, con un peaje cada cien pasos. Lo recorren carretas, gansos con permiso de cobro y bandidos con más ambición que puntería.
 Salidas: bosque (Bosque del Moho), castillo (Castillo Camembert), cuevas (Cuevas del Roquefort), taberna (Taberna del Cuajo Torcido)
+Nivel de la zona: 2 (sus encuentros salen con ese nivel)
 Día 1 · Queso en la despensa: 12 · ración 4 al día (te alcanza para 3)
 Aquí hay algo especial que explorar (explorar.).
 Objetivo: acepta un contrato en el tablón de la taberna.
@@ -298,6 +299,7 @@ Para probar:
 == Camino Real ==
 Un camino empedrado con corteza de queso viejo que se pega a las botas, con un peaje cada cien pasos. Lo recorren carretas, gansos con permiso de cobro y bandidos con más ambición que puntería.
 Salidas: bosque (Bosque del Moho), castillo (Castillo Camembert), cuevas (Cuevas del Roquefort), taberna (Taberna del Cuajo Torcido)
+Nivel de la zona: 2 (sus encuentros salen con ese nivel)
 Día 1 · Queso en la despensa: 12 · ración 4 al día (te alcanza para 3)
 Aquí hay algo especial que explorar (explorar.).
 Objetivo: acepta un contrato en el tablón de la taberna.

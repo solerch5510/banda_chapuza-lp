@@ -79,6 +79,7 @@ Madame Pimentina le suelta un golpe a la Rata Quesera: 8 de vida menos. Ha sido 
 La Rata Quesera se tumba, cierra los ojos y espera. Esta vez es en serio. Ofendida, pero en serio.
 Victoria. Nadie la esperaba, y menos que nadie la propia Banda.
 Botín: 1 queso fresco. Lo guardaba «para emergencias». Esto lo era.
+El combate vale 6 de experiencia, a repartir: 2 para cada uno de los que siguen en pie. Los caídos, ninguna.
 Contrato resuelto con éxito: «Ratas del Granero». La recompensa os espera en la taberna, en cuanto Doña Mantecosa deje de contarla.
 Su Excelencia Bigotes lleva tres días en lo alto del árbol y dice que desde allí se juzga mejor. Tenéis tres intentos y ninguna idea.
 El Gato en el Árbol: Su Excelencia Bigotes no piensa bajar solo.
@@ -91,6 +92,7 @@ Objetivo: vuelve a la taberna a cobrar lo que has resuelto.
 
 > elegir(trepar)
 Tuerca trepa sin ruido, saluda al gato con una reverencia y baja con él bajo el brazo. Las alturas le sientan bien.
+Tuerca gana 15 de experiencia por resolverlo. Cuanto antes se acierta, más se aprende.
 Contrato resuelto con éxito: «El Gato en el Árbol». La recompensa os espera en la taberna, en cuanto Doña Mantecosa deje de contarla.
 
 > ir(taberna)
@@ -113,13 +115,18 @@ Sueldos pagados: 5 quesos. Doña Mantecosa asiente; los mercenarios también, y 
 > compania
 La compañía:
   Sir Baldomero (caballero)  vida 30/30  ataque 11  defensa 3  moral 9/10  fila frente  sueldo 1  rasgo teme_caballos  [en_pie]
+      nivel 1 · experiencia 2/20
   Madame Pimentina (maga)  vida 18/18  ataque 6  defensa 1  moral 9/10  fila retaguardia  sueldo 2  rasgo hechizos_de_cocina  [en_pie]
+      nivel 1 · experiencia 2/20
   Rufino (bardo)  vida 20/20  ataque 4  defensa 2  moral 9/10  fila retaguardia  sueldo 1  rasgo cobra_por_callar  [en_pie]
+      nivel 1 · experiencia 2/20
   Tuerca (ladron)  vida 22/22  ataque 7  defensa 2  moral 9/10  fila frente  sueldo 1  rasgo manos_largas  [en_pie]
+      nivel 1 · experiencia 17/20
 
 > ir(camino_real)
 Día 4 de la Banda Chapuza. El Registro de Compañías sigue donde estaba: abajo. Ración: 4 quesos.
 Camino Real: un peaje cada cien pasos, corteza vieja pegada a las suelas y bandidos con más ambición que puntería.
+Ojo: en el Camino Real los encuentros son de nivel 2 y la Banda va por el 1. Se puede, pero duele.
 Una carreta del Gremio de Afinadores cruza el Camino Real sin parar, con el sello bien visible y un cargamento tapado con lonas. Los carreteros miran al frente con la cara de quien no tiene que dar explicaciones. Nadie les cobra peaje. Nadie les pregunta nada.
   1. Tuerca se cuela entre las lonas (Tuerca)
   2. Rufino canta junto a la carreta (Rufino)
@@ -207,6 +214,8 @@ Sir Baldomero alcanza al Bandido Torpe y le quita 14. Un testigo toma nota; otro
 El Bandido Torpe huye gritando «¡Esto no ha pasado!». Ha pasado, y con testigos.
 Victoria. Se recoge el botín, se cuenta el queso y se niega todo lo que haya salido mal.
 Botín: 3 quesos frescos. Los guardaban «para emergencias». Esto lo era.
+El combate vale 20 de experiencia, a repartir: 5 para cada uno de los que siguen en pie. Los caídos, ninguna.
+Tuerca sube al nivel 2: más vida, más fuerza y la misma cara de no saber qué hace.
 Contrato resuelto con éxito: «Lady Clotilde Plumífera». La recompensa os espera en la taberna, en cuanto Doña Mantecosa deje de contarla.
 Objetivo: vuelve a la taberna a cobrar lo que has resuelto.
 
@@ -223,6 +232,13 @@ Combate · ronda 1 · turno de Sir Baldomero
 
 > defender
 Sir Baldomero levanta la guardia, la ceja y la moral. En ese orden.
+Combate · ronda 1 · turno de Tuerca
+  el Ballestero Oxidado: vida 10/10 (retaguardia)
+  el Bandido Torpe: vida 12/12 (frente)
+  el Ganso del Peaje: vida 16/16 (frente)
+
+> defender
+Tuerca se pone a la defensiva: escudo arriba, ojos cerrados y una plegaria a medias.
 Combate · ronda 1 · turno de Madame Pimentina
   el Ballestero Oxidado: vida 10/10 (retaguardia)
   el Bandido Torpe: vida 12/12 (frente)
@@ -231,13 +247,6 @@ Combate · ronda 1 · turno de Madame Pimentina
 > habilidad(ballestero_oxidado)
 Madame Pimentina lanza una Fondue Flamígera contra el Ballestero Oxidado. Huele a cena y a problemas para el enemigo.
 Madame Pimentina golpea al Ballestero Oxidado y le quita 8 de vida. Cuentas claras, modales mejorables.
-Combate · ronda 1 · turno de Tuerca
-  el Ballestero Oxidado: vida 2/10 (retaguardia)
-  el Bandido Torpe: vida 12/12 (frente)
-  el Ganso del Peaje: vida 16/16 (frente)
-
-> defender
-Tuerca se pone a la defensiva: escudo arriba, ojos cerrados y una plegaria a medias.
 El Ballestero Oxidado le suelta un golpe a Madame Pimentina: 5 de vida menos. Ha sido casi técnico.
 Golpe del Ganso del Peaje a Tuerca: 2 puntos. Limpio, correcto y olvidable.
 Combate · ronda 1 · turno de Rufino
@@ -255,6 +264,13 @@ Combate · ronda 2 · turno de Sir Baldomero
 
 > defender
 Sir Baldomero levanta la guardia, la ceja y la moral. En ese orden.
+Combate · ronda 2 · turno de Tuerca
+  el Ballestero Oxidado: vida 2/10 (retaguardia)
+  el Bandido Torpe: vida 12/12 (frente)
+  el Ganso del Peaje: vida 16/16 (frente)
+
+> defender
+Tuerca se pone a la defensiva: escudo arriba, ojos cerrados y una plegaria a medias.
 Combate · ronda 2 · turno de Madame Pimentina
   el Ballestero Oxidado: vida 2/10 (retaguardia)
   el Bandido Torpe: vida 12/12 (frente)
@@ -264,14 +280,7 @@ Combate · ronda 2 · turno de Madame Pimentina
 Madame Pimentina lanza una Fondue Flamígera contra el Ballestero Oxidado. Huele a cena y a problemas para el enemigo.
 Madame Pimentina golpea al Ballestero Oxidado y le quita 8 de vida. Cuentas claras, modales mejorables.
 El Ballestero Oxidado cae redondo. Se levantará luego con 1 de vida y ninguna dignidad.
-Combate · ronda 2 · turno de Tuerca
-  el Ballestero Oxidado: caído
-  el Bandido Torpe: vida 12/12 (frente)
-  el Ganso del Peaje: vida 16/16 (frente)
-
-> habilidad(ganso_de_peaje)
-Tuerca rebusca en el Ganso del Peaje y no halla nada. Se queda con la dignidad, que no cotiza.
-El Ganso del Peaje le suelta un golpe a Tuerca: 4 de vida menos. Ha sido casi técnico.
+El Ganso del Peaje le suelta un golpe a Tuerca: 2 de vida menos. Ha sido casi técnico.
 Combate · ronda 2 · turno de Rufino
   el Ballestero Oxidado: caído
   el Bandido Torpe: vida 12/12 (frente)
@@ -279,7 +288,7 @@ Combate · ronda 2 · turno de Rufino
 
 > habilidad
 Rufino canta. El grupo se anima, el enemigo se desanima y los pájaros emigran.
-Golpe del Bandido Torpe a Tuerca: 3 puntos. Limpio, correcto y olvidable.
+Golpe del Bandido Torpe a Tuerca: 1 puntos. Limpio, correcto y olvidable.
 Combate · ronda 3 · turno de Sir Baldomero
   el Ballestero Oxidado: caído
   el Bandido Torpe: vida 12/12 (frente)
@@ -288,6 +297,13 @@ Combate · ronda 3 · turno de Sir Baldomero
 > habilidad(ganso_de_peaje)
 Sir Baldomero grita «¡Por mi honor!» y carga contra el Ganso del Peaje. Hay más honor que puntería, pero llega.
 Sir Baldomero alcanza al Ganso del Peaje y le quita 14. Un testigo toma nota; otro, distancia.
+Combate · ronda 3 · turno de Tuerca
+  el Ballestero Oxidado: caído
+  el Bandido Torpe: vida 12/12 (frente)
+  el Ganso del Peaje: vida 2/16 (frente)
+
+> habilidad(ganso_de_peaje)
+Tuerca rebusca en el Ganso del Peaje y no halla nada. Se queda con la dignidad, que no cotiza.
 Combate · ronda 3 · turno de Madame Pimentina
   el Ballestero Oxidado: caído
   el Bandido Torpe: vida 12/12 (frente)
@@ -297,13 +313,6 @@ Combate · ronda 3 · turno de Madame Pimentina
 Madame Pimentina lanza una Fondue Flamígera contra el Ganso del Peaje. Huele a cena y a problemas para el enemigo.
 Madame Pimentina golpea al Ganso del Peaje y le quita 8 de vida. Cuentas claras, modales mejorables.
 El Ganso del Peaje cae redondo. Se levantará luego con 1 de vida y ninguna dignidad.
-Combate · ronda 3 · turno de Tuerca
-  el Ballestero Oxidado: caído
-  el Bandido Torpe: vida 12/12 (frente)
-  el Ganso del Peaje: caído
-
-> habilidad(bandido_torpe)
-Tuerca rebusca en los bolsillos del Bandido Torpe y encuentra un queso. «Lo tomo prestado», dice.
 Combate · ronda 3 · turno de Rufino
   el Ballestero Oxidado: caído
   el Bandido Torpe: vida 12/12 (frente)
@@ -323,6 +332,7 @@ Golpe de Sir Baldomero al Bandido Torpe: 14 puntos. Limpio, correcto y olvidable
 El Bandido Torpe huye gritando «¡Esto no ha pasado!». Ha pasado, y con testigos.
 El combate acaba a vuestro favor. Es la clase de noticia que la Banda nunca sabe dónde guardar.
 Botín: 3 quesos frescos. Los guardaban «para emergencias». Esto lo era.
+El combate vale 19 de experiencia, a repartir: 5 para cada uno de los que siguen en pie. Los caídos, ninguna.
 Contrato resuelto con éxito: «El Peaje del Ganso». La recompensa os espera en la taberna, en cuanto Doña Mantecosa deje de contarla.
 
 > ir(castillo)
@@ -341,6 +351,7 @@ Contrato aceptado: «La Despensa Real». Todos asienten con convicción; nadie h
 > ir(camino_real)
 Amanece el día 6. Alguien tiene hambre y alguien más, una cuenta pendiente. Ración: 4 quesos.
 El Camino Real está empedrado con corteza de queso viejo. Se te pega a las botas y a la conversación.
+Ojo: en el Camino Real los encuentros son de nivel 2 y la Banda va por el 1. Se puede, pero duele.
   1. Tuerca se cuela entre las lonas (Tuerca)
   2. Rufino canta junto a la carreta (Rufino)
   3. Madame Pimentina se hace pasar por una inspectora del Gremio (si sabéis lo del sello) (Madame Pimentina) [no disponible]
@@ -349,6 +360,7 @@ Elige con elegir(Opcion). (el número o el nombre).
 > ir(cuevas)
 Día 7 de la Banda Chapuza. El Registro de Compañías sigue donde estaba: abajo. Ración: 4 quesos.
 Cuevas del Roquefort: aire de sótano, un goteo cada tres segundos y la sensación de que el suelo te mira.
+Ojo: en las Cuevas del Roquefort los encuentros son de nivel 3 y la Banda va por el 1. Se puede, pero duele.
 Habéis llegado: «La Despensa Real» os espera. Ahora toca ganarse el queso, que es lo que se espera de unos mercenarios.
 Al fondo de las Cuevas, algo azul y enorme se mueve despacio. Tiene barba de moho y opiniones firmes.
 Combate · ronda 1 · turno de Sir Baldomero
@@ -357,6 +369,11 @@ Combate · ronda 1 · turno de Sir Baldomero
 > habilidad(gran_roquefort)
 Sir Baldomero grita «¡Por mi honor!» y carga contra el Gran Roquefort. Hay más honor que puntería, pero llega.
 Sir Baldomero alcanza al Gran Roquefort y le quita 12. Un testigo toma nota; otro, distancia.
+Combate · ronda 1 · turno de Tuerca
+  el Gran Roquefort: vida 48/60 (frente)
+
+> habilidad(gran_roquefort)
+Tuerca rebusca en el Gran Roquefort y no halla nada. Se queda con la dignidad, que no cotiza.
 El Gran Roquefort murmura algo antiguo y de la pared se despega un moho saltarín, con ganas de conocer gente.
 Combate · ronda 1 · turno de Madame Pimentina
   el Gran Roquefort: vida 48/60 (frente)
@@ -365,12 +382,6 @@ Combate · ronda 1 · turno de Madame Pimentina
 > habilidad(gran_roquefort)
 Madame Pimentina lanza una Fondue Flamígera contra el Gran Roquefort. Huele a cena y a problemas para el enemigo.
 Madame Pimentina golpea al Gran Roquefort y le quita 8 de vida. Cuentas claras, modales mejorables.
-Combate · ronda 1 · turno de Tuerca
-  el Gran Roquefort: vida 40/60 (frente)
-  el Moho Saltarín: vida 10/10 (frente)
-
-> habilidad(gran_roquefort)
-Tuerca rebusca en el Gran Roquefort y no halla nada. Se queda con la dignidad, que no cotiza.
 Combate · ronda 1 · turno de Rufino
   el Gran Roquefort: vida 40/60 (frente)
   el Moho Saltarín: vida 10/10 (frente)
@@ -384,75 +395,69 @@ Combate · ronda 2 · turno de Sir Baldomero
 > habilidad(gran_roquefort)
 Carga heroica: Sir Baldomero baja la visera, cierra los ojos y avanza hacia el Gran Roquefort. Funciona.
 Sir Baldomero le suelta un golpe al Gran Roquefort: 12 de vida menos. Ha sido casi técnico.
-Golpe del Gran Roquefort a Tuerca: 9 puntos. Limpio, correcto y olvidable.
-Tuerca cae redondo. Se levantará luego con 1 de vida y ninguna dignidad.
-Combate · ronda 2 · turno de Madame Pimentina
+Combate · ronda 2 · turno de Tuerca
   el Gran Roquefort: vida 28/60 (frente)
+  el Moho Saltarín: vida 10/10 (frente)
+
+> atacar(gran_roquefort)
+Golpe de Tuerca al Gran Roquefort: 5 puntos. Limpio, correcto y olvidable.
+El Gran Roquefort alcanza a Tuerca y le quita 9. Un testigo toma nota; otro, distancia.
+Combate · ronda 2 · turno de Madame Pimentina
+  el Gran Roquefort: vida 23/60 (frente)
   el Moho Saltarín: vida 10/10 (frente)
 
 > habilidad(gran_roquefort)
 Madame Pimentina lanza una Fondue Flamígera contra el Gran Roquefort. Huele a cena y a problemas para el enemigo.
-Madame Pimentina alcanza al Gran Roquefort y le quita 8. Un testigo toma nota; otro, distancia.
-El Moho Saltarín golpea a Sir Baldomero y le quita 1 de vida. Cuentas claras, modales mejorables.
+Madame Pimentina golpea al Gran Roquefort y le quita 8 de vida. Cuentas claras, modales mejorables.
+El Moho Saltarín le suelta un golpe a Tuerca: 2 de vida menos. Ha sido casi técnico.
 Combate · ronda 2 · turno de Rufino
-  el Gran Roquefort: vida 20/60 (frente)
+  el Gran Roquefort: vida 15/60 (frente)
   el Moho Saltarín: vida 10/10 (frente)
 
 > habilidad
 Rufino entona la Balada Inspiradora. La moral sube; los oídos se despiden.
 Combate · ronda 3 · turno de Sir Baldomero
-  el Gran Roquefort: vida 20/60 (frente)
+  el Gran Roquefort: vida 15/60 (frente)
   el Moho Saltarín: vida 10/10 (frente)
 
 > habilidad(gran_roquefort)
 Sir Baldomero grita «¡Por mi honor!» y carga contra el Gran Roquefort. Hay más honor que puntería, pero llega.
-Sir Baldomero le suelta un golpe al Gran Roquefort: 12 de vida menos. Ha sido casi técnico.
-El Gran Roquefort se bebe lo que lleva encima y recupera 8 de vida. Hasta los malos tienen botiquín.
-Combate · ronda 3 · turno de Madame Pimentina
-  el Gran Roquefort: vida 16/60 (frente)
+Golpe de Sir Baldomero al Gran Roquefort: 12 puntos. Limpio, correcto y olvidable.
+Combate · ronda 3 · turno de Tuerca
+  el Gran Roquefort: vida 3/60 (frente)
   el Moho Saltarín: vida 10/10 (frente)
 
-> habilidad(gran_roquefort)
-Madame Pimentina lanza una Fondue Flamígera contra el Gran Roquefort. Huele a cena y a problemas para el enemigo.
-Golpe de Madame Pimentina al Gran Roquefort: 8 puntos. Limpio, correcto y olvidable.
-El Moho Saltarín alcanza a Sir Baldomero y le quita 1. Un testigo toma nota; otro, distancia.
-Combate · ronda 3 · turno de Rufino
-  el Gran Roquefort: vida 8/60 (frente)
-  el Moho Saltarín: vida 10/10 (frente)
-
-> habilidad
-Rufino canta. El grupo se anima, el enemigo se desanima y los pájaros emigran.
-Combate · ronda 4 · turno de Sir Baldomero
-  el Gran Roquefort: vida 8/60 (frente)
-  el Moho Saltarín: vida 10/10 (frente)
-
-> habilidad(gran_roquefort)
-Carga heroica: Sir Baldomero baja la visera, cierra los ojos y avanza hacia el Gran Roquefort. Funciona.
-Sir Baldomero golpea al Gran Roquefort y le quita 12 de vida. Cuentas claras, modales mejorables.
+> atacar(gran_roquefort)
+Tuerca alcanza al Gran Roquefort y le quita 5. Un testigo toma nota; otro, distancia.
 El Gran Roquefort suspira, se agrieta y murmura: «Quizá sí tenía prisa». El moho se retira.
-Combate · ronda 4 · turno de Madame Pimentina
+Combate · ronda 3 · turno de Madame Pimentina
   el Gran Roquefort: caído
   el Moho Saltarín: vida 10/10 (frente)
 
 > habilidad(moho_saltarin)
 Madame Pimentina lanza una Fondue Flamígera contra el Moho Saltarín. Huele a cena y a problemas para el enemigo.
-Madame Pimentina le suelta un golpe al Moho Saltarín: 8 de vida menos. Ha sido casi técnico.
-Golpe del Moho Saltarín a Sir Baldomero: 1 puntos. Limpio, correcto y olvidable.
-Combate · ronda 4 · turno de Rufino
+Madame Pimentina golpea al Moho Saltarín y le quita 8 de vida. Cuentas claras, modales mejorables.
+El Moho Saltarín le suelta un golpe a Tuerca: 2 de vida menos. Ha sido casi técnico.
+Tuerca cae redondo. Se levantará luego con 1 de vida y ninguna dignidad.
+Combate · ronda 3 · turno de Rufino
   el Gran Roquefort: caído
   el Moho Saltarín: vida 2/10 (frente)
 
 > habilidad
-Rufino entona la Balada Inspiradora. La moral sube; los oídos se despiden.
-Combate · ronda 5 · turno de Sir Baldomero
+Rufino canta. El grupo se anima, el enemigo se desanima y los pájaros emigran.
+Combate · ronda 4 · turno de Sir Baldomero
   el Gran Roquefort: caído
   el Moho Saltarín: vida 2/10 (frente)
 
 > habilidad(moho_saltarin)
-Sir Baldomero grita «¡Por mi honor!» y carga contra el Moho Saltarín. Hay más honor que puntería, pero llega.
-Sir Baldomero alcanza al Moho Saltarín y le quita 16. Un testigo toma nota; otro, distancia.
+Carga heroica: Sir Baldomero baja la visera, cierra los ojos y avanza hacia el Moho Saltarín. Funciona.
+Golpe de Sir Baldomero al Moho Saltarín: 16 puntos. Limpio, correcto y olvidable.
 El Moho Saltarín se deshace en esporas y en disculpas, por ese orden.
 Habéis ganado. Un par de testigos aplauden; el resto prefiere no mojarse.
+El combate vale 43 de experiencia, a repartir: 15 para cada uno de los que siguen en pie. Los caídos, ninguna.
+Sir Baldomero sube al nivel 2: más vida, más fuerza y la misma cara de no saber qué hace.
+Madame Pimentina sube al nivel 2: más vida, más fuerza y la misma cara de no saber qué hace.
+Rufino sube al nivel 2: más vida, más fuerza y la misma cara de no saber qué hace.
 Contrato resuelto con éxito: «La Despensa Real». La recompensa os espera en la taberna, en cuanto Doña Mantecosa deje de contarla.
 Chapuza de toda la vida. Ganáis. Más o menos. El Gran Roquefort cae, el moho retrocede y el rey os paga... en dos plazos: el primero, hoy; el segundo, «cuando la despensa se recupere», que es una forma de decir «nunca».
 El Registro os sube al puesto 31, con una nota a lápiz: «a confirmar». Baldomero jura que lo planeó todo y Pimentina ha probado el moho y opina que le falta fondo.

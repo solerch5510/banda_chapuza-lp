@@ -38,7 +38,7 @@ Por qué se pudo atacar(baldomero,bandido_torpe):
    [ok] \+ aturdido(baldomero)   [no demostrable]
    [ok] \+ (teme(baldomero, A), clase_de(e(bandido_torpe, 1), A))   [no demostrable]
 [ok] dano(baldomero, e(bandido_torpe, 1), 9)   [clausula 1]
-   [ok] ataque(baldomero, 11)   [clausula 1]   [+2 nodos]
+   [ok] ataque(baldomero, 11)   [clausula 1]   [+22 nodos]
    [ok] defensa(e(bandido_torpe, 1), 2)   [clausula 1]   [+9 nodos]
    [ok] modificador(baldomero, e(bandido_torpe, 1), 0)   [clausula 1]   [+17 nodos]
    [ok] 9 is max(1, 11-2+0)   [builtin]

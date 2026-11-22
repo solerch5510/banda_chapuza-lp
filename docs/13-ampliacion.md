@@ -7,7 +7,8 @@
 - **Hecho:** los **sucesos de zona** (§4), con cinco sucesos (bosque, aldea, Camino Real, castillo y cuevas), y **contratos y enemigos nuevos** (§3): el peaje del ganso, el fantasma charlatán y la paz del moho; el ganso del peaje y la seta belicosa. El jefe exige ahora dos contratos concretos (la escolta y el peaje). Etiqueta `v1.0-rc2` marcada antes de empezar como punto de vuelta atrás.
 - **Hecho también:** los **encuentros al moverse** (§5): el bosque, el Camino Real y las cuevas, con azar reproducible y `explicar`. Sin huida; el contrato de la zona empieza al terminar el encuentro.
 - **Hecho también (22 de noviembre):** los encuentros pasan a **3–5 enemigos** y entran dos enemigos con truco (la seta curandera y el ballestero oxidado); medida en `docs/11-balance.md`.
-- **Pendiente:** el paquete D de niveles y experiencia (§10) y, si el autor lo decide el 27 de noviembre, el paquete C (§6).
+- **Hecho también (22 de noviembre, rama `paquete-d-niveles`):** el **paquete D mínimo** (§10): experiencia, niveles 1 a 5 con crecimiento por rol, dos pasivas por miembro (niveles 3 y 5), zonas con nivel para los encuentros y aviso al llegar. Decisiones tomadas con los valores por defecto: experiencia individual (combates: a repartir entre los que siguen en pie; eventos: a quien lo resuelve), **además** del queso, contenido hasta el nivel 5 (la curva llega al 20) y pasivas en lugar de habilidades activas nuevas.
+- **Pendiente:** el paquete C reducido que propuso el autor (una sola taberna en el centro, zonas nuevas a 3 días como mucho, sin acortar ningún camino de los de ahora), del 28 de noviembre al 2 de diciembre; las habilidades activas nuevas, si hay tiempo.
 
 ## 1. Resumen
 

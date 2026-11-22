@@ -71,6 +71,10 @@ mostrar_conocido(vista(zona, Datos)) :-
     memberchk(queso(Queso), Datos),
     format("~n== ~w ==~n~w~n", [Nombre, Descripcion]),
     escribir_salidas(Salidas),
+    (   memberchk(nivel_zona(NZ), Datos), NZ > 1
+    ->  format("Nivel de la zona: ~w (sus encuentros salen con ese nivel)~n", [NZ])
+    ;   true
+    ),
     format("Día ~w · Queso en la despensa: ~w", [Dia, Queso]),
     (   memberchk(racion(R), Datos), memberchk(dias(D), Datos)
     ->  format(" · ración ~w al día (te alcanza para ~w)", [R, D])
@@ -148,9 +152,12 @@ mostrar_conocido(vista(escenas, Escenas)) :-
     forall(member(Nombre-Titulo, Escenas), format("  demo(~w).   ~w~n", [Nombre, Titulo])).
 mostrar_conocido(vista(compania, Filas)) :-
     format("La compañía:~n", []),
-    forall(member(miembro(_, Nombre, Rol, Vida, VidaMax, Ataque, Defensa, Moral, Fila, Rasgo, Sueldo, Estado), Filas),
-           format("  ~w (~w)  vida ~w/~w  ataque ~w  defensa ~w  moral ~w/10  fila ~w  sueldo ~w  rasgo ~w  [~w]~n",
-                  [Nombre, Rol, Vida, VidaMax, Ataque, Defensa, Moral, Fila, Sueldo, Rasgo, Estado])).
+    forall(member(miembro(Id, Nombre, Rol, Vida, VidaMax, Ataque, Defensa, Moral, Fila, Rasgo, Sueldo, Estado), Filas),
+           (   format("  ~w (~w)  vida ~w/~w  ataque ~w  defensa ~w  moral ~w/10  fila ~w  sueldo ~w  rasgo ~w  [~w]~n",
+                      [Nombre, Rol, Vida, VidaMax, Ataque, Defensa, Moral, Fila, Sueldo, Rasgo, Estado]),
+               escribir_progreso(Id)
+           )).
+
 mostrar_conocido(vista(inventario, Datos)) :-
     memberchk(dia(Dia), Datos),
     memberchk(total(Total), Datos),
@@ -264,3 +271,19 @@ titulo_de_prueba(encuentro(Zona), Titulo) :-
     format(atom(Titulo), "Por qué os salió un encuentro en ~w", [Zona]).
 titulo_de_prueba(Accion, Titulo) :-
     format(atom(Titulo), "Por qué se pudo ~w", [Accion]).
+
+% escribir_progreso(+Id): nivel, experiencia y pasivas (paquete D).
+escribir_progreso(Id) :-
+    (   compania:progreso(Id, Nivel, XP, Siguiente, Pasivas)
+    ->  (   Siguiente == maximo
+        ->  format("      nivel ~w (el máximo) · experiencia ~w", [Nivel, XP])
+        ;   format("      nivel ~w · experiencia ~w/~w", [Nivel, XP, Siguiente])
+        ),
+        (   Pasivas == []
+        ->  nl
+        ;   findall(N, ( member(P, Pasivas), narrador:nombre(P, N) ), Ns),
+            atomic_list_concat(Ns, ', ', Lista),
+            format(" · pasivas: ~w~n", [Lista])
+        )
+    ;   true
+    ).

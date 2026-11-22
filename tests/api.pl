@@ -629,9 +629,10 @@ test(la_tabla_de_moral_cubre_de_0_a_10_y_coincide_con_las_reglas) :-
     campo(J, reglas, R), campo(R, huelga_si_moral_hasta, U),
     mundo:parametro(moral_huelga, U).
 
-test(no_hay_niveles_y_las_cifras_base_no_cambian_en_una_campana_entera) :-
+test(hay_niveles_pero_las_fichas_son_las_del_nivel_1_y_no_cambian_en_una_campana_entera) :-
     nueva_partida, api:fichas_json(Antes),
-    campo(Antes, progresion, P), campo(P, sube_de_nivel, SN), assertion(SN == @(false)),
+    campo(Antes, progresion, P), campo(P, sube_de_nivel, SN), assertion(SN == @(true)),
+    campo(P, nivel_maximo, NM), assertion(NM == 5),
     main:leer_guion('examples/campana-comandos.txt', Terminos),
     forall(member(T, Terminos), ( format(atom(A), '~q', [T]), orden(A, _) )),
     api:fichas_json(Despues),
@@ -897,7 +898,7 @@ test(un_post_y_otra_peticion_por_la_misma_conexion_no_dan_500) :-
 test(las_fichas_por_http) :-
     obtener('/api/fichas', J), campo(J, miembros, Ms),
     length(Ms, N), assertion(N == 4),
-    campo(J, progresion, P), campo(P, sube_de_nivel, SN), assertion(SN == @(false)).
+    campo(J, progresion, P), campo(P, sube_de_nivel, SN), assertion(SN == @(true)).
 
 test(las_escenas_por_http) :-
     obtener('/api/escenas', J), campo(J, escenas, Es),

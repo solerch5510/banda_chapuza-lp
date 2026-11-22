@@ -93,8 +93,7 @@ Las reglas de más prioridad no se aplicaron:
   prioridad 1 (curarse):
     \- [no] vida_baja(e(bandido_torpe, 1))
           |- [ok] vida(e(bandido_torpe, 1), 12)
-          |- [ok] tipo_de(e(bandido_torpe, 1), bandido_torpe)
-          |- [ok] enemigo(bandido_torpe, vida(12), ataque(5), defensa(2))
+          |- [ok] vida_maxima(e(bandido_torpe, 1), 12)
           |- [ok] parametro(umbral_vida_baja, 30)
           \- [no] 12*100=<12*30
                 12*100=<12*30 es falso

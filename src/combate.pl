@@ -87,14 +87,21 @@ ataca_a_distancia(A) :-
 % ---------------------------------------------------------------------------
 % Atributos base (los del catalogo, sin rasgos ni moral; los efectivos llegan con el dano).
 % ---------------------------------------------------------------------------
+% Con niveles (paquete D) se suma lo que da el nivel: en el nivel 1 la suma es 0 y las cifras son las de siempre.
 ataque_base(Id, A) :-
-    mundo:personaje(Id, _, _, _, ataque(A), _, _).
+    mundo:personaje(Id, _, _, _, ataque(A0), _, _),
+    estado:bono_de_nivel(Id, ataque, B),
+    A is A0 + B.
 ataque_base(Id, A) :-
     tipo_de(Id, Tipo),
-    mundo:enemigo(Tipo, _, ataque(A), _).
+    mundo:enemigo(Tipo, _, ataque(A0), _),
+    estado:bono_de_nivel(Id, ataque, B),
+    A is A0 + B.
 
 defensa_base(Id, D) :-
-    mundo:personaje(Id, _, _, _, _, defensa(D), _).
+    mundo:personaje(Id, _, _, _, _, defensa(D0), _),
+    estado:bono_de_nivel(Id, defensa, B),
+    D is D0 + B.
 defensa_base(Id, D) :-
     tipo_de(Id, Tipo),
     mundo:enemigo(Tipo, _, _, defensa(D)).
@@ -229,8 +236,7 @@ efectos_accion(E, invocar_moho, [invocar(moho_saltarin), mensaje(invoca_moho, [E
 efectos_accion(E, curar_aliado(O), [curar(O, N), mensaje(cura_aliado, [E, O, N])]) :-
     puede_curar_aliado(E, O),
     estado:vida(O, V),
-    tipo_de(O, Tipo),
-    mundo:enemigo(Tipo, vida(Max), _, _),
+    estado:vida_maxima(O, Max),
     mundo:parametro(cura_de_seta, Cura),
     N is min(Cura, Max - V).
 efectos_accion(E, robar_queso, [gastar_queso(Tipo, Edad, 1), contar(quesos_robados, 1), mensaje(roba_queso, [E])]) :-
@@ -309,8 +315,7 @@ accion_enemigo_sin_corte(E, A) :-
 % vida_baja(+E): le queda el umbral (30 %) o menos de su vida maxima (aritmetica entera).
 vida_baja(E) :-
     estado:vida(E, V),
-    tipo_de(E, Tipo),
-    mundo:enemigo(Tipo, vida(Max), _, _),
+    estado:vida_maxima(E, Max),
     mundo:parametro(umbral_vida_baja, P),
     V * 100 =< Max * P.
 
@@ -352,8 +357,7 @@ puede_curar_aliado(E, O) :-
 % herido(+Id): le falta vida (la maxima es la de su tipo).
 herido(Id) :-
     estado:vida(Id, V),
-    tipo_de(Id, Tipo),
-    mundo:enemigo(Tipo, vida(Max), _, _),
+    estado:vida_maxima(Id, Max),
     V < Max.
 
 % objetivo_mas_debil(+Atacante, -B): de los que puede atacar, el de menos vida (empate: el id menor).
@@ -393,9 +397,25 @@ efectos_fin(victoria, Efectos) :-
     ;   Queso = []
     ),
     (   Tiradas > 0 -> Semilla = [fijar_semilla(S)] ; Semilla = [] ),
-    append([[mensaje(victoria, [])], Queso, Semilla, Moral, [terminar_combate]], Efectos).
+    efectos_xp_victoria(Experiencia),
+    append([[mensaje(victoria, [])], Queso, Semilla, Moral, Experiencia, [terminar_combate]], Efectos).
 
 efectos_fin(derrota, [fin(derrota(derrota_combate)), mensaje(derrota_combate, [])]).
+
+% efectos_xp_victoria(-Efectos): la experiencia del combate (la suma de lo que vale cada enemigo) se REPARTE entre los
+% miembros que siguen en pie al ganar (redondeando hacia arriba): quien ha caido no la gana, y a los demas les toca mas
+% (paquete D: caer cuesta algo).
+efectos_xp_victoria(Efectos) :-
+    findall(X, ( estado:instancia(_, T), mundo:xp_de(T, X) ), Xs),
+    sumlist(Xs, Total),
+    findall(Id, ( compania:miembro(Id), compania:vivo(Id) ), EnPie),
+    length(EnPie, N),
+    (   Total > 0, N > 0
+    ->  Cada is (Total + N - 1) // N,
+        findall(E, ( member(Id, EnPie), compania:efectos_ganar_xp(Id, Cada, Es), member(E, Es) ), Todos),
+        Efectos = [mensaje(xp_victoria, [Total, Cada])|Todos]
+    ;   Efectos = []
+    ).
 
 % tirada_de_botin(+Cantidad, +Probabilidad, +S0, -S1, -Quesos): una tirada de 0 a 99 con la semilla; si sale
 % por debajo de la probabilidad (en %), suelta Cantidad quesos; si no, ninguno.

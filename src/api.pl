@@ -37,13 +37,13 @@
 termino_texto(Termino, Atomo) :-
     format(atom(Atomo), '~W', [Termino, [quoted(true), spacing(next_argument)]]).
 
+% Con codigos, como en narrador.pl: sub_atom/5 de 5.10.4 no es fiable con tildes. Una primera letra no ASCII se deja igual.
 mayuscula_inicial(Atomo, Texto) :-
-    (   Atomo == ''
-    ->  Texto = Atomo
-    ;   sub_atom(Atomo, 0, 1, _, Primera),
-        sub_atom(Atomo, 1, _, 0, Resto),
-        upcase_atom(Primera, Mayuscula),
-        atom_concat(Mayuscula, Resto, Texto)
+    atom_codes(Atomo, Codigos),
+    (   Codigos = [C|Resto], C < 128
+    ->  char_code(Letra, C), upcase_atom(Letra, May), atom_codes(May, [C1]),
+        atom_codes(Texto, [C1|Resto])
+    ;   Texto = Atomo
     ).
 
 % bonito(+Id, -Texto): teme_caballos -> 'Teme caballos'.
@@ -371,7 +371,8 @@ motivo_corto(Nodos, Texto) :-
 % ---------------------------------------------------------------------------
 
 zona_json(Datos, json([tipo=zona, id=Id, nombre=Nombre, descripcion=Descripcion, salidas=Salidas,
-                       dia=Dia, queso=Queso])) :-
+                       dia=Dia, queso=Queso, nivel_zona=NivelZona])) :-
+    (   memberchk(nivel_zona(NivelZona), Datos) -> true ; NivelZona = 1 ),
     memberchk(nombre(Nombre), Datos),
     memberchk(descripcion(Descripcion), Datos),
     memberchk(dia(Dia), Datos),
@@ -383,8 +384,20 @@ zona_json(Datos, json([tipo=zona, id=Id, nombre=Nombre, descripcion=Descripcion,
 miembro_json(miembro(Id, Nombre, Rol, Vida, VidaMax, Ataque, Defensa, Moral, Fila, Rasgo, Sueldo, Estado),
              json([id=Id, nombre=Nombre, rol=Rol, vida=Vida, vida_max=VidaMax, ataque=Ataque,
                    defensa=Defensa, moral=Moral, moral_max=10, fila=Fila, rasgo=Rasgo, rasgo_texto=RT,
-                   sueldo=Sueldo, estado=Estado])) :-
-    bonito(Rasgo, RT).
+                   sueldo=Sueldo, estado=Estado, nivel=Nivel, xp=XP, xp_nivel=XPNivel, xp_siguiente=XPSig,
+                   pasivas=Pasivas])) :-
+    bonito(Rasgo, RT),
+    compania:progreso(Id, Nivel, XP, Siguiente, Ps),
+    mundo:xp_para(Nivel, XPNivel),
+    (   Siguiente == maximo -> XPSig = @(null) ; XPSig = Siguiente ),
+    findall(json([id=P, nombre=NP, nivel=L, texto=TP]),
+            ( member(P, Ps), mundo:pasiva(Id, L, P, Bono), narrador:nombre(P, NP), texto_bono(Bono, TP) ),
+            Pasivas).
+
+% texto_bono(+Bono, -Texto): ataque(2) -> '+2 de ataque'.
+texto_bono(Bono, Texto) :-
+    Bono =.. [Atributo, N],
+    format(atom(Texto), '+~w de ~w', [N, Atributo]).
 
 despensa_json(Datos, json([dia=Dia, total=Total, valor=Valor, categorias=json(Cats), lotes=Lotes, objetos=Objetos])) :-
     memberchk(dia(Dia), Datos),
@@ -596,10 +609,12 @@ fichas_json(json([miembros=Ms, moral=Moral, reglas=Reglas, progresion=Prog])) :-
     mundo:parametro(moral_impago, Impago), mundo:parametro(moral_max, MoralMax),
     Reglas = json([moral_max=MoralMax, huelga_si_moral_hasta=Huelga, moral_por_victoria=Victoria, bono_defender=Defender,
                    coste_descanso=Descanso, moral_perdida_por_impago=Impago]),
-    Prog = json([sube_de_nivel= @(false),
-                 texto='En esta versión los personajes no suben de nivel ni ganan experiencia: sus cifras base son fijas.',
-                 cambia=['vida', 'moral', 'equipo'],
-                 detalle='Lo que sí cambia durante la partida es la vida (se cura al descansar), la moral (sube al ganar un combate o con la balada de Rufino y baja si no se paga a la Banda o no se come) y el equipo (la venda de caballos de Baldomero).']).
+    mundo:parametro(nivel_maximo, NivelMax),
+    findall(json([nivel=L, xp=X]), ( between(2, NivelMax, L), mundo:xp_para(L, X) ), Curva),
+    Prog = json([sube_de_nivel= @(true), nivel_maximo=NivelMax, curva=Curva,
+                 texto='Los personajes ganan experiencia y suben de nivel: cada nivel suma vida y ataque según su rol, y en los niveles 3 y 5 aprenden una pasiva.',
+                 cambia=['vida', 'moral', 'equipo', 'nivel'],
+                 detalle='La experiencia sale de los combates (la ganan los que siguen en pie al final: quien cae no aprende) y de resolver los eventos de los contratos (la gana quien lo resuelve, más cuanto antes). Las cifras de la ficha son las del nivel 1.']).
 
 ficha_json(Todos, Id, json([id=Id, nombre=Nombre, rol=Rol, vida_max=V, ataque=A, defensa=D, sueldo=S, fila=Fila,
                             alcance=Alcance, alcance_texto=AlcanceT, rasgo=Rasgo, rasgo_nombre=RasgoN, rasgo_texto=RasgoT,

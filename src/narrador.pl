@@ -128,6 +128,19 @@ frase(suceso(encuentro(camino_real)), ambos,
 frase(suceso(encuentro(cuevas)), ambos,
       'El goteo se detiene de golpe. En las cuevas el silencio nunca es buena señal, y esta vez tampoco.').
 frase(suceso(encuentro(Z)), ambos, 'Algo os corta el paso en ~w.'-[Z]).
+% --- niveles y experiencia (paquete D) ---
+frase(suceso(xp_victoria(T, N)), ambos,
+      'El combate vale ~w de experiencia, a repartir: ~w para cada uno de los que siguen en pie. Los caídos, ninguna.'-[T, N]).
+frase(suceso(xp_evento(P, N)), ambos,
+      '~w gana ~w de experiencia por resolverlo. Cuanto antes se acierta, más se aprende.'-[P, N]).
+frase(suceso(sube_nivel(P, N)), ambos,
+      '~w sube al nivel ~w: más vida, más fuerza y la misma cara de no saber qué hace.'-[P, N]).
+frase(suceso(pasiva_nueva(P, H)), ambos,
+      '~w aprende ~w. Se nota en cada golpe, aunque nadie sepa explicarlo.'-[P, H]).
+frase(suceso(enemigos_de_nivel(N)), ambos,
+      'Estos son de nivel ~w: más vida y más mala leche que los de la taberna.'-[N]).
+frase(suceso(aviso_nivel(Z, N, B)), ambos,
+      'Ojo: en ~w los encuentros son de nivel ~w y la Banda va por el ~w. Se puede, pero duele.'-[Z, N, B]).
 frase(suceso(victoria), ambos,
       'Victoria. Nadie la esperaba, y menos que nadie la propia Banda.').
 frase(suceso(sin_botin), ambos,
@@ -626,6 +639,14 @@ nombre(gran_roquefort,  'el Gran Roquefort').
 nombre(ganso_de_peaje,  'el Ganso del Peaje').
 nombre(seta_belicosa,   'la Seta Belicosa').
 nombre(seta_curandera,  'la Seta Curandera').
+nombre(escudo_de_corteza,   'Escudo de Corteza').
+nombre(brazo_de_parmesano,  'Brazo de Parmesano').
+nombre(delantal_ignifugo,   'Delantal Ignífugo').
+nombre(cucharon_templado,   'Cucharón Templado').
+nombre(pulmones_de_tenor,   'Pulmones de Tenor').
+nombre(laud_reforzado,      'Laúd Reforzado').
+nombre(pies_de_gato,        'Pies de Gato').
+nombre(punal_de_queso_duro, 'Puñal de Queso Duro').
 nombre(ballestero_oxidado, 'el Ballestero Oxidado').
 nombre(carretero_anonimo, 'el Carretero Anónimo').
 nombre(peaje_del_ganso,    'El Peaje del Ganso').
@@ -732,11 +753,15 @@ sustituir(Entrada, De, A, Salida) :-
     atomic_list_concat(Partes, De, Entrada),
     atomic_list_concat(Partes, A, Salida).
 
+% Con codigos y no con sub_atom/5: en SWI-Prolog 5.10.4 sub_atom/5 falla a veces con atomos que tienen tildes (devuelve
+% basura o deja la letra sin ligar). Una primera letra que no es ASCII (Ú, ¡, «) se deja como esta.
 mayuscula_inicial(T0, T) :-
-    sub_atom(T0, 0, 1, _, Primera),
-    upcase_atom(Primera, Mayuscula),
-    sub_atom(T0, 1, _, 0, Resto),
-    atom_concat(Mayuscula, Resto, T).
+    atom_codes(T0, Codigos),
+    (   Codigos = [C|Resto], C < 128
+    ->  char_code(Letra, C), upcase_atom(Letra, May), atom_codes(May, [C1]),
+        atom_codes(T, [C1|Resto])
+    ;   T = T0
+    ).
 
 % ===========================================================================
 % Lo que usan los demas modulos

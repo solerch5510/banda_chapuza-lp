@@ -147,7 +147,21 @@ efectos_eleccion(E, Opcion, Efectos) :-
     opcion_evento(E, Opcion, _, _, Efectos04, Final),
     expandir_todos(Efectos04, Propios),
     efectos_final(E, Opcion, Final, DelFinal),
-    append([Propios, [mensaje(evento_elige, [E, Opcion])], DelFinal], Efectos).
+    efectos_xp_evento(E, Opcion, Final, Experiencia),
+    append([Propios, [mensaje(evento_elige, [E, Opcion])], DelFinal, Experiencia], Efectos).
+
+% efectos_xp_evento(+E, +Opcion, +Final, -Efectos): quien resuelve el evento gana experiencia segun el intento en que lo
+% consigue (xp_por_intento/2: el primero vale mas). Un intento fallido no da nada.
+efectos_xp_evento(E, Opcion, resuelve, Efectos) :-
+    opcion_evento(E, Opcion, Quien, _, _, _),
+    compania:miembro(Quien),
+    intentos_hechos(E, Hechos),
+    Intento is Hechos + 1,
+    mundo:xp_por_intento(Intento, XP),
+    !,
+    compania:efectos_ganar_xp(Quien, XP, Es),
+    Efectos = [mensaje(xp_evento, [Quien, XP])|Es].
+efectos_xp_evento(_, _, _, []).
 
 efectos_final(E, _, resuelve, [desmarcar(evento_abierto(E))]).
 efectos_final(E, _, intento, Efectos) :-

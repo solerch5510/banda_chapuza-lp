@@ -91,7 +91,7 @@ test(con_un_contrato_el_destino_es_su_zona) :-
 
 test(la_campana_de_ejemplo_se_gana) :-
     ruta_de_referencia('examples/campana-comandos.txt', r(Fin, Dia, _Queso, Pasos)),
-    assertion(Fin == victoria), assertion(Dia == 7), assertion(Pasos == 51).
+    assertion(Fin == victoria), assertion(Dia == 7), assertion(Pasos == 50).
 
 test(la_ruta_de_la_partida_perdida_llega_al_dia_6_sin_final_aun) :-
     ruta_separada(Ruta), jugar_ruta(Ruta, r(Fin, Dia, _, Pasos)),
@@ -147,7 +147,7 @@ test(un_jugador_con_plan_puede_ganar) :-
 
 test(el_jugador_sin_plan_pierde_casi_siempre) :-
     findall(x, ( between(1, 12, I), S is 2000 + I, episodio(azar, S, 400, r(victoria, _, _, _)) ), Gana),
-    length(Gana, N), assertion(N =< 2).
+    length(Gana, N), assertion(N =< 3).      % con niveles gana alguna mas por suerte, pero sigue perdiendo casi siempre
 
 test(tras_un_episodio_se_puede_empezar_otra_partida_limpia) :-
     episodio(plan(10, 2), 5, 400, _),

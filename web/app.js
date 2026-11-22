@@ -265,8 +265,17 @@
       '<span class="status-dot ' + (critico || clsEstado ? "bad" : "") + '"></span></div>' +
       medidor(m.vida, m.vida_max, "life") +
       (compacta ? "" : medidor(m.moral, m.moral_max, "morale")) +
-      '<div class="member-meta"><span>' + esc(mayus(m.fila)) + "</span><span>" + esc(m.rasgo_texto) + "</span>" +
+      '<div class="member-meta"><span class="member-level" title="' + esc(textoNivel(m)) + '">Nv ' + m.nivel +
+      (m.xp_siguiente ? " · " + (m.xp - m.xp_nivel) + "/" + (m.xp_siguiente - m.xp_nivel) + " XP" : " · máx.") + "</span>" +
+      "<span>" + esc(mayus(m.fila)) + "</span><span>" + esc(m.rasgo_texto) + "</span>" +
       (etiquetaEstado ? '<span class="member-state">' + etiquetaEstado + "</span>" : "") + "</div></article>";
+  }
+
+  // textoNivel(m): el nivel y las pasivas, para el titulo de la tarjeta.
+  function textoNivel(m) {
+    var p = (m.pasivas || []).map(function (x) { return x.nombre + " (" + x.texto + ")"; }).join(", ");
+    return "Nivel " + m.nivel + ", experiencia " + m.xp + (m.xp_siguiente ? " de " + m.xp_siguiente + " para el siguiente" : " (nivel máximo)") +
+      (p ? ". Pasivas: " + p : "");
   }
 
   function despensa(sinTitulo) {
@@ -336,7 +345,8 @@
     var e = S.estado;
     return '<p class="panel-kicker">UBICACIÓN ACTUAL</p><h3>' + esc(e.zona.nombre) + "</h3>" + grafoZonas() +
       bloqueObjetivo() + '<dl class="zone-facts"><div><dt>Jornada</dt><dd>Día ' + e.dia + "</dd></div>" +
-      "<div><dt>Salidas</dt><dd>" + (e.zona.salidas.map(function (s) { return esc(s.nombre); }).join(" · ") || "Ninguna") + "</dd></div></dl>";
+      "<div><dt>Salidas</dt><dd>" + (e.zona.salidas.map(function (s) { return esc(s.nombre); }).join(" · ") || "Ninguna") + "</dd></div>" +
+      (e.zona.nivel_zona > 1 ? "<div><dt>Nivel</dt><dd>" + e.zona.nivel_zona + " (encuentros más duros)</dd></div>" : "") + "</dl>";
   }
 
   // ---- el arbol de explicacion ----

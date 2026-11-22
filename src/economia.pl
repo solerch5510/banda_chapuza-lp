@@ -116,7 +116,7 @@ efectos_descanso([mensaje(descanso, [])|Efectos]) :-
 
 efecto_de_descanso(Efecto) :-
     compania:activo(Id),
-    (   mundo:personaje(Id, _, _, vida(Max), _, _, _),
+    (   estado:vida_maxima(Id, Max),
         Efecto = curar(Id, Max)
     ;   Efecto = mod_moral(Id, 1)
     ).
