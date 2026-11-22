@@ -15,7 +15,7 @@ Leyenda: ✅ comprobado (con el script o con la orden indicada) · ⏳ lo tiene 
 | Ítem | Estado | Cómo |
 |---|---|---|
 | Clon limpio: `swipl -q -s src/main -g main -t halt` arranca con SWI-Prolog 5.10.4 | ✅ | script |
-| `tests/todas` pasa con código 0 en el clon (40 suites, 2278 pruebas) | ✅ | script |
+| `tests/todas` pasa con código 0 en el clon (40 suites, 2282 pruebas) | ✅ | script |
 | Ninguna excepción en partida de victoria ni de derrota (`derrota_combate`, `derrota_hambre`) | ✅ | `tests/campana.pl` (las tres partidas) y `tests/api.pl` (la campaña entera por la API) |
 | PT-3: guion ejecutado dos veces con cronómetro y tiempos anotados | ⏳ | `docs/09-guion-exposicion.md` §6 |
 | Etiqueta `v1.0-rc1` creada y subida | ✅ | §4 (sobre `6f931d6`, 20 de noviembre) |
