@@ -17,6 +17,8 @@
 :- use_module('../src/contratos').
 :- use_module('../src/juego').
 :- use_module('../herramientas/simulador').
+% Los jugadores simulados pelean como una persona atenta: atacan sin despistes y descansan si vuelven heridos (herramientas/simulador.pl).
+:- fijar_estilo(solo_atacar).
 
 contiene(Texto, Fragmento) :- sub_atom(Texto, _, _, _, Fragmento), !.
 
@@ -89,7 +91,7 @@ test(con_un_contrato_el_destino_es_su_zona) :-
 
 test(la_campana_de_ejemplo_se_gana) :-
     ruta_de_referencia('examples/campana-comandos.txt', r(Fin, Dia, _Queso, Pasos)),
-    assertion(Fin == victoria), assertion(Dia == 7), assertion(Pasos == 42).
+    assertion(Fin == victoria), assertion(Dia == 7), assertion(Pasos == 51).
 
 test(la_ruta_de_la_partida_perdida_llega_al_dia_6_sin_final_aun) :-
     ruta_separada(Ruta), jugar_ruta(Ruta, r(Fin, Dia, _, Pasos)),
@@ -159,6 +161,7 @@ test(el_informe_trae_las_referencias_y_cada_politica) :-
     with_output_to(atom(T), informe(3, 1)),
     assertion(contiene(T, 'REF campana')), assertion(contiene(T, 'REF separada')),
     assertion(contiene(T, 'POLITICA azar')), assertion(contiene(T, 'POLITICA plan(10,2)')),
+    assertion(contiene(T, 'con combate solo_atacar')), assertion(contiene(T, 'con combate listo')),
     assertion(contiene(T, 'PARTIDAS 3 victoria=')).
 
 test(resumir_cuenta_y_promedia) :-
@@ -173,3 +176,45 @@ test(sin_victorias_el_informe_lo_dice) :-
     assertion(contiene(T, 'GANADAS ninguna')).
 
 :- end_tests(el_informe).
+
+:- begin_tests(los_estilos_de_combate).
+
+test(el_estilo_por_defecto_es_el_despistado_y_se_puede_cambiar) :-
+    fijar_estilo(azar), simulador:estilo_de_combate(E0), assertion(E0 == azar),
+    fijar_estilo(listo), simulador:estilo_de_combate(E1), assertion(E1 == listo),
+    fijar_estilo(solo_atacar).
+
+test(el_listo_va_primero_a_la_curandera_luego_al_ballestero_y_el_montado) :-
+    forall(member(A-B, [seta_curandera-ballestero_oxidado, ballestero_oxidado-bandido_montado, bandido_montado-bandido_torpe]),
+           (   simulador:peligro(A, PA), simulador:peligro(B, PB), assertion(PA < PB) )).
+
+test(el_listo_pega_a_la_curandera_con_los_de_distancia, [nondet]) :-
+    fijar_estilo(listo),
+    nueva_partida, juego:comenzar_combate([bandido_torpe, seta_curandera], _),
+    estado:cola_turnos([Actor|_]), assertion(compania:miembro(Actor)),
+    simulador:orden_de_combate(Cmd),
+    assertion(Cmd \= defender),
+    fijar_estilo(solo_atacar).
+
+test(un_jugador_sensato_herido_en_la_taberna_descansa, [nondet]) :-
+    fijar_estilo(solo_atacar),
+    nueva_partida,
+    estado:aplicar_efectos([dano(tuerca, 12)]),                       % 10 de 22: menos de dos tercios
+    simulador:orden_planificada(2, Cmd),
+    assertion(Cmd == descansar).
+
+test(el_despistado_no_descansa_por_su_cuenta, [nondet]) :-
+    fijar_estilo(azar),
+    nueva_partida,
+    estado:aplicar_efectos([dano(tuerca, 12)]),
+    simulador:orden_planificada(2, Cmd),
+    assertion(Cmd \== descansar),
+    fijar_estilo(solo_atacar).
+
+test(con_la_banda_sana_no_descansa, [nondet]) :-
+    fijar_estilo(solo_atacar),
+    nueva_partida,
+    simulador:orden_planificada(2, Cmd),
+    assertion(Cmd \== descansar).
+
+:- end_tests(los_estilos_de_combate).

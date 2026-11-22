@@ -27,6 +27,8 @@
 :- use_module('../src/main').
 :- use_module('../src/api').
 :- use_module('../herramientas/simulador').
+% Los jugadores simulados pelean como una persona atenta: atacan sin despistes y descansan si vuelven heridos (herramientas/simulador.pl).
+:- fijar_estilo(solo_atacar).
 
 contiene(Texto, Fragmento) :- sub_atom(Texto, _, _, _, Fragmento), !.
 campo(json(Cs), K, V) :- memberchk(K=V, Cs).
@@ -549,7 +551,8 @@ test(hablar_da_queso_pero_con_un_techo) :-
     findall(Q, ( between(1, 10, I), S is 7100 + I, episodio(plan(0, 2), S, 400, r(victoria, _, Q, _)) ), Qa),
     findall(Q, ( between(1, 10, I), S is 7100 + I, episodio(plan_hablador(0, 2), S, 400, r(victoria, _, Q, _)) ), Qb),
     sumlist(Qa, Ta), sumlist(Qb, Tb),
-    Extra is (Tb - Ta) / 10,
+    length(Qa, NA), length(Qb, NB), NA > 0, NB > 0,
+    Extra is Tb / NB - Ta / NA,
     assertion(Extra > 0), assertion(Extra =< 11).      % 8 de los personajes y 3 de los sucesos de zona
 
 test(el_hablador_realmente_habla_con_alguien) :-

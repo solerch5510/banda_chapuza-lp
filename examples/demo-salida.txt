@@ -175,8 +175,8 @@ Combate · ronda 1 · turno de Rufino
 
 > explicar
 Por qué el Bandido Torpe hizo eso:
-Eligió la regla de prioridad 5 de 6 (el corte descartó las demás).
-[ok] accion_enemigo(e(bandido_torpe, 1), atacar(tuerca))   [clausula 5 + corte]
+Eligió la regla de prioridad 6 de 7 (el corte descartó las demás).
+[ok] accion_enemigo(e(bandido_torpe, 1), atacar(tuerca))   [clausula 6 + corte]
    [ok] objetivo_mas_debil(e(bandido_torpe, 1), tuerca)   [clausula 1]   [+39 nodos]
    [ok] corte   [corte: se descartaron las clausulas siguientes]
 Las reglas de más prioridad no se aplicaron:
@@ -203,6 +203,11 @@ Las reglas de más prioridad no se aplicaron:
           \- [no] tipo_de(e(bandido_torpe, 1), bandido_montado)
                 \- [no] (nonvar(e(bandido_torpe, 1)), e(bandido_torpe, 1)=e(bandido_torpe, 1)...
                       bandido_montado=bandido_torpe es falso
+  prioridad 5 (curar_aliado):
+    \- [no] puede_curar_aliado(e(bandido_torpe, 1), A)
+          \- [no] tipo_de(e(bandido_torpe, 1), seta_curandera)
+                \- [no] (nonvar(e(bandido_torpe, 1)), e(bandido_torpe, 1)=e(bandido_torpe, 1)...
+                      seta_curandera=bandido_torpe es falso
 Narrador: El Bandido Torpe elige al más débil. Torpe, sí; tonto, solo a ratos.
 
 > demo(gallina)
@@ -231,7 +236,7 @@ El tablón de contratos:
       Su Excelencia Bigotes lleva tres días arriba y dice que desde allí se juzga mejor.
   [bloqueado] Lady Clotilde Plumífera (el Camino Real, dificultad 3): 21 quesos, 1 brie
       Lady Clotilde exige palanquín, escolta y que nadie cante a su alrededor: «Si canta, picoteo».
-  [disponible] El Peaje del Ganso (el Camino Real, dificultad 3): 14 quesos
+  [disponible] El Peaje del Ganso (el Camino Real, dificultad 3): 15 quesos
       Un ganso cobra «el peaje del peaje» en el Camino Real y nadie se atreve a discutirle la tarifa.
   [lejos] El Fantasma Charlatán (la Aldea Requesón, dificultad 2): 12 quesos, poción
       La Casa del Cuervo Gordo está encantada por un mayordomo que solo quiere que alguien le escuche.

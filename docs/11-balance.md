@@ -141,7 +141,7 @@ Lectura: **el botín apenas mueve el equilibrio** (de 5,6 a 6,3 quesos de sobran
 
 ## Con los contratos nuevos (ampliación de contenido)
 
-Tres contratos más (peaje del ganso, fantasma charlatán, paz del moho) pagan por la fórmula (14, 12 y 21 quesos) y el jefe exige ahora dos concretos (la escolta y el peaje). Jugador con plan, 100 partidas:
+Tres contratos más (peaje del ganso, fantasma charlatán, paz del moho) pagan por la fórmula (15, 12 y 22 quesos tras añadirles el ballestero y la curandera) y el jefe exige ahora dos concretos (la escolta y el peaje). Jugador con plan, 100 partidas:
 
 | Jugador | Victorias | Días | Queso final |
 |---|---|---|---|
@@ -150,7 +150,37 @@ Tres contratos más (peaje del ganso, fantasma charlatán, paz del moho) pagan p
 
 Lectura: el jugador que hace **todos** los contratos acaba con muchísimo queso (52) porque cada uno paga más de lo que cuesta; el que va **directo al jefe** (siete días) sigue en la economía ajustada de antes. Las derrotas de ahora (5 a 10 %) son **de combate**, no de hambre: el jugador simulado pelea con todo sin descansar ni usar pociones. Es lo que cabe esperar de contenido opcional bien pagado, y es **el punto de partida para el farmeo**: si se quiere que lo opcional sea obligatorio, hacen falta niveles y enemigos que lo exijan (`docs/13-ampliacion.md` §10).
 
-## Con los encuentros al llegar a una zona
+## Con grupos de 3 a 5 enemigos y enemigos con truco
+
+*(22 de noviembre de 2026.)* Dos enemigos nuevos —la **seta curandera** (12 de vida, desde atrás, cura 5 al aliado más herido, prioridad 5 de su lista, por delante de atacar) y el **ballestero oxidado** (10 de vida, 6 de ataque, a distancia: llega a la retaguardia)— y encuentros de 3 a 5 enemigos; el peaje del ganso y la paz del moho los llevan también (ahora pagan 15 y 22).
+
+El combate no tiene azar, así que cada grupo se mide con un solo combate a la Banda entera, de dos maneras: **solo atacar** (al primero de la lista) y **listo** (la habilidad de quien actúa y a la curandera, luego a los ballesteros y al montado, primero):
+
+| Encuentro | Solo atacar | Listo |
+|---|---|---|
+| Bosque: 2 setas, curandera, 2 mohos | gana; Tuerca con 8 de 22 | gana; Tuerca con 4 |
+| Bosque: seta, 2 ratas, 2 mohos | gana; Tuerca con 16 | gana; Tuerca con 7 |
+| Bosque: 3 setas y curandera | gana; Tuerca con 12 | gana; Tuerca con 12 |
+| Camino: 2 bandidos y ballestero | gana; Pimentina con 8 de 18 | igual |
+| Camino: 2 bandidos, montado y ballestero | gana, **1 caído**; Pimentina con 3 | gana, 1 caído; Pimentina con 13 |
+| Camino: 3 bandidos y 2 ballesteros | gana, **1 caído**; Pimentina con 1 | igual, Pimentina con 1 |
+| Cuevas: 3 ratas y 2 mohos | gana; Tuerca con 16 | gana; Tuerca con 12 |
+| Cuevas: 2 mohos, curandera, seta y rata | gana; Tuerca con 13 | gana; Tuerca con 6 |
+| **Cuevas: montado, bandido, ballestero y curandera** | **pierde: caen los cuatro** | **gana, 1 caído** |
+
+Antes, con los grupos de uno o dos enemigos, «solo atacar» ganaba todo sin que cayera nadie; ahora se pierde el más duro y de varias peleas salen heridos o caídos los de retaguardia. Las partidas simuladas lo confirman (100 por política, semilla 1, con encuentros):
+
+| Jugador | Victorias | Queso final |
+|---|---|---|
+| Combate al azar con pesos (sin descansar) | 41 de 100 | 39,7 |
+| Atento (solo atacar), con 10 % de errores, descansando si vuelve herido | 91 | 42,0 |
+| Atento (listo), con 10 % de errores | 85 | 34,0 |
+| Atento (solo atacar), sin errores | 98 | 52,9 |
+| Atento (listo), sin errores | 95 | 46,3 |
+
+Lectura honesta: **la pelea sola ya no se gana siempre pulsando `atacar`** (el grupo duro de las cuevas), y **el desgaste manda**: el jugador que no descansa en la taberna pierde más de la mitad de las veces (41 % de victorias, contra 91–98 % del que sí descansa). Pero quien descansa cuando toca sigue ganando casi siempre, incluso solo atacando: descansar cuesta dos quesos y un día, y el botín de los grupos grandes (los bandidos y ballesteros siempre sueltan queso) lo paga de sobra. Si se quisiera apretar más: subir la probabilidad de los encuentros, o que descansar cueste más; hacerlo con el paquete D (niveles y zonas por nivel, `docs/13` §10) es más sano. El «listo» no gana más que el «solo atacar» porque la curandera y el ballestero solo pesan en los grupos duros y sus habilidades gastan queso.
+
+## Con los encuentros al llegar a una zona (con los grupos de antes: un solo enemigo o dos)
 
 Probabilidades de 30 % (bosque y Camino Real) y 25 % (cuevas), con 2 o 3 grupos por zona. Cien partidas por política, semilla 1; entre paréntesis, la prueba con 50 / 50 / 45 %:
 

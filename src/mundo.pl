@@ -93,6 +93,8 @@ fila_preferida(bandido_montado, frente).
 fila_preferida(gran_roquefort,  frente).
 fila_preferida(ganso_de_peaje,  frente).
 fila_preferida(seta_belicosa,   frente).
+fila_preferida(seta_curandera,  retaguardia).      % los dos nuevos pelean desde atras
+fila_preferida(ballestero_oxidado, retaguardia).
 
 rasgo(baldomero, teme_caballos).
 rasgo(pimentina, hechizos_de_cocina).
@@ -121,6 +123,8 @@ alcance(bandido_montado, cuerpo).
 alcance(gran_roquefort,  cuerpo).
 alcance(ganso_de_peaje,  cuerpo).
 alcance(seta_belicosa,   cuerpo).
+alcance(seta_curandera,  cuerpo).
+alcance(ballestero_oxidado, distancia).             % el unico enemigo que llega a Pimentina y a Rufino
 
 % ---------------------------------------------------------------------------
 % Bestiario (version minima, por orden de dificultad): enemigo(Tipo, vida(V), ataque(A), defensa(D)).
@@ -133,6 +137,8 @@ enemigo(moho_saltarin,   vida(10), ataque(4),  defensa(0)).
 enemigo(bandido_montado, vida(18), ataque(7),  defensa(3)).
 enemigo(ganso_de_peaje,   vida(16), ataque(6),  defensa(2)).     % el que cobra el peaje del Camino Real
 enemigo(seta_belicosa,   vida(14), ataque(5),  defensa(1)).     % las del bosque, con muy mal humor
+enemigo(seta_curandera,  vida(12), ataque(3),  defensa(1)).     % cura al aliado mas herido: hay que ir a por ella
+enemigo(ballestero_oxidado, vida(10), ataque(6), defensa(0)).   % dispara a distancia: llega a la retaguardia
 enemigo(gran_roquefort,  vida(60), ataque(11), defensa(4)).     % el jefe final
 
 % clase(Tipo, Clase): alimenta reglas como la de teme_caballos (un caballo asusta a Baldomero).
@@ -143,6 +149,8 @@ clase(bandido_montado, caballo).
 clase(gran_roquefort,  queso_vivo).
 clase(ganso_de_peaje,  ave).
 clase(seta_belicosa,   hongo).
+clase(seta_curandera,  hongo).
+clase(ballestero_oxidado, humano).
 
 % curacion(Objeto, Vida): lo que cura un objeto cuando un enemigo lo usa (la IA se cura con el).
 curacion(pocion,  10).
@@ -163,6 +171,8 @@ botin(bandido_montado, 1, 100).
 botin(rata_quesera,    1,  60).
 botin(ganso_de_peaje,  1, 100).        % el peaje que habia cobrado
 botin(seta_belicosa,   1,  50).
+botin(seta_curandera,  1,  50).
+botin(ballestero_oxidado, 1, 100).
 
 % Encuentros al llegar a una zona (docs/13-ampliacion.md, 5): probabilidad_de_encuentro(Zona, Porcentaje) y, de las
 % encuentro(Zona, Grupo) de esa zona, un grupo que sale (el segundo dado elige cual). Las zonas sin probabilidad
@@ -171,13 +181,15 @@ probabilidad_de_encuentro(bosque,      30).
 probabilidad_de_encuentro(camino_real, 30).
 probabilidad_de_encuentro(cuevas,      25).
 
-encuentro(bosque,      [seta_belicosa]).
-encuentro(bosque,      [rata_quesera, moho_saltarin]).
-encuentro(camino_real, [bandido_torpe]).
-encuentro(camino_real, [bandido_torpe, rata_quesera]).
-encuentro(camino_real, [bandido_montado]).
-encuentro(cuevas,      [rata_quesera, rata_quesera]).
-encuentro(cuevas,      [moho_saltarin, rata_quesera]).
+encuentro(bosque,      [seta_belicosa, seta_belicosa, seta_curandera, moho_saltarin, moho_saltarin]).
+encuentro(bosque,      [seta_belicosa, rata_quesera, rata_quesera, moho_saltarin, moho_saltarin]).
+encuentro(bosque,      [seta_belicosa, seta_belicosa, seta_belicosa, seta_curandera]).
+encuentro(camino_real, [bandido_torpe, bandido_torpe, ballestero_oxidado]).
+encuentro(camino_real, [bandido_torpe, bandido_torpe, bandido_montado, ballestero_oxidado]).
+encuentro(camino_real, [bandido_torpe, bandido_torpe, bandido_torpe, ballestero_oxidado, ballestero_oxidado]).
+encuentro(cuevas,      [rata_quesera, rata_quesera, rata_quesera, moho_saltarin, moho_saltarin]).
+encuentro(cuevas,      [moho_saltarin, moho_saltarin, seta_curandera, seta_belicosa, rata_quesera]).
+encuentro(cuevas,      [bandido_montado, bandido_torpe, ballestero_oxidado, seta_curandera]).
 
 % numerar_grupo(+Tipos, -Ids): un grupo de enemigos [rata_quesera, rata_quesera, bandido_torpe]
 % pasa a instancias numeradas por tipo: [e(rata_quesera,1), e(rata_quesera,2), e(bandido_torpe,1)].
@@ -220,6 +232,7 @@ parametro(bono_defender,     2).    % defensa extra de quien esta defendiendo (p
 parametro(dano_miedo,        2).    % dano extra que recibe quien teme a la clase del atacante (lore 7)
 parametro(umbral_vida_baja, 30).   % vida baja: 30 % o menos de la maxima (la IA se cura)
 parametro(dano_embestida,    2).    % dano extra de la primera embestida del bandido montado
+parametro(cura_de_seta,      5).    % vida que cura la seta curandera al aliado mas herido, cada turno
 parametro(max_mohos,         2).    % mohos que el jefe puede invocar en un combate
 parametro(dias_de_ayuno_max, 2).    % dias seguidos sin comer que aguanta la Banda antes de perder por hambre (docs/11)
 parametro(pago_base,         6).    % quesos que paga todo contrato antes de sumar nada (balance, docs/11)

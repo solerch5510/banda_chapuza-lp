@@ -289,7 +289,7 @@ test(las_tres_formas_de_regla_ganadora) :-
     assertion(memberchk(tipo=corte, A)), assertion(memberchk(prioridad=3, A)),
     api:regla_ganadora(hecho(accion_enemigo(e(x, 1), defender)), json(B)),
     memberchk(total=Total, B),
-    assertion(Total == 6),
+    assertion(Total == 7),
     assertion(memberchk(tipo=comodin, B)), assertion(memberchk(prioridad=Total, B)),
     api:regla_ganadora(regla(golpea_a_clotilde(e(x, 1)), 1, []), json(C)),
     assertion(memberchk(tipo=escolta, C)), assertion(memberchk(prioridad= @(null), C)).
@@ -303,15 +303,15 @@ test(la_regla_ganadora_con_corte) :-
     preparar, nb_getval(decision, D),
     campo(D, regla, Reg), campo(D, accion, A),
     campo(Reg, tipo, T), campo(Reg, prioridad, P), campo(Reg, total, Tot),
-    assertion(T == corte), assertion(P == 5), assertion(Tot == 6),
+    assertion(T == corte), assertion(P == 6), assertion(Tot == 7),
     campo(A, texto, Txt), campo(A, termino, Term),
     assertion(Txt == 'Atacar a Tuerca'), assertion(Term == 'atacar(tuerca)').
 
-test(las_cuatro_reglas_de_mayor_prioridad_con_su_motivo) :-
+test(las_cinco_reglas_de_mayor_prioridad_con_su_motivo) :-
     preparar, nb_getval(decision, D),
     campo(D, descartes, Ds),
     findall(P-Ti, ( member(X, Ds), campo(X, prioridad, P), campo(X, titulo, Ti) ), Ps),
-    assertion(Ps == [1-'Curarse', 2-'Invocar moho', 3-'Robar queso', 4-'Embestir']),
+    assertion(Ps == [1-'Curarse', 2-'Invocar moho', 3-'Robar queso', 4-'Embestir', 5-'Curar aliado']),
     forall(member(X, Ds),
            (   campo(X, motivo, M), assertion(M \== ''),
                campo(X, nodos, Ns), assertion(Ns \== [])
@@ -705,7 +705,7 @@ test(la_decision_del_enemigo_coincide_con_la_consola) :-
     consola(explicar, Pantalla),
     forall(member(X, Ds), ( campo(X, motivo, M), assertion(contiene(Pantalla, M)) )),
     campo(D, regla, Reg), campo(Reg, prioridad, P),
-    format(atom(Frase), 'prioridad ~w de 6', [P]),
+    format(atom(Frase), 'prioridad ~w de 7', [P]),
     assertion(contiene(Pantalla, Frase)).
 
 :- end_tests(web_y_consola).

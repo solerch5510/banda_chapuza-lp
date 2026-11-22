@@ -74,9 +74,9 @@ test(un_moho_saltarin_ataca, [nondet]) :-
     elige(e(moho_saltarin, 1), A),
     A == atacar(tuerca).
 
-test(la_regla_5_es_atacar_y_la_6_es_el_comodin) :-
+test(la_regla_6_es_atacar_y_la_7_es_el_comodin) :-
     predicate_property(combate:accion_enemigo(_, _), number_of_clauses(N)),
-    N == 6.
+    N == 7.
 
 test(sin_nada_que_atacar_se_defiende, [nondet]) :-
     montado([bandido_torpe]),
@@ -413,9 +413,12 @@ escenario(14) :- montado([rata_quesera]), aplicar_efecto(ganar_objeto(e(rata_que
                  vida_de(e(rata_quesera, 1), 2).
 escenario(15) :- montado([bandido_torpe, bandido_montado]), aplicar_efecto(dano(baldomero, 99)),
                  aplicar_efecto(dano(tuerca, 99)).
+escenario(16) :- montado([bandido_torpe, seta_curandera]), aplicar_efecto(dano(e(bandido_torpe, 1), 5)).   % la curandera ve a un herido
+escenario(17) :- montado([bandido_torpe, seta_curandera]).                                                % ... o a todos enteros
+escenario(18) :- montado([seta_curandera]).                                                               % ... o sola
 
-test(la_gemela_sin_corte_da_la_misma_accion_en_15_escenarios) :-
-    forall(( between(1, 15, N), escenario(N) ),
+test(la_gemela_sin_corte_da_la_misma_accion_en_18_escenarios) :-
+    forall(( between(1, 18, N), escenario(N) ),
            forall(estado:instancia(E, _),
                   (   findall(A, combate:accion_enemigo(E, A), [A1]),
                       findall(A, combate:accion_enemigo_sin_corte(E, A), [A2]),
@@ -423,14 +426,14 @@ test(la_gemela_sin_corte_da_la_misma_accion_en_15_escenarios) :-
                   ))).
 
 test(la_gemela_tiene_una_sola_solucion_por_enemigo) :-
-    forall(( between(1, 15, N), escenario(N) ),
+    forall(( between(1, 18, N), escenario(N) ),
            forall(estado:instancia(E, _),
                   (   findall(A, combate:accion_enemigo_sin_corte(E, A), As), As = [_] ))).
 
-test(la_tabla_tiene_seis_reglas_con_numeros_distintos) :-
+test(la_tabla_tiene_siete_reglas_con_numeros_distintos) :-
     findall(N, clause(combate:regla_ia(N, _, _), _), Ns),
     msort(Ns, S),
-    S == [1, 2, 3, 4, 5, 6].
+    S == [1, 2, 3, 4, 5, 6, 7].
 
 test(el_numero_de_la_regla_ganadora_es_la_prioridad_de_la_clausula, [nondet]) :-
     escenario(6),                                      % cura
@@ -447,13 +450,16 @@ test(el_numero_de_la_regla_ganadora_es_la_prioridad_de_la_clausula, [nondet]) :-
     P4 = regla(_, 4, _),
     escenario(1),                                      % ataca
     solve(combate:accion_enemigo(e(bandido_torpe, 1), _), P5),
-    P5 = regla(_, 5, _),
+    P5 = regla(_, 6, _),
+    escenario(16),                                     % cura a un aliado
+    solve(combate:accion_enemigo(e(seta_curandera, 1), _), P5b),
+    P5b = regla(_, 5, _),
     escenario(10),                                     % comodin
     solve(combate:accion_enemigo(e(bandido_torpe, 1), _), P6),
     P6 = hecho(accion_enemigo(_, defender)).      % el comodin es un hecho: sin cuerpo ni corte
 
 test(solve_da_lo_mismo_que_ejecutar_con_el_enemigo_ligado) :-
-    forall(( between(1, 15, N), escenario(N) ),
+    forall(( between(1, 18, N), escenario(N) ),
            forall(estado:instancia(E, _),
                   (   findall(A, combate:accion_enemigo(E, A), Directo),
                       findall(A, solve(combate:accion_enemigo(E, A), _), ConSolve),
@@ -461,7 +467,7 @@ test(solve_da_lo_mismo_que_ejecutar_con_el_enemigo_ligado) :-
                   ))).
 
 test(solve_da_lo_mismo_que_ejecutar_con_el_enemigo_libre) :-
-    forall(( between(1, 15, N), escenario(N) ),
+    forall(( between(1, 18, N), escenario(N) ),
            (   findall(E-A, combate:accion_enemigo(E, A), Directo),
                findall(E-A, solve(combate:accion_enemigo(E, A), _), ConSolve),
                Directo =@= ConSolve
@@ -471,7 +477,7 @@ test(el_corte_se_ve_en_la_prueba, [nondet]) :-
     escenario(1),
     solve(combate:accion_enemigo(e(bandido_torpe, 1), _), P),
     explicar:prueba_a_lineas(P, Lineas),
-    memberchk('[ok] accion_enemigo(e(bandido_torpe, 1), atacar(tuerca))   [clausula 5 + corte]', Lineas),
+    memberchk('[ok] accion_enemigo(e(bandido_torpe, 1), atacar(tuerca))   [clausula 6 + corte]', Lineas),
     memberchk('   [ok] corte   [corte: se descartaron las clausulas siguientes]', Lineas).
 
 test(el_comodin_no_lleva_corte, [nondet]) :-
@@ -497,7 +503,7 @@ test(con_la_accion_libre_las_dos_coinciden, [nondet]) :-
     A1 == A2.
 
 test(a_igual_accion_ligada_la_gemela_acierta_en_cada_regla) :-
-    forall(( between(1, 15, N), escenario(N) ),
+    forall(( between(1, 18, N), escenario(N) ),
            forall(estado:instancia(E, _),
                   (   combate:accion_enemigo_sin_corte(E, Real),
                       forall(member(Otra, [curarse, invocar_moho, robar_queso, defender]),
@@ -581,7 +587,7 @@ test(explicar_tras_un_turno_enemigo_dice_la_prioridad, [nondet]) :-
     empieza([bandido_torpe], _),
     ordena(defender, _), ordena(defender, _), ordena(defender, _),
     pantalla(explicar, Texto),
-    sub_atom(Texto, _, _, _, 'Eligió la regla de prioridad 5 de 6'),
+    sub_atom(Texto, _, _, _, 'Eligió la regla de prioridad 6 de 7'),
     sub_atom(Texto, _, _, _, 'Por qué el Bandido Torpe hizo eso').
 
 test(la_pantalla_explica_el_comodin_como_la_ultima_regla, [nondet]) :-
@@ -590,13 +596,13 @@ test(la_pantalla_explica_el_comodin_como_la_ultima_regla, [nondet]) :-
     solve(combate:accion_enemigo(e(bandido_torpe, 1), _), Prueba),
     with_output_to(atom(Texto),
                    ui:mostrar(resultado([vista(decision, e(bandido_torpe, 1), Prueba, [])]))),
-    sub_atom(Texto, _, _, _, 'Eligió la última regla (prioridad 6 de 6)').
+    sub_atom(Texto, _, _, _, 'Eligió la última regla (prioridad 7 de 7)').
 
 test(explicar_tras_robar_la_rata_dice_prioridad_3, [nondet]) :-
     empieza([rata_quesera], _),
     ordena(defender, _), ordena(defender, _), ordena(defender, _),
     pantalla(explicar, Texto),
-    sub_atom(Texto, _, _, _, 'Eligió la regla de prioridad 3 de 6'),
+    sub_atom(Texto, _, _, _, 'Eligió la regla de prioridad 3 de 7'),
     sub_atom(Texto, _, _, _, 'accion_enemigo(e(rata_quesera, 1), robar_queso)').
 
 test(las_pantallas_de_la_ia_no_ensenan_terminos_crudos, [nondet]) :-

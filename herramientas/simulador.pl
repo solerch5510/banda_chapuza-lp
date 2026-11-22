@@ -15,7 +15,7 @@
 %   swipl -q -s herramientas/simulador -g "informe(200, 1)" -t halt      (200 partidas, semilla 1)
 
 :- module(simulador, [episodio/4, informe/2, orden_con_plan/3, jugar_ruta/2, ruta_de_referencia/2, candidatas/1,
-                      resumen_de/2, ruta_separada/1, resumir/2, fijar_azar/1]).
+                      resumen_de/2, ruta_separada/1, resumir/2, fijar_azar/1, fijar_estilo/1]).
 :- encoding(utf8).
 
 :- use_module('../src/mundo').
@@ -151,11 +151,19 @@ orden_con_plan(Eps, Lote, Cmd) :-
 
 orden_planificada(_, Cmd) :-
     candidatas(Cs),
-    (   once(estado:fase(combate))                       -> elegir_orden(Cmd)
+    (   once(estado:fase(combate))                       -> orden_en_combate(Cmd)
     ;   findall(N, member(_-elegir(N), Cs), Ns), Ns = [_|_] -> nth_azar(Ns, N0), Cmd = elegir(N0)
     ),
     !.
 orden_planificada(_, Cmd) :- candidatas(Cs), memberchk(_-pagar, Cs), !, Cmd = pagar.
+% Un jugador sensato descansa en la taberna cuando la Banda vuelve herida (alguien con menos de dos tercios de vida),
+% si le sobra queso para pagar las camas y la comida de manana.
+orden_planificada(_, descansar) :-
+    estilo_de_combate(Estilo), Estilo \== azar,
+    valida(descansar),
+    economia:queso_total(Q), Q >= 8,
+    compania:miembro(Id), estado:vida(Id, V), mundo:personaje(Id, _, _, vida(Max), _, _, _),
+    V * 3 < Max * 2, !.
 orden_planificada(Lote, Cmd) :-
     contratos:contratos_activos(K), K < Lote,
     findall(C, ( contratos:contrato(C, _, _, _, _), valida(aceptar(C)) ), Aceptables),
@@ -166,6 +174,12 @@ orden_planificada(_, ir(Paso)) :-
     zonas_objetivo(Zs), Zs = [_|_],
     camino_a(Aqui, Zs, [Paso|_]),
     valida(ir(Paso)).
+
+% orden_en_combate(-Cmd): la orden de un jugador con plan en pleno combate, segun su estilo.
+orden_en_combate(Cmd) :-
+    (   estilo_de_combate(azar) -> elegir_orden(Cmd)
+    ;   orden_de_combate(Cmd)
+    ).
 
 nth_azar(L, E) :- length(L, N), azar(N, I), nth0(I, L, E).
 
@@ -222,8 +236,40 @@ combatir_solo :-
     ;   true
     ).
 
+% El ESTILO de combate de los jugadores con plan (fijar_estilo/1):
+%   azar         una orden al azar entre las validas, con pesos (el de siempre: un jugador despistado);
+%   solo_atacar  atacar al primero que haya y, si no se puede, defender (el que solo pulsa «atacar»);
+%   listo        usa la habilidad de quien actua y va primero a quien mas daña: la seta curandera, luego los ballesteros, el
+%                bandido montado y el resto por vida. Es el jugador que entiende el combate (las habilidades, la fila, el curandero).
+% Las rutas guionizadas juegan el combate con solo_atacar (o con listo si se pide).
+fijar_estilo(E) :- nb_setval(sim_estilo, E).
+estilo_de_combate(E) :- ( catch(nb_getval(sim_estilo, E0), _, fail) -> E = E0 ; E = azar ).
+
+orden_de_combate(Cmd) :-
+    estilo_de_combate(listo), !,
+    orden_lista(Cmd).
 orden_de_combate(atacar(T)) :- tipo_vivo(T), valida(atacar(T)), !.
 orden_de_combate(defender).
+
+% orden_lista(-Cmd): la primera orden valida de: la habilidad sin objetivo, la habilidad o el ataque al enemigo mas peligroso, defender.
+orden_lista(Cmd) :-
+    findall(P-V-T, ( tipo_vivo(T), estado:instancia(E, T), compania:vivo(E), estado:vida(E, V), peligro(T, P) ), L0),
+    msort(L0, L),
+    findall(T, member(_-_-T, L), Ts0), sort_estable(Ts0, Ts),
+    (   valida(habilidad) -> Cmd = habilidad
+    ;   member(T, Ts), valida(habilidad(T)) -> Cmd = habilidad(T)
+    ;   member(T, Ts), valida(atacar(T)) -> Cmd = atacar(T)
+    ;   Cmd = defender
+    ).
+
+peligro(seta_curandera, 0) :- !.
+peligro(ballestero_oxidado, 1) :- !.
+peligro(bandido_montado, 2) :- !.
+peligro(_, 5).
+
+% sort_estable(+Lista, -SinRepetidos): quita repetidos conservando el orden.
+sort_estable([], []).
+sort_estable([X|Xs], [X|Ys]) :- exclude(==(X), Xs, Zs), sort_estable(Zs, Ys).
 
 % La ruta de un jugador real que perdio el dia 6: los contratos de la aldea UNO POR UNO.
 ruta_separada([aceptar(gato_en_el_arbol), ir(aldea), elegir(trepar), ir(taberna),
@@ -250,10 +296,17 @@ informe(N, Semilla) :-
     ruta_separada(Sep), jugar_ruta(Sep, RS),
     format("REF campana ~q~n", [RC]),
     format("REF separada ~q~n", [RS]),
+    fijar_estilo(azar),
     forall(member(Pol, [azar, plan(10, 1), plan(10, 2), plan(10, 3), plan_hablador(10, 2)]),
            (   findall(R, ( between(1, N, I), S is Semilla * 1000 + I, episodio(Pol, S, 400, R) ), Rs),
                format("POLITICA ~q~n", [Pol]),
-               resumir(Rs, N) )).
+               resumir(Rs, N) )),
+    forall(member(Estilo-Pol, [solo_atacar-plan(10, 2), listo-plan(10, 2), solo_atacar-plan(0, 2), listo-plan(0, 2)]),
+           (   fijar_estilo(Estilo),
+               findall(R, ( between(1, N, I), S is Semilla * 1000 + I, episodio(Pol, S, 400, R) ), Rs),
+               format("POLITICA ~q con combate ~w~n", [Pol, Estilo]),
+               resumir(Rs, N) )),
+    fijar_estilo(azar).
 
 resumir(Rs, N) :-
     cuantas(Rs, victoria, V), cuantas(Rs, hambre, H), cuantas(Rs, combate, C), cuantas(Rs, sin_final, X),

@@ -398,6 +398,8 @@ frase(suceso(se_cura(E, N)), ambos,
       '~w se bebe lo que lleva encima y recupera ~w de vida. Hasta los malos tienen botiquín.'-[E, N]).
 frase(suceso(invoca_moho(E)), ambos,
       '~w murmura algo antiguo y de la pared se despega un moho saltarín, con ganas de conocer gente.'-[E]).
+frase(suceso(cura_aliado(E, O, N)), ambos,
+      '~w murmura una receta y ~w recupera ~w de vida. Las setas curan lo que no deberían.'-[E, O, N]).
 frase(suceso(roba_queso(E)), ambos,
       '~w se lleva un queso de la despensa mientras todos miran el combate. Roba con una técnica impecable.'-[E]).
 frase(suceso(embiste(E, B, D)), ambos,
@@ -524,6 +526,8 @@ frase(accion_enemigo(bandido_montado, embestir(_)), ambos,
       'El caballo embiste primero. El bandido le sigue, por cortesía.').
 frase(accion_enemigo(gran_roquefort, invocar_moho), ambos,
       'El Gran Roquefort llama a su moho sin prisa. Lleva cuarenta años practicando la calma.').
+frase(accion_enemigo(seta_curandera, curar_aliado(_)), ambos,
+      'La Seta Curandera cura a un herido antes de atacar: prioridad cinco de su lista. Hay que ir a por ella.').
 frase(accion_enemigo(_, curarse), ambos,
       'El primer caso de la lista que aplica es curarse, y la regla no mira más. Eso se llama prioridad.').
 frase(accion_enemigo(_, _), detallado,
@@ -621,6 +625,8 @@ nombre(bandido_montado, 'el Bandido Montado').
 nombre(gran_roquefort,  'el Gran Roquefort').
 nombre(ganso_de_peaje,  'el Ganso del Peaje').
 nombre(seta_belicosa,   'la Seta Belicosa').
+nombre(seta_curandera,  'la Seta Curandera').
+nombre(ballestero_oxidado, 'el Ballestero Oxidado').
 nombre(carretero_anonimo, 'el Carretero Anónimo').
 nombre(peaje_del_ganso,    'El Peaje del Ganso').
 nombre(fantasma_charlatan, 'El Fantasma Charlatán').

@@ -25,6 +25,8 @@
 :- use_module('../src/ui').
 :- use_module('../src/main').
 :- use_module('../herramientas/simulador').
+% Los jugadores simulados pelean como una persona atenta: atacan sin despistes y descansan si vuelven heridos (herramientas/simulador.pl).
+:- fijar_estilo(solo_atacar).
 
 contiene(Texto, Fragmento) :- sub_atom(Texto, _, _, _, Fragmento), !.
 
@@ -32,7 +34,7 @@ orden(Cmd, Items) :- juego:ejecutar(Cmd, resultado(Items)).
 
 % la politica de combate del playtest: habilidad si se puede, ataque si no, defensa como ultimo recurso
 objetivo_fuerte(T) :-
-    member(T, [gran_roquefort, bandido_montado, ganso_de_peaje, seta_belicosa, bandido_torpe, moho_saltarin, rata_quesera]),
+    member(T, [gran_roquefort, seta_curandera, ballestero_oxidado, bandido_montado, ganso_de_peaje, seta_belicosa, bandido_torpe, moho_saltarin, rata_quesera]),
     estado:instancia(E, T), compania:vivo(E), !.
 
 orden_de_turno(Cmd) :-
@@ -159,7 +161,7 @@ test(se_cumple_derrotando_al_ganso_y_a_un_bandido) :-
     assertion(memberchk(msg(objetivo, [peaje_del_ganso], _), Items)),
     assertion(estado:en_combate(_)),
     findall(T, ( estado:instancia(_, T) ), Ts), msort(Ts, S),
-    assertion(S == [bandido_torpe, ganso_de_peaje]).
+    assertion(S == [ballestero_oxidado, bandido_torpe, ganso_de_peaje]).
 
 test(ganar_el_combate_lo_deja_cumplido_con_exito_y_por_cobrar) :-
     nueva_partida, orden(ir(camino_real), _), jugar(aceptar(peaje_del_ganso), _),
@@ -172,8 +174,8 @@ test(se_cobra_en_la_taberna_con_la_paga_de_la_formula) :-
     assertion(memberchk(msg(cobra, [peaje_del_ganso], _), Items)),
     economia:queso_total(Q), assertion(Q >= Pago).
 
-test(paga_catorce_quesos) :-
-    contratos:pago_de(peaje_del_ganso, N), assertion(N == 14).
+test(paga_quince_quesos) :-
+    contratos:pago_de(peaje_del_ganso, N), assertion(N == 15).
 
 :- end_tests(el_peaje_del_ganso).
 
@@ -260,10 +262,10 @@ test(se_cumple_contra_dos_setas_y_un_moho_en_el_bosque) :-
     orden(aceptar(paz_del_moho), _), orden(ir(aldea), _), orden(ir(bosque), Items),
     assertion(memberchk(msg(objetivo, [paz_del_moho], _), Items)),
     findall(T, estado:instancia(_, T), Ts), msort(Ts, S),
-    assertion(S == [moho_saltarin, seta_belicosa, seta_belicosa]).
+    assertion(S == [moho_saltarin, seta_belicosa, seta_belicosa, seta_curandera]).
 
 test(paga_veintiun_quesos_porque_el_bosque_esta_lejos) :-
-    contratos:pago_de(paz_del_moho, N), assertion(N == 21),
+    contratos:pago_de(paz_del_moho, N), assertion(N == 22),
     contratos:dias_de_ruta(paz_del_moho, D), assertion(D == 4).
 
 :- end_tests(la_paz_del_moho).

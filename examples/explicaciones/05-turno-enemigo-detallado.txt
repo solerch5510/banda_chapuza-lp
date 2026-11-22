@@ -46,8 +46,8 @@ Combate · ronda 1 · turno de Rufino
 
 > explicar
 Por qué el Bandido Torpe hizo eso:
-Eligió la regla de prioridad 5 de 6 (el corte descartó las demás).
-[ok] accion_enemigo(e(bandido_torpe, 1), atacar(tuerca))   [clausula 5 + corte]
+Eligió la regla de prioridad 6 de 7 (el corte descartó las demás).
+[ok] accion_enemigo(e(bandido_torpe, 1), atacar(tuerca))   [clausula 6 + corte]
    [ok] objetivo_mas_debil(e(bandido_torpe, 1), tuerca)   [clausula 1]
       [ok] findall(A-B, (combatiente(B, C), puede_atacar(e(bandido_torpe, 1), B)...   [findall: 2 solucion(es)]
          [ok] combatiente(baldomero, jugador)   [hecho]
@@ -113,6 +113,11 @@ Las reglas de más prioridad no se aplicaron:
           \- [no] tipo_de(e(bandido_torpe, 1), bandido_montado)
                 \- [no] (nonvar(e(bandido_torpe, 1)), e(bandido_torpe, 1)=e(bandido_torpe, 1)...
                       bandido_montado=bandido_torpe es falso
+  prioridad 5 (curar_aliado):
+    \- [no] puede_curar_aliado(e(bandido_torpe, 1), A)
+          \- [no] tipo_de(e(bandido_torpe, 1), seta_curandera)
+                \- [no] (nonvar(e(bandido_torpe, 1)), e(bandido_torpe, 1)=e(bandido_torpe, 1)...
+                      seta_curandera=bandido_torpe es falso
 Narrador: El Bandido Torpe elige al más débil. Torpe, sí; tonto, solo a ratos.
 
 > salir

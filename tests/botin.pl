@@ -23,6 +23,8 @@
 :- use_module('../src/juego').
 :- use_module('../src/ui').
 :- use_module('../herramientas/simulador').
+% Los jugadores simulados pelean como una persona atenta: atacan sin despistes y descansan si vuelven heridos (herramientas/simulador.pl).
+:- fijar_estilo(solo_atacar).
 
 contiene(Texto, Fragmento) :- sub_atom(Texto, _, _, _, Fragmento), !.
 
@@ -38,7 +40,7 @@ orden(Cmd, Items) :- juego:ejecutar(Cmd, resultado(Items)).
 
 % combatir: cada miembro usa su habilidad si puede y, si no, ataca (la misma via que el playtest)
 objetivo_fuerte(T) :-
-    member(T, [gran_roquefort, bandido_montado, bandido_torpe, moho_saltarin, rata_quesera]),
+    member(T, [gran_roquefort, seta_curandera, ballestero_oxidado, bandido_montado, bandido_torpe, moho_saltarin, rata_quesera]),
     estado:instancia(E, T), compania:vivo(E), !.
 
 orden_de_turno(Cmd) :-

@@ -40,7 +40,7 @@ pelea_hasta_el_final(0) :- !.
 pelea_hasta_el_final(N) :-
     (   ( \+ estado:en_combate(_) ; estado:fin_partida(_) )
     ->  true
-    ;   (   member(Obj, [gran_roquefort, moho_saltarin, bandido_montado, ganso_de_peaje, seta_belicosa, bandido_torpe, rata_quesera]),
+    ;   (   member(Obj, [gran_roquefort, seta_curandera, ballestero_oxidado, moho_saltarin, bandido_montado, ganso_de_peaje, seta_belicosa, bandido_torpe, rata_quesera]),
             ordena(atacar(Obj), I), \+ I = [error(_)|_]
         ->  true
         ;   ordena(defender, _)
@@ -85,7 +85,7 @@ nueva_partida_en_el_jefe_y_ganar(Texto) :-
     atomic_list_concat(Ts, '\n', Texto).
 
 golpe_con_texto(Texto) :-
-    (   member(Obj, [gran_roquefort, moho_saltarin, bandido_montado, ganso_de_peaje, seta_belicosa, bandido_torpe, rata_quesera]),
+    (   member(Obj, [gran_roquefort, seta_curandera, ballestero_oxidado, moho_saltarin, bandido_montado, ganso_de_peaje, seta_belicosa, bandido_torpe, rata_quesera]),
         ejecutar(atacar(Obj), R), R = resultado(I), \+ I = [error(_)|_]
     ->  with_output_to(atom(Texto), ui:mostrar(R))
     ;   pantalla(defender, Texto)

@@ -38,12 +38,12 @@ contrato(gato_en_el_arbol, aldea, evento(rescate_gato),
 contrato(gallina_noble, camino_real, escoltar(gallina_noble, castillo),
          recompensa([quesos(pago), queso(brie, 0, 1)]),
          [requiere(rasgo_no(teme_caballos))]).
-contrato(peaje_del_ganso, camino_real, eliminar([ganso_de_peaje-1, bandido_torpe-1]),
+contrato(peaje_del_ganso, camino_real, eliminar([ganso_de_peaje-1, bandido_torpe-1, ballestero_oxidado-1]),
          recompensa([quesos(pago)]), []).
 contrato(fantasma_charlatan, aldea, evento(escuchar_al_fantasma),
          recompensa([quesos(pago), objeto(pocion)]),
          [requiere(moral_media_min(4))]).
-contrato(paz_del_moho, bosque, eliminar([seta_belicosa-2, moho_saltarin-1]),
+contrato(paz_del_moho, bosque, eliminar([seta_belicosa-2, moho_saltarin-1, seta_curandera-1]),
          recompensa([quesos(pago)]), []).
 % El jefe: el rey no se fia de cualquiera. Ademas de tres contratos cumplidos, pide dos concretos: la escolta de
 % Clotilde (la prueba de que se puede confiar en la Banda con lo valioso) y el peaje del Camino Real (el camino

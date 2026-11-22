@@ -226,6 +226,13 @@ efectos_accion(_, usar(Objeto, Miembro), Efectos) :-          % un objeto de la 
     economia:efectos_usar(Objeto, Miembro, Efectos).
 efectos_accion(E, invocar_moho, [invocar(moho_saltarin), mensaje(invoca_moho, [E])]) :-
     debe_invocar_moho(E).
+efectos_accion(E, curar_aliado(O), [curar(O, N), mensaje(cura_aliado, [E, O, N])]) :-
+    puede_curar_aliado(E, O),
+    estado:vida(O, V),
+    tipo_de(O, Tipo),
+    mundo:enemigo(Tipo, vida(Max), _, _),
+    mundo:parametro(cura_de_seta, Cura),
+    N is min(Cura, Max - V).
 efectos_accion(E, robar_queso, [gastar_queso(Tipo, Edad, 1), contar(quesos_robados, 1), mensaje(roba_queso, [E])]) :-
     puede_robar_queso(E),
     economia:despensa([q(Tipo, Edad, _)|_]).                 % lo primero que ve: lo mas fresco
@@ -272,14 +279,16 @@ efecto_de_paso(Id, Estado, Turnos, Efecto) :-
 %   2 invocar_moho  el jefe, si no queda un moho aliado en pie (y como mucho dos por combate)
 %   3 robar_queso   la rata, si hay queso en la despensa del grupo
 %   4 embestir(O)   el bandido montado, en su primer turno (dano +2)
-%   5 atacar(O)     al mas debil de los que alcanza
-%   6 defender      si no hay nada mejor
+%   5 curar_aliado(O) la seta curandera, si un aliado esta herido (cura al mas herido)
+%   6 atacar(O)     al mas debil de los que alcanza
+%   7 defender      si no hay nada mejor
 % Cada regla tiene su gemela sin corte en regla_ia/3 (abajo), que sirve de oraculo en las pruebas.
 % ---------------------------------------------------------------------------
 accion_enemigo(E, curarse)      :- vida_baja(E), tiene_curativo(E), !.
 accion_enemigo(E, invocar_moho) :- debe_invocar_moho(E), !.
 accion_enemigo(E, robar_queso)  :- puede_robar_queso(E), !.
 accion_enemigo(E, embestir(O))  :- puede_embestir(E, O), !.
+accion_enemigo(E, curar_aliado(O)) :- puede_curar_aliado(E, O), !.
 accion_enemigo(E, atacar(O))    :- objetivo_mas_debil(E, O), !.
 accion_enemigo(_, defender).
 
@@ -288,8 +297,9 @@ regla_ia(1, E, curarse)      :- vida_baja(E), tiene_curativo(E).
 regla_ia(2, E, invocar_moho) :- debe_invocar_moho(E).
 regla_ia(3, E, robar_queso)  :- puede_robar_queso(E).
 regla_ia(4, E, embestir(O))  :- puede_embestir(E, O).
-regla_ia(5, E, atacar(O))    :- objetivo_mas_debil(E, O).
-regla_ia(6, _, defender).
+regla_ia(5, E, curar_aliado(O)) :- puede_curar_aliado(E, O).
+regla_ia(6, E, atacar(O))    :- objetivo_mas_debil(E, O).
+regla_ia(7, _, defender).
 
 accion_enemigo_sin_corte(E, A) :-
     regla_ia(N, E, A),
@@ -331,6 +341,20 @@ puede_embestir(E, O) :-
     tipo_de(E, bandido_montado),
     \+ estado:alterado(E, embistio, _),
     objetivo_mas_debil(E, O).
+
+% La seta curandera cura cada turno al aliado mas herido (el de menos vida de los que no estan enteros; empate: el id menor).
+puede_curar_aliado(E, O) :-
+    tipo_de(E, seta_curandera),
+    findall(V-Id, ( estado:combatiente(Id, enemigo), Id \== E, compania:vivo(Id), herido(Id), estado:vida(Id, V) ), Pares),
+    Pares = [_|_],
+    msort(Pares, [_-O|_]).
+
+% herido(+Id): le falta vida (la maxima es la de su tipo).
+herido(Id) :-
+    estado:vida(Id, V),
+    tipo_de(Id, Tipo),
+    mundo:enemigo(Tipo, vida(Max), _, _),
+    V < Max.
 
 % objetivo_mas_debil(+Atacante, -B): de los que puede atacar, el de menos vida (empate: el id menor).
 objetivo_mas_debil(A, B) :-

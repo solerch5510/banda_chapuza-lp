@@ -26,6 +26,8 @@
 :- use_module('../src/main').
 :- use_module('../src/api').
 :- use_module('../herramientas/simulador').
+% Los jugadores simulados pelean como una persona atenta: atacan sin despistes y descansan si vuelven heridos (herramientas/simulador.pl).
+:- fijar_estilo(solo_atacar).
 
 contiene(Texto, Fragmento) :- sub_atom(Texto, _, _, _, Fragmento), !.
 campo(json(Cs), K, V) :- memberchk(K=V, Cs).

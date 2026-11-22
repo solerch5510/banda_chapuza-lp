@@ -113,7 +113,7 @@ test(dos_dados_avanzan_la_semilla_dos_pasos) :-
 test(sale_con_una_tirada_menor_que_la_probabilidad) :-
     mundo:probabilidad_de_encuentro(bosque, P), P1 is P - 1,
     combate:sale_encuentro(bosque, P1, 0, G),
-    assertion(G == [seta_belicosa]).
+    assertion(G == [seta_belicosa, seta_belicosa, seta_curandera, moho_saltarin, moho_saltarin]).
 
 test(con_una_tirada_igual_a_la_probabilidad_no_sale) :-
     mundo:probabilidad_de_encuentro(bosque, P),

@@ -48,7 +48,7 @@ orden_y_combate(Cmd) :-
 
 % En su turno cada miembro usa su habilidad si puede (contra el enemigo mas fuerte vivo) y, si no, ataca.
 objetivo_fuerte(T) :-
-    member(T, [gran_roquefort, bandido_montado, ganso_de_peaje, seta_belicosa, bandido_torpe, moho_saltarin, rata_quesera]),
+    member(T, [gran_roquefort, seta_curandera, ballestero_oxidado, bandido_montado, ganso_de_peaje, seta_belicosa, bandido_torpe, moho_saltarin, rata_quesera]),
     estado:instancia(E, T), compania:vivo(E), !.
 
 orden_de_turno(Cmd) :-

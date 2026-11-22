@@ -600,7 +600,7 @@ test(la_prueba_de_la_decision_nombra_la_accion_elegida, [nondet]) :-
     ordena(defender, _), ordena(defender, _), ordena(defender, _),
     ordena(explicar, [vista(decision, _, Prueba, _)]),
     explicar:prueba_a_lineas(Prueba, Lineas),
-    memberchk('[ok] accion_enemigo(e(bandido_torpe, 1), atacar(tuerca))   [clausula 5 + corte]', Lineas).
+    memberchk('[ok] accion_enemigo(e(bandido_torpe, 1), atacar(tuerca))   [clausula 6 + corte]', Lineas).
 
 test(la_prueba_ensena_el_objetivo_mas_debil, [nondet]) :-
     empieza([bandido_torpe]),

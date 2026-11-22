@@ -142,11 +142,11 @@ test(una_partida_nueva_lo_borra, [setup(nueva_partida)]) :-
 
 :- begin_tests(los_descartes_de_cada_regla).
 
-test(el_bandido_que_ataca_descarta_las_cuatro_primeras, [nondet]) :-
+test(el_bandido_que_ataca_descarta_las_cinco_primeras, [nondet]) :-
     turno([bandido_torpe], e(bandido_torpe, 1)),
     descartes_de_la_decision(Ds),
-    prioridades_de(Ds, [1, 2, 3, 4]),
-    nombres_de(Ds, [curarse, invocar_moho, robar_queso, embestir]).
+    prioridades_de(Ds, [1, 2, 3, 4, 5]),
+    nombres_de(Ds, [curarse, invocar_moho, robar_queso, embestir, curar_aliado]).
 
 test(la_rata_que_roba_descarta_dos, [nondet]) :-
     turno([rata_quesera], e(rata_quesera, 1)),
@@ -171,13 +171,13 @@ test(quien_se_cura_no_descarta_nada, [nondet]) :-
     descartes_de_la_decision(Ds),
     Ds == [].
 
-test(el_comodin_descarta_las_cinco_anteriores, [nondet]) :-
+test(el_comodin_descarta_las_seis_anteriores, [nondet]) :-
     montado([bandido_torpe]),
     retractall(estado:combatiente(_, jugador)),
     juego:turno_enemigo(e(bandido_torpe, 1), _),
     descartes_de_la_decision(Ds),
-    prioridades_de(Ds, [1, 2, 3, 4, 5]),
-    nombres_de(Ds, [curarse, invocar_moho, robar_queso, embestir, atacar]).
+    prioridades_de(Ds, [1, 2, 3, 4, 5, 6]),
+    nombres_de(Ds, [curarse, invocar_moho, robar_queso, embestir, curar_aliado, atacar]).
 
 test(el_golpe_a_clotilde_no_descarta_nada, [nondet]) :-
     montado([bandido_torpe]),
@@ -214,7 +214,7 @@ test(cada_descarte_diagnostica_su_propia_regla, [nondet]) :-
     turno([bandido_torpe], e(bandido_torpe, 1)),
     descartes_de_la_decision(Ds),
     forall(member(descarte(J, _, D), Ds),
-           (   nth1(J, [vida_baja, debe_invocar_moho, puede_robar_queso, puede_embestir], Cond),
+           (   nth1(J, [vida_baja, debe_invocar_moho, puede_robar_queso, puede_embestir, puede_curar_aliado], Cond),
                diag_detalle_a_lineas(D, Ls),
                once(( member(L, Ls), contiene(L, Cond) ))
            )).
@@ -248,19 +248,19 @@ test(el_item_es_una_decision_con_su_enemigo_su_prueba_y_sus_descartes, [nondet])
     turno([bandido_torpe], E),
     ordena(explicar, [vista(decision, E2, Prueba, Ds)]),
     E2 == E,
-    Prueba = regla(accion_enemigo(_, _), 5, _),
+    Prueba = regla(accion_enemigo(_, _), 6, _),
     is_list(Ds).
 
 test(dice_quien_decidio_y_la_prioridad, [nondet]) :-
     turno([bandido_torpe], _),
     pantalla(explicar, T),
     contiene(T, 'Por qué el Bandido Torpe hizo eso:'),
-    contiene(T, 'Eligió la regla de prioridad 5 de 6 (el corte descartó las demás).').
+    contiene(T, 'Eligió la regla de prioridad 6 de 7 (el corte descartó las demás).').
 
 test(muestra_la_regla_que_gano_con_su_corte, [nondet]) :-
     turno([bandido_torpe], _),
     pantalla(explicar, T),
-    contiene(T, '[clausula 5 + corte]'),
+    contiene(T, '[clausula 6 + corte]'),
     contiene(T, '[corte: se descartaron las clausulas siguientes]').
 
 test(pliega_el_detalle_y_dice_cuantos_nodos, [nondet]) :-
@@ -285,7 +285,8 @@ test(enumera_las_reglas_que_no_se_aplicaron, [nondet]) :-
     contiene(T, 'prioridad 2 (invocar_moho):'),
     contiene(T, 'prioridad 3 (robar_queso):'),
     contiene(T, 'prioridad 4 (embestir):'),
-    \+ contiene(T, 'prioridad 5 (').
+    contiene(T, 'prioridad 5 (curar_aliado):'),
+    \+ contiene(T, 'prioridad 6 (').
 
 test(la_decision_de_curarse_no_enumera_reglas, [nondet]) :-
     montado([bandido_torpe]),
@@ -293,7 +294,7 @@ test(la_decision_de_curarse_no_enumera_reglas, [nondet]) :-
     aplicar_efecto(dano(e(bandido_torpe, 1), 9)),
     juego:turno_enemigo(e(bandido_torpe, 1), _),
     pantalla(explicar, T),
-    contiene(T, 'prioridad 1 de 6'),
+    contiene(T, 'prioridad 1 de 7'),
     \+ contiene(T, 'no se aplicaron').
 
 test(el_comodin_se_cuenta_como_ultima_regla, [nondet]) :-
@@ -301,8 +302,8 @@ test(el_comodin_se_cuenta_como_ultima_regla, [nondet]) :-
     retractall(estado:combatiente(_, jugador)),
     juego:turno_enemigo(e(bandido_torpe, 1), _),
     pantalla(explicar, T),
-    contiene(T, 'Eligió la última regla (prioridad 6 de 6)'),
-    contiene(T, 'prioridad 5 (atacar):').
+    contiene(T, 'Eligió la última regla (prioridad 7 de 7)'),
+    contiene(T, 'prioridad 6 (atacar):').
 
 test(la_escolta_dice_que_la_gallina_va_escoltada_y_no_enumera, [nondet]) :-
     montado([bandido_torpe]),

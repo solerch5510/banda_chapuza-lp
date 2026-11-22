@@ -36,7 +36,7 @@ hecho(Cmd) :- orden(Cmd, Is), \+ memberchk(error(_), Is).
 
 % En su turno cada miembro usa su habilidad si puede y, si no, ataca (la misma via que el playtest).
 objetivo_fuerte(T) :-
-    member(T, [gran_roquefort, bandido_montado, ganso_de_peaje, seta_belicosa, bandido_torpe, moho_saltarin, rata_quesera]),
+    member(T, [gran_roquefort, seta_curandera, ballestero_oxidado, bandido_montado, ganso_de_peaje, seta_belicosa, bandido_torpe, moho_saltarin, rata_quesera]),
     estado:instancia(E, T), compania:vivo(E), !.
 
 orden_de_turno(Cmd) :-

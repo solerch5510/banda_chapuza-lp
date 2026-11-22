@@ -269,7 +269,7 @@ test(los_archivos_de_explicaciones_existen_y_no_estan_vacios) :-
 test(la_demo_ensena_el_calculo_del_dano_y_el_corte) :-
     leer_utf8('examples/demo-salida.txt', T),
     assertion(contiene(T, '9 is max(1, 11-2+0)')),
-    assertion(contiene(T, '[clausula 5 + corte]')),
+    assertion(contiene(T, '[clausula 6 + corte]')),
     assertion(contiene(T, 'Las reglas de más prioridad no se aplicaron:')).
 
 test(la_demo_ensena_el_miedo_a_los_caballos_en_los_dos_niveles) :-
