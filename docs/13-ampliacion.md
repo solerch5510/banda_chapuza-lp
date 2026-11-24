@@ -9,7 +9,8 @@
 - **Hecho también (22 de noviembre):** los encuentros pasan a **3–5 enemigos** y entran dos enemigos con truco (la seta curandera y el ballestero oxidado); medida en `docs/11-balance.md`.
 - **Hecho también (22 de noviembre, rama `paquete-d-niveles`):** el **paquete D mínimo** (§10): experiencia, niveles 1 a 5 con crecimiento por rol, dos pasivas por miembro (niveles 3 y 5), zonas con nivel para los encuentros y aviso al llegar. Decisiones tomadas con los valores por defecto: experiencia individual (combates: a repartir entre los que siguen en pie; eventos: a quien lo resuelve), **además** del queso, contenido hasta el nivel 5 (la curva llega al 20) y pasivas en lugar de habilidades activas nuevas.
 - **Hecho también (24 de noviembre, rama `paquete-c-mapa`, sacada de `paquete-d-niveles`):** el **paquete C reducido** que propuso el autor (§6.4): una sola taberna, ahora en el centro del mapa con tres vecinas, y tres zonas al norte a 1, 2 y 3 días (la granja, el pantano y las minas de sal), con su gente, sus sucesos, un contrato cada una y encuentros con nivel. Ningún camino de los de antes se acorta (una prueba compara las quince distancias). Las posiciones del mapa las manda el servidor.
-- **Pendiente:** fusionar las ramas D y C en `main` cuando el autor las dé por probadas; las habilidades activas nuevas, si hay tiempo.
+- **Hecho también (24 de noviembre):** las ramas D y C, fusionadas en `main` (commit `216d39c`); 40 suites y 2298 pruebas.
+- **Pendiente:** las habilidades activas nuevas, si hay tiempo.
 
 ## 1. Resumen
 
