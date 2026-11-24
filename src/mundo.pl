@@ -5,7 +5,7 @@
 % otro (es la capa mas baja) y nunca cambia. El estado que cambia vive en estado.pl.
 % Los identificadores son los de docs/01-lore-y-ambientacion.md (seccion 10).
 
-:- module(mundo, [zona/2, descripcion_zona/2, conexion/2, adyacente/2, distancia/3, zona_pacifica/1,
+:- module(mundo, [zona/2, descripcion_zona/2, conexion/2, adyacente/2, distancia/3, zona_pacifica/1, posicion/3,
                   personaje/7, fila_preferida/2, alcance/2, rasgo/2,
                   habilidad_de/2, coste_queso/2,
                   enemigo/4, clase/2, lleva_queso/1, botin/3, numerar_grupo/2,
@@ -26,6 +26,10 @@ zona(bosque,      'Bosque del Moho').
 zona(camino_real, 'Camino Real').
 zona(castillo,    'Castillo Camembert').
 zona(cuevas,      'Cuevas del Roquefort').
+% El paquete C (docs/13-ampliacion.md §6): tres zonas al norte de la taberna, a 1, 2 y 3 dias.
+zona(granja,      'Granja de la Cabra Terca').
+zona(pantano,     'Pantano del Suero').
+zona(mina_de_sal, 'Minas de Sal Gorda').
 
 % descripcion_zona(Id, Texto): lo que ve el jugador al llegar o al mirar.
 descripcion_zona(taberna,
@@ -40,13 +44,27 @@ descripcion_zona(castillo,
     'Una fortaleza blanca y cremosa que, según los lugareños, se hunde un poquito cada año. Los guardias de corteza saludan con una rigidez ejemplar y el rey recibe en una sala tan perfumada que los cortesanos van con la nariz tapada por educación.').
 descripcion_zona(cuevas,
     'Cavernas azules y húmedas, con vetas de moho como mármol en mal estado. El aire sabe a sótano y a decisiones tomadas hace cuarenta años. Algo ahí abajo ha madurado demasiado.').
+descripcion_zona(granja,
+    'Un corral enorme donde las cabras mandan y los humanos obedecen. Huele a heno, a leche agria y a orgullo caprino. La valla tiene más agujeros que un emmental y nadie piensa arreglarla: las cabras la usan de puerta.').
+descripcion_zona(pantano,
+    'Un pantano de suero tibio y verdoso donde las burbujas suben con opiniones. Los juncos están pegajosos, el barro se queda con las botas y el aire huele a requesón que se ha rendido. De noche algo croa en un tono demasiado grave.').
+descripcion_zona(mina_de_sal,
+    'Galerías blancas excavadas en sal, de la que cura los quesos y las heridas (las dos escuecen). Todo lo que tocas se queda salado, incluida la moral. Al fondo se oyen picos, y a veces picos que no son de mineros.').
 
 % ---------------------------------------------------------------------------
 % Mapa: conexion(A, B) se escribe en UN solo sentido; adyacente/2 la hace simetrica.
 %
-%   taberna -- camino_real -- cuevas
-%      |            |  \
-%    aldea ------ bosque    (camino_real -- castillo)
+%   mina_de_sal -- pantano ------------ castillo
+%                     |                    |
+%                  granja                  |
+%                     |                    |
+%      aldea ----- taberna ---------- camino_real -- cuevas
+%        |                                 |
+%        +------------ bosque -------------+
+%
+% La taberna queda en el centro, con tres vecinas. Las zonas del norte (paquete C) estan a 1, 2 y 3 dias y NO acortan
+% ningun camino de los de antes: ir al castillo por el pantano son 3 dias y por el Camino Real siguen siendo 2 (una prueba
+% compara las quince distancias entre las seis zonas viejas, porque de ellas sale el pago de los contratos).
 % ---------------------------------------------------------------------------
 conexion(taberna,     aldea).
 conexion(taberna,     camino_real).
@@ -54,6 +72,23 @@ conexion(aldea,       bosque).
 conexion(bosque,      camino_real).
 conexion(camino_real, castillo).
 conexion(camino_real, cuevas).
+conexion(taberna,     granja).
+conexion(granja,      pantano).
+conexion(pantano,     castillo).
+conexion(pantano,     mina_de_sal).
+
+% posicion(Zona, X, Y): donde se dibuja en el mapa de la web, en % del recuadro (0,0 arriba a la izquierda). Es un dato
+% mas del mundo: la web no sabe que zonas hay ni donde van; se lo manda el servidor (api:mapa_json/1).
+% (Es el punto; el nombre va debajo, asi que la fila de abajo no pasa del 80 %.)
+posicion(taberna,     50, 46).
+posicion(aldea,       16, 52).
+posicion(bosque,      36, 78).
+posicion(camino_real, 82, 62).
+posicion(castillo,    84, 30).
+posicion(cuevas,      82, 80).
+posicion(granja,      44, 25).
+posicion(pantano,     70,  7).
+posicion(mina_de_sal, 20,  7).
 
 adyacente(A, B) :- conexion(A, B).
 adyacente(A, B) :- conexion(B, A).
@@ -181,6 +216,8 @@ botin(ballestero_oxidado, 1, 100).
 probabilidad_de_encuentro(bosque,      30).
 probabilidad_de_encuentro(camino_real, 30).
 probabilidad_de_encuentro(cuevas,      25).
+probabilidad_de_encuentro(pantano,     30).        % la granja, como la aldea, es tranquila
+probabilidad_de_encuentro(mina_de_sal, 25).
 
 encuentro(bosque,      [seta_belicosa, seta_belicosa, seta_curandera, moho_saltarin, moho_saltarin]).
 encuentro(bosque,      [seta_belicosa, rata_quesera, rata_quesera, moho_saltarin, moho_saltarin]).
@@ -191,6 +228,12 @@ encuentro(camino_real, [bandido_torpe, bandido_torpe, bandido_torpe, ballestero_
 encuentro(cuevas,      [rata_quesera, rata_quesera, rata_quesera, moho_saltarin, moho_saltarin]).
 encuentro(cuevas,      [moho_saltarin, moho_saltarin, seta_curandera, seta_belicosa, rata_quesera]).
 encuentro(cuevas,      [bandido_montado, bandido_torpe, ballestero_oxidado, seta_curandera]).
+encuentro(pantano,     [moho_saltarin, moho_saltarin, seta_curandera, rata_quesera]).
+encuentro(pantano,     [seta_belicosa, seta_belicosa, moho_saltarin, rata_quesera, rata_quesera]).
+encuentro(pantano,     [moho_saltarin, moho_saltarin, moho_saltarin, seta_curandera]).
+encuentro(mina_de_sal, [bandido_torpe, bandido_torpe, ballestero_oxidado, rata_quesera]).
+encuentro(mina_de_sal, [bandido_montado, bandido_torpe, bandido_torpe]).
+encuentro(mina_de_sal, [rata_quesera, rata_quesera, rata_quesera, ballestero_oxidado, seta_curandera]).
 
 % ---------------------------------------------------------------------------
 % Niveles y experiencia (paquete D, docs/13-ampliacion.md §10). Regla de oro: el NIVEL 1 son exactamente las cifras de la
@@ -241,6 +284,8 @@ xp_por_intento(3,  5).
 nivel_de_zona(bosque,      2).
 nivel_de_zona(camino_real, 2).
 nivel_de_zona(cuevas,      3).
+nivel_de_zona(pantano,     2).
+nivel_de_zona(mina_de_sal, 3).
 
 % escala_enemigo(vida(V), ataque(A)): lo que suma cada nivel de un enemigo por encima del 1.
 escala_enemigo(vida(3), ataque(1)).

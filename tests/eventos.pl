@@ -55,9 +55,9 @@ test(el_gato_es_el_evento_de_su_contrato, [nondet]) :-
     E == rescate_gato,
     Z == aldea.
 
-test(solo_el_gato_y_el_fantasma_tienen_evento, [nondet]) :-
+test(solo_el_gato_el_fantasma_y_las_cabras_tienen_evento, [nondet]) :-
     findall(C, eventos:evento_de_contrato(C, _, _), Cs),
-    Cs == [gato_en_el_arbol, fantasma_charlatan].
+    Cs == [gato_en_el_arbol, fantasma_charlatan, cabras_tercas].
 
 test(son_tres_intentos) :-
     eventos:intentos_maximos(rescate_gato, N),
@@ -751,3 +751,35 @@ test(solve_da_lo_mismo_que_ejecutar_en_varios_estados) :-
            )).
 
 :- end_tests(ver_y_explicar_el_evento).
+
+
+% ---------------------------------------------------------------------------
+% Las cabras tercas (paquete C): el mismo motor, en la granja. La flauta y el queso las reunen (exito); la fondue las
+% espanta (a medias); perseguirlas solo gasta un intento.
+% ---------------------------------------------------------------------------
+:- begin_tests(las_cabras_tercas).
+
+con_las_cabras :-
+    nueva_partida,
+    ordena(aceptar(cabras_tercas), _),
+    ordena(ir(granja), _).
+
+test(al_llegar_a_la_granja_se_abre_el_evento, [setup(con_las_cabras)]) :-
+    assertion(eventos:evento_abierto(reunir_las_cabras)).
+
+test(la_flauta_de_rufino_lo_resuelve_con_exito, [setup(con_las_cabras)]) :-
+    ordena(elegir(tocar_la_flauta), _),
+    assertion(estado:contrato_por_cobrar(cabras_tercas, exito)).
+
+test(la_fondue_lo_deja_a_medias, [setup(con_las_cabras)]) :-
+    ordena(elegir(asustarlas_con_fondue), _),
+    assertion(estado:contrato_por_cobrar(cabras_tercas, a_medias)).
+
+test(perseguirlas_tres_veces_es_un_fracaso, [setup(con_las_cabras)]) :-
+    ordena(elegir(perseguirlas_con_honor), _),
+    ordena(elegir(perseguirlas_con_honor), _),
+    ordena(elegir(perseguirlas_con_honor), _),
+    assertion(\+ estado:contrato_activo(cabras_tercas)),
+    assertion(\+ contratos:contrato_cumplido(cabras_tercas)).
+
+:- end_tests(las_cabras_tercas).

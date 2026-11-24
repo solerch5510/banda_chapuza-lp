@@ -33,10 +33,10 @@ registrado(N/A) :- estado:transitorio(N/A).
 
 :- begin_tests(mundo).
 
-test(hay_seis_zonas) :-
+test(hay_nueve_zonas_las_seis_de_siempre_y_tres_al_norte) :-
     findall(Z, zona(Z, _), Zs),
     msort(Zs, Ordenadas),
-    Ordenadas == [aldea, bosque, camino_real, castillo, cuevas, taberna].
+    Ordenadas == [aldea, bosque, camino_real, castillo, cuevas, granja, mina_de_sal, pantano, taberna].
 
 test(cada_zona_tiene_descripcion) :-
     forall(zona(Z, _), descripcion_zona(Z, _)).
@@ -61,6 +61,45 @@ test(todo_el_mapa_es_alcanzable_desde_la_taberna) :-
     findall(Z, zona(Z, _), Todas),
     msort(Todas, TodasOrd),
     Ordenadas == TodasOrd.
+
+% --- el mapa centrado en la taberna (paquete C, docs/13-ampliacion.md §6) ---
+% Las quince distancias entre las seis zonas de siempre, ESCRITAS A MANO (no calculadas con el grafo de antes): de ellas
+% sale el pago de los contratos, asi que una zona nueva que abriera un atajo cambiaria lo que se cobra sin que nadie lo
+% hubiera decidido.
+distancia_de_siempre(taberna, aldea, 1).        distancia_de_siempre(taberna, camino_real, 1).
+distancia_de_siempre(taberna, bosque, 2).       distancia_de_siempre(taberna, castillo, 2).
+distancia_de_siempre(taberna, cuevas, 2).       distancia_de_siempre(aldea, bosque, 1).
+distancia_de_siempre(aldea, camino_real, 2).    distancia_de_siempre(aldea, castillo, 3).
+distancia_de_siempre(aldea, cuevas, 3).         distancia_de_siempre(bosque, camino_real, 1).
+distancia_de_siempre(bosque, castillo, 2).      distancia_de_siempre(bosque, cuevas, 2).
+distancia_de_siempre(camino_real, castillo, 1). distancia_de_siempre(camino_real, cuevas, 1).
+distancia_de_siempre(castillo, cuevas, 2).
+
+test(ninguna_distancia_entre_las_seis_zonas_de_siempre_cambia) :-
+    findall(x, distancia_de_siempre(_, _, _), L), length(L, N), assertion(N == 15),
+    forall(distancia_de_siempre(A, B, D),
+           (   distancia(A, B, D1), assertion(D1 == D),
+               distancia(B, A, D2), assertion(D2 == D) )).
+
+test(ninguna_zona_esta_a_mas_de_tres_dias_de_la_taberna) :-
+    forall(zona(Z, _), ( distancia(taberna, Z, D), assertion(D =< 3) )).
+
+test(las_zonas_del_norte_estan_a_uno_dos_y_tres_dias) :-
+    distancia(taberna, granja, 1), distancia(taberna, pantano, 2), distancia(taberna, mina_de_sal, 3).
+
+test(la_taberna_esta_en_el_centro_con_tres_vecinas) :-
+    findall(V, adyacente(taberna, V), Vs), msort(Vs, Ordenadas),
+    Ordenadas == [aldea, camino_real, granja].
+
+test(al_castillo_por_el_norte_se_tarda_mas_que_por_el_camino_real) :-
+    % el atajo que no es atajo: taberna -> granja -> pantano -> castillo son 3 dias; por el Camino Real, 2
+    once(adyacente(pantano, castillo)), distancia(taberna, castillo, 2).
+
+test(cada_zona_tiene_una_posicion_en_el_dibujo_y_no_hay_dos_en_el_mismo_sitio) :-
+    forall(zona(Z, _), ( posicion(Z, X, Y), assertion(between(5, 95, X)), assertion(between(5, 95, Y)) )),
+    findall(Z, posicion(Z, _, _), Zs), msort(Zs, ZsOrd), findall(Z, zona(Z, _), Todas), msort(Todas, TodasOrd),
+    assertion(ZsOrd == TodasOrd),
+    findall(X-Y, posicion(_, X, Y), Ps), sort(Ps, Unicas), length(Ps, N), length(Unicas, N).
 
 test(solo_la_taberna_es_pacifica) :-
     findall(Z, zona_pacifica(Z), Zs),

@@ -8,7 +8,8 @@
 - **Hecho también:** los **encuentros al moverse** (§5): el bosque, el Camino Real y las cuevas, con azar reproducible y `explicar`. Sin huida; el contrato de la zona empieza al terminar el encuentro.
 - **Hecho también (22 de noviembre):** los encuentros pasan a **3–5 enemigos** y entran dos enemigos con truco (la seta curandera y el ballestero oxidado); medida en `docs/11-balance.md`.
 - **Hecho también (22 de noviembre, rama `paquete-d-niveles`):** el **paquete D mínimo** (§10): experiencia, niveles 1 a 5 con crecimiento por rol, dos pasivas por miembro (niveles 3 y 5), zonas con nivel para los encuentros y aviso al llegar. Decisiones tomadas con los valores por defecto: experiencia individual (combates: a repartir entre los que siguen en pie; eventos: a quien lo resuelve), **además** del queso, contenido hasta el nivel 5 (la curva llega al 20) y pasivas en lugar de habilidades activas nuevas.
-- **Pendiente:** el paquete C reducido que propuso el autor (una sola taberna en el centro, zonas nuevas a 3 días como mucho, sin acortar ningún camino de los de ahora), del 28 de noviembre al 2 de diciembre; las habilidades activas nuevas, si hay tiempo.
+- **Hecho también (24 de noviembre, rama `paquete-c-mapa`, sacada de `paquete-d-niveles`):** el **paquete C reducido** que propuso el autor (§6.4): una sola taberna, ahora en el centro del mapa con tres vecinas, y tres zonas al norte a 1, 2 y 3 días (la granja, el pantano y las minas de sal), con su gente, sus sucesos, un contrato cada una y encuentros con nivel. Ningún camino de los de antes se acorta (una prueba compara las quince distancias). Las posiciones del mapa las manda el servidor.
+- **Pendiente:** fusionar las ramas D y C en `main` cuando el autor las dé por probadas; las habilidades activas nuevas, si hay tiempo.
 
 ## 1. Resumen
 
@@ -88,6 +89,16 @@ La `taberna` deja de ser un lugar y pasa a ser un **tipo de lugar**: una tabla `
 - **Contenido nuevo que arrastra:** cada zona nueva pide descripción, enemigos, dos personajes (con su grupo A y B si se quiere mantener la regla de las charlas), contratos y, si se quiere, un evento único. Es **la parte cara en texto**.
 - **Esfuerzo:** de 4 a 5 días contando refugios, peaje, mapa de la web, pruebas, simulador y el contenido de un reino vecino pequeño.
 - **Riesgo:** alto, por tocar el núcleo. Se mitiga marcando una etiqueta antes de empezar (`v1.0-rc2`), haciendo cada paso como un commit que pasa toda la verificación y teniendo una **fecha de decisión** (véase §8).
+
+### 6.4 Lo que se hizo: el paquete C reducido (24 de noviembre)
+
+El autor propuso una versión más barata que la del §6.2: **no** varias tabernas, sino la **misma taberna en el centro** y zonas nuevas a **3 días como mucho**. Así desaparece lo caro (las 232 menciones de `taberna` en las pruebas siguen valiendo) y queda lo que da tamaño.
+
+- **El mapa:** `taberna` pasa a tener tres vecinas (aldea, Camino Real y la **Granja de la Cabra Terca**). De la granja sale el **Pantano del Suero** (2 días), que enlaza con el castillo y con las **Minas de Sal Gorda** (3 días).
+- **La regla que no se rompe:** ningún camino de antes se acorta, porque de las distancias sale el pago de los contratos (`contratos:dias_de_ruta/2`). Ir al castillo por el pantano son 3 días; por el Camino Real, los 2 de siempre. Una prueba compara las **quince distancias** entre las seis zonas viejas con una tabla escrita a mano.
+- **El contenido** (todo datos y textos): nueve personajes con escena (fijo, grupo A y grupo B en cada zona), un suceso por zona, cinco fragmentos de diario, tres contratos (§3.19 de `docs/04`) y las tablas de encuentros del pantano (nivel 2) y las minas (nivel 3). La granja es tranquila, como la aldea.
+- **La economía no se toca:** la gente del norte no da queso neto (el techo de 8 de las charlas y el de 4 de los sucesos siguen, con prueba). El queso del norte sale de los contratos, que la fórmula de pago ya hace valer más cuanto más lejos.
+- **La web:** `mundo:posicion/3` dice dónde va cada zona y `api:mapa_json/1` lo manda; `app.js` ya no tiene una tabla de posiciones propia y el recuadro del mapa crece a 330 px para nueve nombres.
 
 ## 7. Qué se vuelve más difícil de exponer
 

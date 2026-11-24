@@ -173,13 +173,17 @@ test(el_reparto_es_el_acordado_con_el_autor) :-
                    penicilio-bosque-1-99, seta_chismosa-bosque-1-5, aldeano_perdido-bosque-6-99,
                    ganso_recaudador-camino_real-1-99, capitan_pecorino-camino_real-1-5, bandido_arrepentido-camino_real-6-99,
                    rey_brieto-castillo-1-99, lord_tapanarices-castillo-1-5, reina_viuda-castillo-6-99,
-                   el_eco-cuevas-1-99, rata_exiliada-cuevas-1-5, murcielago_azul-cuevas-6-99]),
+                   el_eco-cuevas-1-99, rata_exiliada-cuevas-1-5, murcielago_azul-cuevas-6-99,
+                   % las zonas del norte (paquete C, acordado el 24 de noviembre; docs/12-npcs.md §8)
+                   tia_feta-granja-1-99, burrata-granja-1-5, halloumi-granja-6-99,
+                   bruja_gorgonzola-pantano-1-99, rana_taleggio-pantano-1-5, barquero_emmental-pantano-6-99,
+                   capataz_manchego-mina_de_sal-1-99, minero_cabrales-mina_de_sal-1-5, topo_parmigiano-mina_de_sal-6-99]),
            assertion(charlas:presente(Npc, Zona, Desde, Hasta))).
 
-test(hay_dieciocho_personajes_con_escena_seis_fijos_y_doce_que_rotan) :-
-    findall(Npc, charlas:personaje_de_charla(Npc), L), length(L, N), assertion(N == 18),
-    findall(Npc, ( charlas:presente(Npc, _, 1, 99) ), Fijos), length(Fijos, NF), assertion(NF == 6),
-    findall(Npc, ( charlas:presente(Npc, _, D, H), \+ ( D == 1, H == 99 ) ), Rotan), length(Rotan, NR), assertion(NR == 12).
+test(hay_veintisiete_personajes_con_escena_nueve_fijos_y_dieciocho_que_rotan) :-
+    findall(Npc, charlas:personaje_de_charla(Npc), L), length(L, N), assertion(N == 27),
+    findall(Npc, ( charlas:presente(Npc, _, 1, 99) ), Fijos), length(Fijos, NF), assertion(NF == 9),
+    findall(Npc, ( charlas:presente(Npc, _, D, H), \+ ( D == 1, H == 99 ) ), Rotan), length(Rotan, NR), assertion(NR == 18).
 
 test(en_otra_zona_no_se_puede_hablar_con_alguien_que_esta_en_la_taberna) :-
     en(aldea, 1), assertion(\+ charlas:puede_hablar(mantecosa)).

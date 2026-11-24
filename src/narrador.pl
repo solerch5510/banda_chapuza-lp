@@ -48,6 +48,12 @@ frase(suceso(llegada(castillo)), ambos,
       'El Castillo Camembert se hunde un poquito cada año, pero los guardias saludan con una rigidez ejemplar.').
 frase(suceso(llegada(cuevas)), ambos,
       'Cuevas del Roquefort: aire de sótano, un goteo cada tres segundos y la sensación de que el suelo te mira.').
+frase(suceso(llegada(granja)), ambos,
+      'Granja de la Cabra Terca: las cabras os miran como a intrusos, y en su granja lo sois.').
+frase(suceso(llegada(pantano)), ambos,
+      'El Pantano del Suero os recibe hasta los tobillos. Las burbujas suben, revientan y opinan.').
+frase(suceso(llegada(mina_de_sal)), ambos,
+      'Minas de Sal Gorda: todo brilla, todo escuece y hasta el aire sabe a salmuera.').
 frase(suceso(llegada(Z)), ambos, 'Llegas a ~w.'-[Z]).
 
 % --- descanso, comida y dinero ---
@@ -95,6 +101,18 @@ frase(suceso(evento_elige(escuchar_al_fantasma, fingir_que_se_escucha)), ambos,
       'Tuerca asiente con cara de atención mientras cuenta las tablas del techo. El fantasma nota la diferencia y se lo toma a mal, con mucha educación.').
 frase(suceso(intento_fallido(escuchar_al_fantasma, 0)), ambos,
       'Se acabaron los intentos con el fantasma. Se queda en la casa, muy a gusto, y la alcaldesa suspira: otro siglo de visitas gratis.').
+frase(suceso(evento_abre(reunir_las_cabras)), ambos,
+      'Las cabras de la Tía Feta se han repartido por toda la granja: dos en el tejado, una en el pozo y el resto votando si vuelven al corral. Tenéis tres intentos antes de que se escapen al pantano.').
+frase(suceso(evento_elige(reunir_las_cabras, tocar_la_flauta)), ambos,
+      'Rufino toca una tonada de pastor que no sabía que sabía. Las cabras bajan del tejado y entran en fila en el corral.').
+frase(suceso(evento_elige(reunir_las_cabras, atraerlas_con_queso)), ambos,
+      'Tuerca deja un rastro de queso hasta el corral y las cabras lo siguen como si fuera idea suya. Cuesta un queso.').
+frase(suceso(evento_elige(reunir_las_cabras, asustarlas_con_fondue)), ambos,
+      'Pimentina enciende una fondue flamígera y las cabras vuelven al corral a la carrera, con la leche cortada del susto.').
+frase(suceso(evento_elige(reunir_las_cabras, perseguirlas_con_honor)), ambos,
+      'Baldomero persigue a las cabras con la armadura puesta. Ellas lo rodean, le comen una pluma del casco y vuelven a lo suyo.').
+frase(suceso(intento_fallido(reunir_las_cabras, 0)), ambos,
+      'Se acabaron los intentos. Las cabras se van al pantano en procesión y la Tía Feta os mira como a una cabra que no da leche.').
 frase(suceso(intento_fallido(E, 0)), ambos,
       'Se acabaron los intentos en «~w». El gato se muda a otro árbol y la alcaldesa suspira con experiencia.'-[E]).
 frase(suceso(intento_fallido(_, 1)), ambos,
@@ -127,6 +145,10 @@ frase(suceso(encuentro(camino_real)), ambos,
       'En un recodo del Camino Real os sale al paso alguien con muchas ganas de cobraros una tasa que acaba de inventar.').
 frase(suceso(encuentro(cuevas)), ambos,
       'El goteo se detiene de golpe. En las cuevas el silencio nunca es buena señal, y esta vez tampoco.').
+frase(suceso(encuentro(pantano)), ambos,
+      'El suero borbotea más fuerte de lo normal y del barro sale algo que nadie había invitado.').
+frase(suceso(encuentro(mina_de_sal)), ambos,
+      'Al fondo de la galería un pico deja de sonar. Luego se oyen pasos, y no son de mineros.').
 frase(suceso(encuentro(Z)), ambos, 'Algo os corta el paso en ~w.'-[Z]).
 % --- niveles y experiencia (paquete D) ---
 frase(suceso(xp_victoria(T, N)), ambos,
@@ -395,6 +417,126 @@ frase(suceso(saber_nuevo(moho_en_la_bodega)), ambos,
 frase(suceso(saber_nuevo(altar_alimentado)), ambos,
       'Diario: en las cuevas hay un altar de moho al que alguien lleva siglos dejando queso.').
 
+% --- el tercer lote: la gente y los sucesos de las zonas del norte (paquete C) ---
+frase(suceso(charla_abre(tia_feta)), ambos,
+      'La Tía Feta, con un sombrero de paja y una cabra bajo cada brazo, os habla sin soltarlas. «Desde que el pantano huele a suero agrio, mis cabras no quieren pastar hacia el norte. Y las que van vuelven con las barbas azules. Azules. Yo tengo cabras, no bandera».').
+frase(suceso(charla_elige(tia_feta, examinar_las_barbas)), ambos,
+      'Pimentina examina una barba con lupa y la cabra se deja, con paciencia de abuela. Es moho, el mismo de siempre: llega del pantano y se pega a todo lo que pasta allí.').
+frase(suceso(charla_elige(tia_feta, ayudar_con_el_heno)), ambos,
+      'Baldomero carga heno toda la tarde con la armadura puesta. Acaba cubierto de paja y de respeto caprino, que es el más difícil de ganar.').
+frase(suceso(charla_elige(tia_feta, birlar_un_queso_de_la_quesera)), ambos,
+      'Tuerca sale de la quesera con un queso bajo el chaleco. Una cabra lo mira fijamente, sin parpadear, hasta que Tuerca lo devuelve. Sale sin queso y con la conciencia mordida.').
+
+frase(suceso(charla_abre(burrata)), ambos,
+      'Una cabra blanca os corta el paso y muge. Muge bien, con acento y todo. «Soy Burrata, vaca de la granja», dice, con una dignidad que no admite réplica. Las otras cabras miran hacia otro lado por educación.').
+frase(suceso(charla_elige(burrata, llamarla_vaca_con_respeto)), ambos,
+      'Baldomero le hace una reverencia y la llama «señora vaca». Burrata se emociona y muge de gratitud. La Banda descubre que un poco de cortesía alegra a todo el mundo, incluso a quien la da.').
+frase(suceso(charla_elige(burrata, ensenarle_a_balar)), ambos,
+      'Rufino le enseña a balar con método. Burrata bala una vez, se horroriza y vuelve a mugir. Rufino lo considera un éxito pedagógico.').
+frase(suceso(charla_elige(burrata, darle_queso_de_vaca)), ambos,
+      'Pimentina le da un queso de vaca y Burrata, conmovida, invita a la Banda a un cuenco de su leche, que repone como un caldo. Es leche de cabra, pero nadie se lo va a decir.').
+
+frase(suceso(charla_abre(halloumi)), ambos,
+      'El pastor Halloumi asa un queso sobre unas brasas y el queso, en lugar de fundirse, se dora y chirría. «Es mi receta. No se funde nunca. No sé por qué nadie se queda a cenar».').
+frase(suceso(charla_elige(halloumi, pedir_la_receta)), ambos,
+      'Pimentina apunta la receta con letra de bruja: mucha sal de las minas y paciencia. El queso que no se funde le parece el invento del siglo y sale encantada.').
+frase(suceso(charla_elige(halloumi, probar_sin_permiso)), ambos,
+      'Tuerca prueba un trozo sin permiso, luego otro, y acaba repartiendo la parrilla entera entre la Banda. Todos se reponen y Halloumi, feliz: por fin alguien come.').
+frase(suceso(charla_elige(halloumi, cantar_junto_al_fuego)), ambos,
+      'Rufino canta junto a las brasas y, por primera vez en años, alguien se queda a cenar en la granja. Halloumi llora de alegría y la Banda sale con el ánimo caliente.').
+
+frase(suceso(charla_abre(bruja_gorgonzola)), ambos,
+      'La Bruja Gorgonzola, verde de cintura para arriba y azul de cintura para abajo, remueve un caldero sin fondo. «El pantano no es mío, es del moho. Sube por los arroyos, de muy abajo. Yo solo lo cocino para que no se escape».').
+frase(suceso(charla_elige(bruja_gorgonzola, cocinar_con_ella)), ambos,
+      'Pimentina echa un queso al caldero y las dos brujas cocinan en silencio, como viejas amigas. Gorgonzola le cuenta que el moho sube por los arroyos desde las cuevas.').
+frase(suceso(charla_elige(bruja_gorgonzola, vigilar_el_caldero)), ambos,
+      'Baldomero vigila el caldero con la espada en alto. El caldero escupe y le chamusca el bigote. Baldomero decide que no es enemigo para su honor.').
+frase(suceso(charla_elige(bruja_gorgonzola, cantarle_al_caldero)), ambos,
+      'Rufino le canta al caldero y en las burbujas se dibujan arroyos que bajan hacia las cuevas. La bruja asiente: «Eso. De allí viene».').
+
+frase(suceso(charla_abre(rana_taleggio)), ambos,
+      'Una rana del tamaño de un barril se aclara la garganta sobre un nenúfar. «Taleggio, tenor del pantano. Hoy doy un concierto. Mañana, también. Siempre doy un concierto», y croa una nota tan grave que tiemblan los juncos.').
+frase(suceso(charla_elige(rana_taleggio, hacer_un_duo)), ambos,
+      'Rufino y Taleggio cantan a dúo. El pantano entero se calla para escucharlos y Rufino sale convencido de que su carrera acaba de empezar.').
+frase(suceso(charla_elige(rana_taleggio, exigir_silencio)), ambos,
+      'Baldomero exige silencio. La rana croa más fuerte, por principios. Baldomero se retira con los oídos zumbando y el ánimo por los suelos.').
+frase(suceso(charla_elige(rana_taleggio, buscar_entre_los_juncos)), ambos,
+      'Mientras la rana canta, Tuerca busca entre los juncos y encuentra la batuta que perdió el director del último concierto. Se la queda y se siente artista.').
+
+frase(suceso(charla_abre(barquero_emmental)), ambos,
+      'El barquero Emmental espera junto a una barca con más agujeros que tablas. «Al otro lado, un queso por cabeza. Se paga antes, por si acaso». Bajo la barca, el suero burbujea con expectación.').
+frase(suceso(charla_elige(barquero_emmental, tapar_los_agujeros)), ambos,
+      'Pimentina tapa los agujeros con queso curado y la barca, por primera vez en su vida, flota. Emmental llora, la Banda cruza seca y todos salen de buen humor.').
+frase(suceso(charla_elige(barquero_emmental, remar_con_honor)), ambos,
+      'Baldomero rema con tanto honor que la barca llega al otro lado antes de hundirse del todo. Sale empapado y orgulloso, que en él es lo mismo.').
+frase(suceso(charla_elige(barquero_emmental, regatear_el_pasaje)), ambos,
+      'Tuerca regatea el pasaje hasta que Emmental lo deja subir gratis, solo por que se calle. Tuerca cruza con la sonrisa de quien ha ganado una guerra.').
+
+frase(suceso(charla_abre(capataz_manchego)), ambos,
+      'El capataz Manchego, curtido como un queso de doce meses, os recibe con un pico al hombro. «La sal de esta mina cura los quesos del rey. O los curaba: hace tres inviernos que el Gremio se lleva la fina y aquí nos deja la gorda».').
+frase(suceso(charla_elige(capataz_manchego, picar_un_turno)), ambos,
+      'Baldomero pica un turno entero. No saca casi nada de sal, pero los mineros le aplauden la constancia, y eso para Baldomero vale más.').
+frase(suceso(charla_elige(capataz_manchego, revisar_los_albaranes)), ambos,
+      'Tuerca revisa los albaranes y encuentra el sello del Gremio en todos: hace tres inviernos que se llevan la mejor sal, sin pagar y sin decir para qué.').
+frase(suceso(charla_elige(capataz_manchego, pedir_sal_para_las_heridas)), ambos,
+      'Pimentina pide un saco de sal y cura las heridas de todos. Escuece como un insulto, pero funciona.').
+
+frase(suceso(charla_abre(minero_cabrales)), ambos,
+      'El minero Cabrales sale de la galería con el pico al hombro y los ojos entornados. «¿Es de día? ¿Es de noche? Llevo seis años aquí abajo y he perdido la cuenta. ¿Sigue el sol donde lo dejé?».').
+frase(suceso(charla_elige(minero_cabrales, cantar_una_cancion_de_mina)), ambos,
+      'Rufino entona una canción de mina y los mineros la corean desde todas las galerías. La Banda sale con el ánimo de quien ha cantado bajo tierra y le ha salido bien.').
+frase(suceso(charla_elige(minero_cabrales, buscar_una_veta)), ambos,
+      'Cabrales le enseña a Tuerca dónde buscar y Tuerca encuentra una veta de sal fina, de la buena. Los mineros le ponen su nombre y Tuerca no cabe en sí.').
+frase(suceso(charla_elige(minero_cabrales, preguntar_por_el_sol)), ambos,
+      'Baldomero le describe el sol con todo detalle. Cabrales se emociona, luego se deprime, y a Baldomero se le contagia lo segundo.').
+
+frase(suceso(charla_abre(topo_parmigiano)), ambos,
+      'Un topo anciano, con gafas de culo de botella, asoma la cabeza por un agujero. «Parmigiano, para servirles. No veo nada, pero lo oigo todo. Bajo tierra se oye todo, sobre todo lo que nadie quiere que se oiga».').
+frase(suceso(charla_elige(topo_parmigiano, escuchar_sus_tuneles)), ambos,
+      'Pimentina escucha con paciencia y el topo le cuenta que sus túneles llegan hasta las cuevas, y que de allí sube un olor a queso muy viejo y muy triste.').
+frase(suceso(charla_elige(topo_parmigiano, ofrecerle_el_brazo)), ambos,
+      'Baldomero le ofrece el brazo para cruzar la galería. El topo lo acepta, con mucha ceremonia, y Baldomero se siente el caballero que siempre quiso ser.').
+frase(suceso(charla_elige(topo_parmigiano, pedirle_un_atajo)), ambos,
+      'Tuerca pide un atajo y el topo le señala uno. Tuerca sale una hora después, por el mismo agujero, cubierto de tierra y sin ganas de hablar.').
+
+frase(suceso(charla_abre(la_valla_de_las_cabras)), ambos,
+      'Una valla con más agujeros que tablas rodea el corral. Las cabras entran y salen por donde quieren, y de vez en cuando miran a la Banda como esperando que alguien proponga algo.').
+frase(suceso(charla_elige(la_valla_de_las_cabras, arreglar_la_valla)), ambos,
+      'Baldomero arregla la valla con tablas, clavos y honor. Las cabras la saltan por encima en cuanto termina, pero la valla ha quedado preciosa y él lo sabe.').
+frase(suceso(charla_elige(la_valla_de_las_cabras, colarse_en_la_quesera)), ambos,
+      'Tuerca se cuela por un agujero de la valla hasta la quesera y vuelve con un queso. Las cabras lo miran con complicidad: ellas también lo hacen.').
+frase(suceso(charla_elige(la_valla_de_las_cabras, pastorear_con_musica)), ambos,
+      'Rufino toca para las cabras y las cabras bailan, a su manera. La Banda acaba bailando con ellas y nadie lo cuenta en la taberna.').
+
+frase(suceso(charla_abre(la_isla_que_flota)), ambos,
+      'En medio del pantano flota una isla de requesón del tamaño de una era. Tiene un árbol, un banco y un cofre medio hundido. Se mueve un poco, como si respirara.').
+frase(suceso(charla_elige(la_isla_que_flota, saltar_a_la_isla)), ambos,
+      'Tuerca salta de nenúfar en nenúfar hasta la isla y abre el cofre: un mapa del pantano lleno de cruces y ningún tesoro. Vuelve con los pies llenos de suero y muy orgulloso del salto.').
+frase(suceso(charla_elige(la_isla_que_flota, cuajar_la_isla)), ambos,
+      'Pimentina echa un queso al suero y la orilla de la isla se cuaja hasta hacerse sólida. En el cofre hay una poción con la etiqueta «No beber en el pantano». La bebéis fuera.').
+frase(suceso(charla_elige(la_isla_que_flota, vadear_con_la_armadura)), ambos,
+      'Baldomero vadea hacia la isla con la armadura puesta. A mitad de camino el suero le llega al pecho, y luego al casco. Vuelve sin isla, sin cofre y sin ganas de nada.').
+
+frase(suceso(charla_abre(el_lago_de_salmuera)), ambos,
+      'Al fondo de las minas hay un lago subterráneo de salmuera, quieto y blanco como la leche. Un cartel dice: «Prohibido bañarse. Prohibido cantar. Prohibido llorar: sube la sal».').
+frase(suceso(charla_elige(el_lago_de_salmuera, lavar_las_heridas_con_sal)), ambos,
+      'Pimentina lava las heridas de la Banda en la salmuera. Escuece tanto que nadie se queja de nada más en todo el día, pero las heridas se cierran.').
+frase(suceso(charla_elige(el_lago_de_salmuera, banarse_con_la_armadura)), ambos,
+      'Baldomero se baña con la armadura puesta y sale con una costra de sal que cruje al andar. Durante tres días suena como un queso curado.').
+frase(suceso(charla_elige(el_lago_de_salmuera, cantarle_al_lago)), ambos,
+      'Rufino canta al lago, a pesar del cartel. El eco de la sal le devuelve la canción limpia y brillante. Rufino sale convencido de que el cartel no iba por él.').
+
+frase(suceso(saber_nuevo(barbas_azules)), ambos,
+      'Diario: las cabras de la granja vuelven del pantano con las barbas azules de moho.').
+frase(suceso(saber_nuevo(queso_que_no_se_funde)), ambos,
+      'Diario: el pastor Halloumi hace un queso que no se funde con mucha sal de las minas.').
+frase(suceso(saber_nuevo(moho_sube_por_los_arroyos)), ambos,
+      'Diario: el moho de las cuevas sube por los arroyos hasta el Pantano del Suero.').
+frase(suceso(saber_nuevo(gremio_se_lleva_la_sal)), ambos,
+      'Diario: el Gremio se lleva la mejor sal de las minas desde hace tres inviernos.').
+frase(suceso(saber_nuevo(tuneles_hasta_las_cuevas)), ambos,
+      'Diario: los túneles del topo llegan hasta las cuevas, y de allí sube un olor a queso viejo y triste.').
+
 frase(suceso(botin(1)), ambos,
       'Botín: 1 queso fresco. Lo guardaba «para emergencias». Esto lo era.').
 frase(suceso(botin(N)), ambos,
@@ -618,6 +760,9 @@ nombre(bosque,      'el Bosque del Moho').
 nombre(camino_real, 'el Camino Real').
 nombre(castillo,    'el Castillo Camembert').
 nombre(cuevas,      'las Cuevas del Roquefort').
+nombre(granja,      'la Granja de la Cabra Terca').
+nombre(pantano,     'el Pantano del Suero').
+nombre(mina_de_sal, 'las Minas de Sal Gorda').
 nombre(cheddar,     'el cheddar').
 nombre(brie,        'el brie').
 nombre(ratas_del_granero, 'Ratas del Granero').
@@ -676,6 +821,22 @@ nombre(el_pozo_de_los_deseos, 'el Pozo de los Deseos').
 nombre(la_carreta_del_gremio, 'la Carreta del Gremio').
 nombre(la_bodega_del_rey,     'la Bodega Real').
 nombre(el_altar_del_moho,     'el Altar del Moho').
+nombre(cabras_tercas,      'Las Cabras Tercas').
+nombre(barro_con_hambre,   'El Barro con Hambre').
+nombre(motin_de_la_sal,    'El Motín de la Sal').
+nombre(reunir_las_cabras,  'la reunión de las cabras').
+nombre(tia_feta,            'la Tía Feta').
+nombre(burrata,             'Burrata').
+nombre(halloumi,            'el Pastor Halloumi').
+nombre(bruja_gorgonzola,    'la Bruja Gorgonzola').
+nombre(rana_taleggio,       'la Rana Taleggio').
+nombre(barquero_emmental,   'el Barquero Emmental').
+nombre(capataz_manchego,    'el Capataz Manchego').
+nombre(minero_cabrales,     'el Minero Cabrales').
+nombre(topo_parmigiano,     'el Topo Parmigiano').
+nombre(la_valla_de_las_cabras, 'la Valla de las Cabras').
+nombre(la_isla_que_flota,      'la Isla que Flota').
+nombre(el_lago_de_salmuera,    'el Lago de Salmuera').
 
 % nombre_visible(+Id, -Texto): los numeros y lo desconocido pasan tal cual.
 nombre_visible(Id, Texto) :-
@@ -951,6 +1112,12 @@ descripcion_opcion(escuchar_al_fantasma, exorcizar_con_fondue,  'Madame Pimentin
 descripcion_opcion(escuchar_al_fantasma, exigirle_que_se_vaya,  'Sir Baldomero le exige que se vaya (gasta un intento)').
 descripcion_opcion(escuchar_al_fantasma, fingir_que_se_escucha, 'Tuerca finge que escucha (gasta un intento)').
 
+descripcion_evento(reunir_las_cabras, 'Las Cabras Tercas: el rebaño de la Tía Feta se ha repartido por toda la granja y no piensa volver por las buenas.').
+descripcion_opcion(reunir_las_cabras, tocar_la_flauta,        'Rufino les toca una tonada de pastor').
+descripcion_opcion(reunir_las_cabras, atraerlas_con_queso,    'Tuerca las atrae con un rastro de queso (cuesta 1 queso)').
+descripcion_opcion(reunir_las_cabras, asustarlas_con_fondue,  'Madame Pimentina las asusta con una fondue flamígera').
+descripcion_opcion(reunir_las_cabras, perseguirlas_con_honor, 'Sir Baldomero las persigue con todo su honor (gasta un intento)').
+
 % descripcion_contrato(+Contrato, -Texto): el chiste de cada contrato, que enseña el tablon.
 descripcion_contrato(ratas_del_granero, 'Las ratas dicen tener papeles de alquiler por un queso al siglo y se hacen las muertas para cobrar el seguro.').
 descripcion_contrato(gato_en_el_arbol,  'Su Excelencia Bigotes lleva tres días arriba y dice que desde allí se juzga mejor.').
@@ -959,6 +1126,9 @@ descripcion_contrato(despensa_real,     'El rey contrata a los peores porque los
 descripcion_contrato(peaje_del_ganso,    'Un ganso cobra «el peaje del peaje» en el Camino Real y nadie se atreve a discutirle la tarifa.').
 descripcion_contrato(fantasma_charlatan, 'La Casa del Cuervo Gordo está encantada por un mayordomo que solo quiere que alguien le escuche.').
 descripcion_contrato(paz_del_moho,       'Las setas del bosque han perdido la paciencia y el moho saltarín, los modales.').
+descripcion_contrato(cabras_tercas,      'Las cabras de la Tía Feta han declarado la independencia, y la granja entera es su territorio.').
+descripcion_contrato(barro_con_hambre,   'En el Pantano del Suero el barro se come las botas, y ahora también a quien va dentro.').
+descripcion_contrato(motin_de_la_sal,    'Unos bandidos han tomado las minas y venden la sal gorda como si fuera fina. El capataz quiere su mina y su dignidad, por ese orden.').
 
 % descripcion_personaje(+Npc, -Texto): quien es, para la lista de `hablar.`
 descripcion_personaje(mantecosa,        'La dueña del Cuajo Torcido: cobra todo y no perdona nada.').
@@ -1055,6 +1225,55 @@ descripcion_opcion_charla(la_bodega_del_rey, bajar_a_la_bodega,      'Sir Baldom
 descripcion_opcion_charla(el_altar_del_moho, dejarle_un_queso_al_moho,    'Madame Pimentina deja un queso sobre el altar (cuesta 1 queso)').
 descripcion_opcion_charla(el_altar_del_moho, cantarle_una_nana_al_altar,  'Rufino le canta una nana al altar').
 descripcion_opcion_charla(el_altar_del_moho, tocar_el_moho,               'Sir Baldomero toca el moho').
+
+% --- el tercer lote: las zonas del norte (paquete C) ---
+descripcion_personaje(tia_feta,          'La dueña de la granja, que habla con las cabras de usted y con la gente, a gritos.').
+descripcion_personaje(burrata,           'Una cabra blanca convencida de que es una vaca. Muge con acento.').
+descripcion_personaje(halloumi,          'Un pastor que asa un queso que no se funde y no entiende por qué nadie se queda a cenar.').
+descripcion_personaje(bruja_gorgonzola,  'Una bruja verde y azul que cocina el suero del pantano en un caldero sin fondo.').
+descripcion_personaje(rana_taleggio,     'Una rana enorme, de voz grave, que se presenta como «tenor del pantano».').
+descripcion_personaje(barquero_emmental, 'Un barquero cuya barca tiene más agujeros que tablas. Cobra por adelantado.').
+descripcion_personaje(capataz_manchego,  'El capataz de las minas, curtido como un queso de doce meses.').
+descripcion_personaje(minero_cabrales,   'Un minero que lleva seis años bajo tierra y ya no sabe si es de día.').
+descripcion_personaje(topo_parmigiano,   'Un topo anciano con gafas de culo de botella que lo oye todo bajo tierra.').
+
+descripcion_opcion_charla(tia_feta, examinar_las_barbas,            'Madame Pimentina examina las barbas azules de una cabra').
+descripcion_opcion_charla(tia_feta, ayudar_con_el_heno,             'Sir Baldomero ayuda a cargar el heno').
+descripcion_opcion_charla(tia_feta, birlar_un_queso_de_la_quesera,  'Tuerca se da una vuelta por la quesera').
+descripcion_opcion_charla(burrata, llamarla_vaca_con_respeto,  'Sir Baldomero la llama «señora vaca», con respeto').
+descripcion_opcion_charla(burrata, ensenarle_a_balar,          'Rufino intenta enseñarle a balar').
+descripcion_opcion_charla(burrata, darle_queso_de_vaca,        'Madame Pimentina le da un queso de vaca (cuesta 1 queso; cura a la Banda)').
+descripcion_opcion_charla(halloumi, pedir_la_receta,        'Madame Pimentina le pide la receta').
+descripcion_opcion_charla(halloumi, probar_sin_permiso,     'Tuerca prueba el queso sin pedir permiso').
+descripcion_opcion_charla(halloumi, cantar_junto_al_fuego,  'Rufino canta junto a las brasas').
+descripcion_opcion_charla(bruja_gorgonzola, cocinar_con_ella,     'Madame Pimentina cocina con ella (cuesta 1 queso)').
+descripcion_opcion_charla(bruja_gorgonzola, vigilar_el_caldero,   'Sir Baldomero vigila el caldero, espada en mano').
+descripcion_opcion_charla(bruja_gorgonzola, cantarle_al_caldero,  'Rufino le canta al caldero').
+descripcion_opcion_charla(rana_taleggio, hacer_un_duo,             'Rufino le propone un dúo').
+descripcion_opcion_charla(rana_taleggio, exigir_silencio,          'Sir Baldomero exige silencio').
+descripcion_opcion_charla(rana_taleggio, buscar_entre_los_juncos,  'Tuerca busca entre los juncos mientras canta').
+descripcion_opcion_charla(barquero_emmental, tapar_los_agujeros,  'Madame Pimentina tapa los agujeros de la barca (cuesta 1 queso)').
+descripcion_opcion_charla(barquero_emmental, remar_con_honor,     'Sir Baldomero rema, con honor').
+descripcion_opcion_charla(barquero_emmental, regatear_el_pasaje,  'Tuerca regatea el pasaje').
+descripcion_opcion_charla(capataz_manchego, picar_un_turno,              'Sir Baldomero pica un turno entero').
+descripcion_opcion_charla(capataz_manchego, revisar_los_albaranes,       'Tuerca revisa los albaranes de la sal').
+descripcion_opcion_charla(capataz_manchego, pedir_sal_para_las_heridas,  'Madame Pimentina pide sal para curar las heridas').
+descripcion_opcion_charla(minero_cabrales, cantar_una_cancion_de_mina,  'Rufino canta una canción de mina').
+descripcion_opcion_charla(minero_cabrales, buscar_una_veta,             'Tuerca busca una veta con él').
+descripcion_opcion_charla(minero_cabrales, preguntar_por_el_sol,        'Sir Baldomero le describe el sol').
+descripcion_opcion_charla(topo_parmigiano, escuchar_sus_tuneles,  'Madame Pimentina le escucha hablar de sus túneles').
+descripcion_opcion_charla(topo_parmigiano, ofrecerle_el_brazo,    'Sir Baldomero le ofrece el brazo').
+descripcion_opcion_charla(topo_parmigiano, pedirle_un_atajo,      'Tuerca le pide un atajo').
+
+descripcion_opcion_charla(la_valla_de_las_cabras, arreglar_la_valla,      'Sir Baldomero arregla la valla').
+descripcion_opcion_charla(la_valla_de_las_cabras, colarse_en_la_quesera,  'Tuerca se cuela por un agujero hasta la quesera').
+descripcion_opcion_charla(la_valla_de_las_cabras, pastorear_con_musica,   'Rufino pastorea a las cabras con música').
+descripcion_opcion_charla(la_isla_que_flota, saltar_a_la_isla,        'Tuerca salta a la isla de nenúfar en nenúfar').
+descripcion_opcion_charla(la_isla_que_flota, cuajar_la_isla,          'Madame Pimentina cuaja la orilla con queso (cuesta 1 queso)').
+descripcion_opcion_charla(la_isla_que_flota, vadear_con_la_armadura,  'Sir Baldomero vadea hasta la isla con la armadura').
+descripcion_opcion_charla(el_lago_de_salmuera, lavar_las_heridas_con_sal,  'Madame Pimentina lava las heridas en la salmuera').
+descripcion_opcion_charla(el_lago_de_salmuera, banarse_con_la_armadura,    'Sir Baldomero se baña con la armadura').
+descripcion_opcion_charla(el_lago_de_salmuera, cantarle_al_lago,           'Rufino le canta al lago').
 
 % texto_saber(+Marca, -Texto): la linea del diario (la misma frase con la que se anuncia al averiguarlo).
 texto_saber(Marca, Texto) :-

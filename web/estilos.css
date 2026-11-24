@@ -1400,7 +1400,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid #2d6f73; outline-
 }
 
 .zone-graph {
-  height: 255px;
+  height: 330px; /* nueve zonas desde el paquete C: mas alto para que no se pisen los nombres */
   position: relative;
   overflow: hidden;
   border: 1px solid var(--line);

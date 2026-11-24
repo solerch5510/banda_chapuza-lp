@@ -322,11 +322,11 @@
       "</small></span><span class=\"arrow\">›</span></button>";
   }
 
-  // El mapa: posiciones fijas de las seis zonas; las conexiones son las del juego.
-  var POS = { taberna: [17, 17], aldea: [17, 55], bosque: [45, 80], camino_real: [52, 47], castillo: [84, 17], cuevas: [84, 76] };
-
+  // El mapa: zonas, posiciones (x, y en %) y conexiones llegan del servidor (mundo:posicion/3).
   function grafoZonas() {
     var e = S.estado, aqui = e.zona.id, mapa = e.mapa;
+    var POS = {};
+    mapa.zonas.forEach(function (z) { POS[z.id] = [z.x, z.y]; });
     var salidas = {};
     e.zona.salidas.forEach(function (s) { salidas[s.id] = true; });
     var lineas = mapa.conexiones.map(function (c) {

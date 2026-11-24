@@ -240,7 +240,7 @@ El proyecto se hizo en tareas pequeñas y verificables (T-01 a T-42 más el extr
 
 ## 9. Limitaciones y trabajo futuro
 
-- **Alcance.** Se cumplió el nivel mínimo y se fue más allá: 7 contratos, 9 enemigos (dos con truco), niveles y experiencia hasta el nivel 5, 21 comandos (con `hablar`, `usar`, `explorar` y `diario`), botín con azar reproducible, ayuno, charlas con 18 personajes, sucesos de zona y un simulador de balance. No se hicieron `huir`, `comer`, tienda, `guardar`/`cargar` ni reclutas.
+- **Alcance.** Se cumplió el nivel mínimo y se fue más allá: 9 zonas con la taberna en el centro, 10 contratos, 9 enemigos (dos con truco), niveles y experiencia hasta el nivel 5, 21 comandos (con `hablar`, `usar`, `explorar` y `diario`), botín con azar reproducible, ayuno, charlas con 27 personajes, sucesos de zona y un simulador de balance. No se hicieron `huir`, `comer`, tienda, `guardar`/`cargar` ni reclutas.
 - **Balance.** La ruta cómoda gana el día 7 con **cero** quesos de margen: el juego es ganable pero ajustado, y un segundo playtest con otra persona queda como mejora.
 - **Web.** Una partida por servidor, y la crónica vive en el navegador (se pierde al recargar).
 - **Versión de SWI-Prolog.** Se usó solo lo disponible en la 5.10.4 (sin `yall`, `foldl/4` ni `sort/4`), lo que obligó a escribir ayudantes propios.

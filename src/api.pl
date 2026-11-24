@@ -489,8 +489,9 @@ comida_json(json([queso=Queso, racion=Racion, dias=Dias, riesgo=Riesgo, aviso=Av
     economia:riesgo_de_gasto(0, Riesgo),
     (   narrador:texto_riesgo(Riesgo, T) -> Aviso = T ; Aviso = @(null) ).
 
+% Cada zona lleva su posicion en el dibujo (mundo:posicion/3): la web no tiene una tabla propia de zonas.
 mapa_json(json([zonas=Zonas, conexiones=Conex])) :-
-    findall(json([id=Id, nombre=N]), mundo:zona(Id, N), Zonas),
+    findall(json([id=Id, nombre=N, x=X, y=Y]), ( mundo:zona(Id, N), mundo:posicion(Id, X, Y) ), Zonas),
     findall([A, B], mundo:conexion(A, B), Conex).
 
 % ---------------------------------------------------------------------------

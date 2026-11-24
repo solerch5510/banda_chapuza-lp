@@ -163,6 +163,21 @@ Lectura: el jugador que hace **todos** los contratos acaba con muchísimo queso 
 
 Lectura: con niveles **el juego queda algo más duro que antes** (91–98 % del jugador atento sin niveles), porque los encuentros de las cuevas suben más que la Banda. La Banda acaba la partida en el nivel 2 o 3, lejos del 5: el nivel 4 y el 5 son para quien **farmea**. Una primera prueba sin reparto (cada uno ganaba la experiencia entera) llevaba a toda la Banda al nivel 4 o 5 y el juego se volvía fácil (98 % de victorias del atento y 70 % del despistado): por eso se reparte. El «listo» pierde más que el que solo ataca porque gasta turnos en habilidades que no siempre convienen (la balada, rebuscar): elegir **cuándo** usar una habilidad también es parte del juego.
 
+## Con el mapa del norte (paquete C reducido)
+
+*(24 de noviembre de 2026, rama `paquete-c-mapa`.)* Tres zonas nuevas a 1, 2 y 3 días de la taberna, tres contratos más (ninguno obligatorio para el jefe) y encuentros de nivel 2 en el pantano y de nivel 3 en las minas. Mismo informe (`informe(200, 1)`, 200 partidas por jugador, misma semilla) en la rama de niveles sola y con el norte:
+
+| Jugador (combate) | Sin el norte | Con el norte | Queso al ganar (media) |
+|---|---|---|---|
+| Atento, 10 % de errores, solo atacar | 161 (80,5 %) | 173 (86,5 %) | 44 → 32 |
+| Atento, 10 % de errores, «listo» | 117 (58,5 %) | 123 (61,5 %) | 33 → 24 |
+| Atento sin errores, solo atacar | 184 (92 %) | 189 (94,5 %) | 56 → 36 |
+| Atento sin errores, «listo» | 132 (66 %) | 131 (65,5 %) | 45 → 28 |
+| Con plan, combate al azar | 69 (34,5 %) | 87 (43,5 %) | 41 → 31 |
+| Al azar | 1 | 2 | — |
+
+Lectura: el norte **no rompe el equilibrio**. Gana algo más quien tiene plan (más contratos = más experiencia y más queso por cobrar), pero llega a la victoria con **menos queso de sobra** y, a veces, un día o dos más tarde: el norte está lejos y cada día de viaje es una ración. Las muertes por hambre suben un poco (de 2 a 6 de 200 en el atento con errores), que es justo lo que el autor quería que costara ir lejos. No hizo falta tocar ningún número.
+
 ## Con grupos de 3 a 5 enemigos y enemigos con truco
 
 *(22 de noviembre de 2026.)* Dos enemigos nuevos —la **seta curandera** (12 de vida, desde atrás, cura 5 al aliado más herido, prioridad 5 de su lista, por delante de atacar) y el **ballestero oxidado** (10 de vida, 6 de ataque, a distancia: llega a la retaguardia)— y encuentros de 3 a 5 enemigos; el peaje del ganso y la paz del moho los llevan también (ahora pagan 15 y 22).

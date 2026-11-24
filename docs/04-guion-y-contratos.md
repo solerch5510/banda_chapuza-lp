@@ -619,6 +619,18 @@ La ficha de `pelea_de_taberna` está en la sección 3.17.
 
 > Nota: en una partida normal Baldomero ya lleva la venda cuando llega el `bandido_montado`, así que `por_que_no(atacar(baldomero, bandido_montado))` solo falla en un estado de prueba (la `demo` y las pruebas parten de un estado con la venda sin equipar). Con la venda, `explicar(atacar(baldomero, bandido_montado))` muestra por qué sí puede.
 
+### 3.19 Los contratos del norte (paquete C, 24 de noviembre de 2026)
+
+Tres contratos más, uno por zona nueva (`docs/13-ampliacion.md` §6). Ninguno es condición del jefe: son el camino opcional del norte. Cada uno **aparece en el tablón al pasar por la zona anterior** del camino, así que el norte se descubre andando.
+
+| Contrato | Zona (días) | Objetivo | Aparece | Recompensa | Dificultad |
+|---|---|---|---|---|---|
+| `cabras_tercas` — Las Cabras Tercas | `granja` (1) | evento `reunir_las_cabras`, 3 intentos | desde el día 1 | pago (12) + poción | 1 |
+| `barro_con_hambre` — El Barro con Hambre | `pantano` (2) | eliminar 2 mohos, una seta curandera y una rata | `visita(granja)` | pago | 3 |
+| `motin_de_la_sal` — El Motín de la Sal | `mina_de_sal` (3) | eliminar un bandido montado, dos torpes y un ballestero | `visita(pantano)` | pago + poción | 4 |
+
+**El evento de las cabras** usa el mismo motor que el gato: la flauta de Rufino o el rastro de queso de Tuerca (1 queso) las reúnen (**éxito**); la fondue de Pimentina las espanta (**a medias**, se cobra la mitad); perseguirlas con honor (Baldomero) solo gasta un intento. El pago lo calcula la fórmula de siempre con los días de ida y vuelta, así que la mina, a 6 días de viaje, paga más que las cabras.
+
 ---
 
 ## 4. Contratos por nivel de alcance (hilo principal frente a secundarios)

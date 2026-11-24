@@ -8,7 +8,7 @@ Escribe ayuda. para ver los comandos; explicar. y por_que_no(Accion). cuentan po
 
 == Taberna del Cuajo Torcido ==
 El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
-Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
+Salidas: aldea (Aldea Requesón), camino_real (Camino Real), granja (Granja de la Cabra Terca)
 Día 1 · Queso en la despensa: 12 · ración 4 al día (te alcanza para 3)
 Objetivo: acepta un contrato en el tablón de la taberna.
 
@@ -26,7 +26,7 @@ Para probar:
 
 == Taberna del Cuajo Torcido ==
 El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
-Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
+Salidas: aldea (Aldea Requesón), camino_real (Camino Real), granja (Granja de la Cabra Terca)
 Día 12 · Queso en la despensa: 15 · ración 4 al día (te alcanza para 3)
 Objetivo: acepta un contrato en el tablón de la taberna.
 
@@ -34,7 +34,7 @@ Objetivo: acepta un contrato en el tablón de la taberna.
 
 == Taberna del Cuajo Torcido ==
 El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
-Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
+Salidas: aldea (Aldea Requesón), camino_real (Camino Real), granja (Granja de la Cabra Terca)
 Día 12 · Queso en la despensa: 15 · ración 4 al día (te alcanza para 3)
 Objetivo: acepta un contrato en el tablón de la taberna.
 
@@ -241,6 +241,8 @@ El tablón de contratos:
       Un ganso cobra «el peaje del peaje» en el Camino Real y nadie se atreve a discutirle la tarifa.
   [lejos] El Fantasma Charlatán (la Aldea Requesón, dificultad 2): 12 quesos, poción
       La Casa del Cuervo Gordo está encantada por un mayordomo que solo quiere que alguien le escuche.
+  [lejos] Las Cabras Tercas (la Granja de la Cabra Terca, dificultad 1): 12 quesos, poción
+      Las cabras de la Tía Feta han declarado la independencia, y la granja entera es su territorio.
 
 > por_que_no(aceptar(gallina_noble))
 Por qué no se puede aceptar(gallina_noble):

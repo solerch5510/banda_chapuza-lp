@@ -45,6 +45,13 @@ contrato(fantasma_charlatan, aldea, evento(escuchar_al_fantasma),
          [requiere(moral_media_min(4))]).
 contrato(paz_del_moho, bosque, eliminar([seta_belicosa-2, moho_saltarin-1, seta_curandera-1]),
          recompensa([quesos(pago)]), []).
+% Los del norte (paquete C): uno por zona nueva, y cada uno aparece al pasar por la zona anterior del camino.
+contrato(cabras_tercas, granja, evento(reunir_las_cabras),
+         recompensa([quesos(pago), objeto(pocion)]), []).
+contrato(barro_con_hambre, pantano, eliminar([moho_saltarin-2, seta_curandera-1, rata_quesera-1]),
+         recompensa([quesos(pago)]), []).
+contrato(motin_de_la_sal, mina_de_sal, eliminar([bandido_montado-1, bandido_torpe-2, ballestero_oxidado-1]),
+         recompensa([quesos(pago), objeto(pocion)]), []).
 % El jefe: el rey no se fia de cualquiera. Ademas de tres contratos cumplidos, pide dos concretos: la escolta de
 % Clotilde (la prueba de que se puede confiar en la Banda con lo valioso) y el peaje del Camino Real (el camino
 % hasta las cuevas tiene que estar libre).
@@ -107,6 +114,9 @@ oferente(peaje_del_ganso,    carretero_anonimo, camino_real).
 oferente(fantasma_charlatan, alcaldesa_nata,    aldea).
 oferente(paz_del_moho,        alcaldesa_nata,    aldea).
 oferente(despensa_real,     rey_brieto,     castillo).
+oferente(cabras_tercas,     tia_feta,         granja).
+oferente(barro_con_hambre,  bruja_gorgonzola, pantano).
+oferente(motin_de_la_sal,   capataz_manchego, mina_de_sal).
 
 % aparece(Contrato, Condiciones): cuando se ve en el tablon (son del mismo vocabulario).
 aparece(ratas_del_granero, []).
@@ -116,6 +126,9 @@ aparece(peaje_del_ganso,    []).
 aparece(fantasma_charlatan, []).
 aparece(paz_del_moho,       [requiere(visita(bosque))]).     % solo se oye hablar de el al pasar por el bosque
 aparece(despensa_real,     [requiere(visita(castillo))]).
+aparece(cabras_tercas,     []).
+aparece(barro_con_hambre,  [requiere(visita(granja))]).        % en la granja se oye hablar del pantano
+aparece(motin_de_la_sal,   [requiere(visita(pantano))]).       % y en el pantano, de la mina
 
 % enemigos_de(Contrato, Grupo): los enemigos de los contratos cuyo objetivo es escoltar.
 enemigos_de(gallina_noble, [bandido_torpe, bandido_torpe, bandido_montado]).
@@ -137,6 +150,11 @@ resolucion(fantasma_charlatan, a_medias, [marca(fantasma_espantado)]).
 resolucion(fantasma_charlatan, fracaso,  []).
 resolucion(paz_del_moho,       exito,    []).
 resolucion(despensa_real,     exito,    []).
+resolucion(cabras_tercas,     exito,    [marca(cabras_reunidas)]).
+resolucion(cabras_tercas,     a_medias, [marca(cabras_espantadas)]).
+resolucion(cabras_tercas,     fracaso,  []).
+resolucion(barro_con_hambre,  exito,    []).
+resolucion(motin_de_la_sal,   exito,    []).
 
 % ---------------------------------------------------------------------------
 % Como se cumple el objetivo: en un combate o en un evento (vocabulario cerrado de docs/04 §3.1).
@@ -336,6 +354,9 @@ dificultad(peaje_del_ganso,    3).
 dificultad(fantasma_charlatan, 2).
 dificultad(paz_del_moho,       3).
 dificultad(despensa_real,     5).
+dificultad(cabras_tercas,     1).
+dificultad(barro_con_hambre,  3).
+dificultad(motin_de_la_sal,   4).
 
 
 % ---------------------------------------------------------------------------
@@ -363,6 +384,11 @@ consecuencia(fantasma_charlatan, exito,    [cobrar(todo), moral(grupo, 1), marca
 consecuencia(fantasma_charlatan, a_medias, [cobrar(mitad), cobrar(objetos)]).
 consecuencia(fantasma_charlatan, fracaso,  [moral(grupo, -1)]).
 consecuencia(paz_del_moho,       exito,    [cobrar(todo), moral(grupo, 1)]).
+consecuencia(cabras_tercas,     exito,    [cobrar(todo), moral(grupo, 1)]).
+consecuencia(cabras_tercas,     a_medias, [cobrar(mitad), cobrar(objetos)]).
+consecuencia(cabras_tercas,     fracaso,  [moral(grupo, -1)]).
+consecuencia(barro_con_hambre,  exito,    [cobrar(todo), moral(grupo, 1)]).
+consecuencia(motin_de_la_sal,   exito,    [cobrar(todo), moral(grupo, 1)]).
 consecuencia(despensa_real,     exito,    [cobrar(todo), victoria]).    % ganar el jefe es ganar la partida
 
 % --- los finales de victoria (docs/04 §8.4) ---

@@ -27,6 +27,7 @@
 % ---------------------------------------------------------------------------
 intentos_maximos(rescate_gato, 3).
 intentos_maximos(escuchar_al_fantasma, 3).
+intentos_maximos(reunir_las_cabras, 3).
 
 opcion_evento(rescate_gato, trepar, tuerca,
               [en_pie(tuerca)],
@@ -54,6 +55,21 @@ opcion_evento(escuchar_al_fantasma, exigirle_que_se_vaya, baldomero,
               [], intento).
 opcion_evento(escuchar_al_fantasma, fingir_que_se_escucha, tuerca,
               [en_pie(tuerca)],
+              [], intento).
+
+% Las cabras tercas: no obedecen a nadie, pero siguen la musica y el queso. Con miedo vuelven al corral, pero a medias
+% (y con la leche cortada); perseguirlas no sirve de nada.
+opcion_evento(reunir_las_cabras, tocar_la_flauta, rufino,
+              [en_pie(rufino)],
+              [marcar(cabras_reunidas)], resuelve).
+opcion_evento(reunir_las_cabras, atraerlas_con_queso, tuerca,
+              [en_pie(tuerca), queso_min(1)],
+              [perder_queso(1), marcar(cabras_reunidas)], resuelve).
+opcion_evento(reunir_las_cabras, asustarlas_con_fondue, pimentina,
+              [en_pie(pimentina)],
+              [marcar(cabras_espantadas)], resuelve).
+opcion_evento(reunir_las_cabras, perseguirlas_con_honor, baldomero,
+              [en_pie(baldomero)],
               [], intento).
 
 % evento_de_contrato(?Contrato, ?Evento, ?Zona): el evento que es el objetivo de un contrato.

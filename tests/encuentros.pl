@@ -96,9 +96,9 @@ test(la_taberna_y_las_zonas_pacificas_no_tienen_encuentros) :-
     assertion(\+ mundo:probabilidad_de_encuentro(aldea, _)),
     assertion(\+ mundo:probabilidad_de_encuentro(castillo, _)).
 
-test(las_zonas_peligrosas_son_el_bosque_el_camino_y_las_cuevas) :-
+test(las_zonas_peligrosas_son_el_bosque_el_camino_las_cuevas_el_pantano_y_la_mina) :-
     findall(Z, mundo:probabilidad_de_encuentro(Z, _), Zs0), msort(Zs0, Zs),
-    assertion(Zs == [bosque, camino_real, cuevas]).
+    assertion(Zs == [bosque, camino_real, cuevas, mina_de_sal, pantano]).
 
 :- end_tests(la_tabla).
 

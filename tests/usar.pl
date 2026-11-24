@@ -273,9 +273,10 @@ test(cantar_el_anuncio_a_ricota_da_una_pocion) :-
     assertion(\+ memberchk(error(_), Items)),
     pociones(P), assertion(P == 1).
 
-test(solo_tres_opciones_dan_pocion_una_cuesta_un_queso_y_otra_pide_saber_algo) :-
+test(solo_cuatro_opciones_dan_pocion_dos_cuestan_un_queso_y_otra_pide_saber_algo) :-
     findall(Op, ( charlas:opcion_charla(_, Op, _, _, Efs), memberchk(objeto(_), Efs) ), Ops),
-    msort(Ops, S), assertion(S == [cantar_el_anuncio, darle_de_comer, hacerse_pasar_por_el_gremio]),
-    once(charlas:opcion_charla(_, darle_de_comer, _, _, Efs2)), assertion(memberchk(perder_queso(1), Efs2)).
+    msort(Ops, S), assertion(S == [cantar_el_anuncio, cuajar_la_isla, darle_de_comer, hacerse_pasar_por_el_gremio]),
+    once(charlas:opcion_charla(_, darle_de_comer, _, _, Efs2)), assertion(memberchk(perder_queso(1), Efs2)),
+    once(charlas:opcion_charla(_, cuajar_la_isla, _, _, Efs3)), assertion(memberchk(perder_queso(1), Efs3)).
 
 :- end_tests(de_donde_salen_las_pociones).

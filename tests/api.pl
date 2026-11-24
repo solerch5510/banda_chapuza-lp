@@ -241,7 +241,7 @@ test(la_zona_lleva_id_nombre_y_salidas) :-
     campo(Z, id, Id), campo(Z, nombre, N), campo(Z, salidas, Ss),
     assertion(Id == taberna), assertion(N == 'Taberna del Cuajo Torcido'),
     findall(S, ( member(X, Ss), campo(X, id, S) ), Ids),
-    assertion(msort(Ids, [aldea, camino_real])).
+    assertion(msort(Ids, [aldea, camino_real, granja])).
 
 test(la_prueba_tiene_nodos_y_comentario_del_narrador) :-
     nueva_partida, estado:aplicar_efectos([viajar(camino_real)]),
@@ -439,20 +439,31 @@ test(la_despensa_con_quesos_de_tres_edades) :-
     orden('demo(economia)', R), estado_de(R, E), campo(E, despensa, D), campo(D, categorias, json(Cats)),
     assertion(memberchk(fresco=12, Cats)), assertion(memberchk(curado=2, Cats)), assertion(memberchk(rancio=1, Cats)).
 
-test(el_mapa_son_las_seis_zonas_y_sus_conexiones_reales) :-
+test(el_mapa_son_las_nueve_zonas_y_sus_conexiones_reales) :-
     nueva_partida, estado_json(E), campo(E, mapa, json(M)),
     memberchk(zonas=Zs, M), memberchk(conexiones=Cx, M),
-    length(Zs, NZ), assertion(NZ == 6),
+    length(Zs, NZ), assertion(NZ == 9),
     findall(A-B, member([A, B], Cx), Pares),
     findall(A-B, mundo:conexion(A, B), Reales),
     assertion(Pares == Reales),
     assertion(\+ memberchk(camino_real-aldea, Pares)),
     assertion(\+ memberchk(aldea-camino_real, Pares)).
 
+test(cada_zona_del_mapa_lleva_su_posicion_la_web_no_tiene_tabla_propia) :-
+    % paquete C: las posiciones salen de mundo:posicion/3, asi que una zona nueva aparece en la web sin tocar app.js
+    nueva_partida, estado_json(E), campo(E, mapa, json(M)), memberchk(zonas=Zs, M),
+    forall(member(Z, Zs),
+           (   campo(Z, id, Id), campo(Z, x, X), campo(Z, y, Y),
+               assertion(mundo:posicion(Id, X, Y)) )),
+    setup_call_cleanup(open('web/app.js', read, S, [type(binary)]), read_stream_to_codes(S, Cs), close(S)),
+    atom_codes(App, Cs),
+    assertion(\+ sub_atom(App, _, _, _, 'castillo: [')).
+
 test(los_contratos_visibles_con_sus_estados) :-
     nueva_partida, estado_json(E), campo(E, contratos, Cs),
     findall(Id-Es, ( member(C, Cs), campo(C, id, Id), campo(C, estado, Es) ), Ps),
-    assertion(Ps = [ratas_del_granero-_, gato_en_el_arbol-_, gallina_noble-bloqueado, peaje_del_ganso-_, fantasma_charlatan-_]),
+    assertion(Ps = [ratas_del_granero-_, gato_en_el_arbol-_, gallina_noble-bloqueado, peaje_del_ganso-_, fantasma_charlatan-_,
+                    cabras_tercas-_]),
     forall(member(C, Cs), ( campo(C, nombre, N), campo(C, recompensa, R), assertion(atom(N)), assertion(atom(R)) )).
 
 test(en_exploracion_sin_combate_ni_final) :-
