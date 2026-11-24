@@ -732,11 +732,15 @@ sustituir(Entrada, De, A, Salida) :-
     atomic_list_concat(Partes, De, Entrada),
     atomic_list_concat(Partes, A, Salida).
 
+% Con codigos y no con sub_atom/5: en SWI-Prolog 5.10.4 sub_atom/5 falla a veces con atomos que tienen tildes (devuelve
+% basura o deja la letra sin ligar). Una primera letra que no es ASCII (Ú, ¡, «) se deja como esta.
 mayuscula_inicial(T0, T) :-
-    sub_atom(T0, 0, 1, _, Primera),
-    upcase_atom(Primera, Mayuscula),
-    sub_atom(T0, 1, _, 0, Resto),
-    atom_concat(Mayuscula, Resto, T).
+    atom_codes(T0, Codigos),
+    (   Codigos = [C|Resto], C < 128
+    ->  char_code(Letra, C), upcase_atom(Letra, May), atom_codes(May, [C1]),
+        atom_codes(T, [C1|Resto])
+    ;   T = T0
+    ).
 
 % ===========================================================================
 % Lo que usan los demas modulos

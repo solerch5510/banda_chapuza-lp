@@ -18,6 +18,7 @@
 :- use_module('../src/explicar').
 :- use_module('../src/juego').
 :- use_module('../src/ui').
+:- use_module('../src/api', []).          % solo para api:mayuscula_inicial/2
 
 % Frases de ejemplo, solo para las pruebas.
 narrador:frase(prueba(rotacion), ambos, 'uno').
@@ -299,3 +300,26 @@ test(el_narrador_no_cambia_el_estado, [setup(nueva)]) :-
     Antes == Despues.
 
 :- end_tests(integracion_con_el_juego).
+
+% La primera letra en mayuscula, con tildes: en SWI-Prolog 5.10.4 sub_atom/5 fallaba a veces con atomos con tildes y el
+% cierre del diario («Última página...») dejo de formatearse. Ahora se hace con codigos.
+:- begin_tests(mayuscula_inicial).
+
+test(una_letra_ascii_se_pone_en_mayuscula) :-
+    narrador:mayuscula_inicial('el rey firmo', T), assertion(T == 'El rey firmo'),
+    api:mayuscula_inicial('teme caballos', A), assertion(A == 'Teme caballos').
+
+test(una_primera_letra_con_tilde_se_deja_como_esta) :-
+    narrador:mayuscula_inicial('Última página del diario', T), assertion(T == 'Última página del diario'),
+    narrador:mayuscula_inicial('¡Por mi honor!', U), assertion(U == '¡Por mi honor!'),
+    api:mayuscula_inicial('«hola»', A), assertion(A == '«hola»').
+
+test(el_texto_vacio_sigue_vacio) :-
+    narrador:mayuscula_inicial('', T), assertion(T == ''),
+    api:mayuscula_inicial('', A), assertion(A == '').
+
+test(el_cierre_del_diario_se_puede_decir) :-
+    narrador:texto(diario_completo, [], 0, T),
+    assertion(sub_atom(T, 0, _, _, 'Última página')).
+
+:- end_tests(mayuscula_inicial).

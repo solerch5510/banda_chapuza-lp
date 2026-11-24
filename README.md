@@ -170,7 +170,7 @@ Cada suite corre en su propio proceso (así ninguna contagia a otra), se escribe
 & "C:\Program Files\pl\bin\swipl.exe" -q -s tests/combate -g "run_tests,halt" -t "halt(1)"
 ```
 
-Suites actuales (39 suites, 2233 pruebas):
+Suites actuales (39 suites, 2237 pruebas):
 
 | Suite | Qué comprueba |
 |---|---|
@@ -212,7 +212,7 @@ Suites actuales (39 suites, 2233 pruebas):
 | `tests/escolta.pl` (41) | La escolta de Clotilde: la regla (un golpe por ronda al primer enemigo que actúa), el aviso, el turno enemigo con su prueba guardada y el `explicar` de la escolta, el resultado por umbrales (2 / 4 / 5), el fracaso con reintento y que los demás combates no cuentan golpes. |
 | `tests/habilidades.pl` (82) | Las habilidades: la tabla de datos `efecto_habilidad/2`, las reglas `puede_habilidad/2` y `/3`, los efectos de la carga, la fondue, la balada y rebuscar, el comando `habilidad` (errores sin efecto, prueba guardada, `explicar`), las pantallas y combates enteros jugados con habilidades. |
 | `tests/diagnosticos.pl` (63) | Del diagnóstico de `por_que_no` a la frase: `claves_de_diag/2` y `comentario_diag/4` con diagnósticos escritos a mano (`neg_viola`, `fallo`, `tras`, `ninguna`, `sin_clausula`, `builtin_falso`, `limite`), las claves del núcleo (huelga, aturdido, fila, hechizo, viaje, descanso, contrato, miedo a los caballos) y las frases de reserva. |
-| `tests/narrador.pl` (44) | El narrador: el banco de frases, la clave más específica, la rotación de variantes, los niveles, los nombres con artículo, las frases genéricas y el comentario de `explicar`. |
+| `tests/narrador.pl` (48) | El narrador: el banco de frases, la clave más específica, la rotación de variantes, los niveles, los nombres con artículo, las frases genéricas y el comentario de `explicar`. |
 | `tests/spike_explicar.pl` (17) | El meta-intérprete de `src/explicar.pl`, con dos módulos de juguete (`tests/spike/`). |
 
 Se ejecutan en procesos distintos porque los módulos de juguete del spike exportan nombres (como `vida/2`) que chocarían con los de `estado`.

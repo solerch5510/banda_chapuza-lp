@@ -37,13 +37,13 @@
 termino_texto(Termino, Atomo) :-
     format(atom(Atomo), '~W', [Termino, [quoted(true), spacing(next_argument)]]).
 
+% Con codigos, como en narrador.pl: sub_atom/5 de 5.10.4 no es fiable con tildes. Una primera letra no ASCII se deja igual.
 mayuscula_inicial(Atomo, Texto) :-
-    (   Atomo == ''
-    ->  Texto = Atomo
-    ;   sub_atom(Atomo, 0, 1, _, Primera),
-        sub_atom(Atomo, 1, _, 0, Resto),
-        upcase_atom(Primera, Mayuscula),
-        atom_concat(Mayuscula, Resto, Texto)
+    atom_codes(Atomo, Codigos),
+    (   Codigos = [C|Resto], C < 128
+    ->  char_code(Letra, C), upcase_atom(Letra, May), atom_codes(May, [C1]),
+        atom_codes(Texto, [C1|Resto])
+    ;   Texto = Atomo
     ).
 
 % bonito(+Id, -Texto): teme_caballos -> 'Teme caballos'.
