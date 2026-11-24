@@ -13,7 +13,9 @@
         contrato_activo/1, contrato_por_cobrar/2, contrato_cerrado/2,
         evento_visto/2, semilla/1, usos_frase/2, ajuste/2, fin_partida/1,
         en_combate/1, combatiente/2, instancia/2, fila/2, cola_turnos/1,
-        alterado/3, zona_previa/1, ultima_prueba/2, ultimos_descartes/2,
+        alterado/3, zona_previa/1, ultima_prueba/2, ultimos_descartes/2, xp/2, nivel_enemigo/2,
+        % derivados (paquete D: niveles)
+        nivel_de/2, nivel_por_xp/2, bono_de_nivel/3, bono_en_nivel/4, vida_maxima/2, vida_maxima_en/3,
         % operaciones
         nueva_partida/0, reiniciar_estado/0,
         aplicar_efectos/1, aplicar_efecto/1, con_transaccion/1,
@@ -46,6 +48,7 @@
 :- dynamic usos_frase/2.          % usos_frase(Grupo, N): rotacion de variantes del narrador
 :- dynamic ajuste/2.              % ajuste(Clave, Valor): opciones de sesion
 :- dynamic fin_partida/1.         % fin_partida(victoria | derrota(Motivo))
+:- dynamic xp/2.                  % xp(Id, Puntos): la experiencia de cada miembro (paquete D)
 
 % TRANSITORIOS (solo durante un combate)
 :- dynamic en_combate/1.          % en_combate(Ronda)
@@ -57,6 +60,7 @@
 :- dynamic zona_previa/1.         % zona_previa(Zona)
 :- dynamic ultima_prueba/2.       % ultima_prueba(Accion, Prueba)
 :- dynamic ultimos_descartes/2.   % ultimos_descartes(Enemigo, [descarte(Prioridad, Accion, Diag)...])
+:- dynamic nivel_enemigo/2.       % nivel_enemigo(e(Tipo, N), Nivel): el de la zona del encuentro
 
 % ---------------------------------------------------------------------------
 % Inicializacion y reinicio
@@ -70,11 +74,12 @@ persistente(lleva/3).        persistente(equipado/2).          persistente(marca
 persistente(contador/2).     persistente(visitada/1).          persistente(consejo_dado/1).
 persistente(contrato_activo/1). persistente(contrato_por_cobrar/2). persistente(contrato_cerrado/2).
 persistente(evento_visto/2). persistente(semilla/1).           persistente(usos_frase/2).
-persistente(ajuste/2).       persistente(fin_partida/1).
+persistente(ajuste/2).       persistente(fin_partida/1).       persistente(xp/2).
 
 transitorio(en_combate/1).   transitorio(combatiente/2).       transitorio(instancia/2).
 transitorio(fila/2).         transitorio(cola_turnos/1).       transitorio(alterado/3).
 transitorio(zona_previa/1).  transitorio(ultima_prueba/2).  transitorio(ultimos_descartes/2).
+transitorio(nivel_enemigo/2).
 
 todo(N/A) :- persistente(N/A).
 todo(N/A) :- transitorio(N/A).
@@ -97,6 +102,7 @@ cargar_inicio(miembro(Id))    :-
     mundo:fila_preferida(Id, F),
     assertz(en_compania(Id)),
     assertz(vida(Id, V)),
+    assertz(xp(Id, 0)),
     assertz(moral(Id, M)),
     assertz(fila(Id, F)).
 
@@ -214,6 +220,7 @@ aplicar_conocido(terminar_combate) :-
     retractall(combatiente(_, _)),
     retractall(cola_turnos(_)),
     retractall(alterado(_, _, _)),
+    retractall(nivel_enemigo(_, _)),
     retractall(en_combate(_)).
 % Estados alterados de un combatiente (aturdido, defendiendo...): duran N turnos o son fijos.
 % Alterar de nuevo el mismo estado lo sustituye (no se acumula).
@@ -270,6 +277,20 @@ aplicar_conocido(viajar(Z)) :-
     en_zona(A), once(mundo:adyacente(A, Z)),
     retractall(en_zona(_)),
     assertz(en_zona(Z)).
+% ganar_xp(Id, N): un miembro gana N de experiencia (el nivel se deriva; la curacion de subir de nivel es otro efecto).
+aplicar_conocido(ganar_xp(Id, N)) :-
+    integer(N), N >= 0,
+    xp(Id, X0),
+    X is X0 + N,
+    retractall(xp(Id, _)),
+    assertz(xp(Id, X)).
+% nivelar_enemigos(L): los enemigos del combate (los que aun no tienen nivel) pasan a nivel L y empiezan con su vida maxima.
+aplicar_conocido(nivelar_enemigos(L)) :-
+    en_combate(_), integer(L), L >= 1,
+    forall(( instancia(E, _), \+ nivel_enemigo(E, _) ),
+           (   assertz(nivel_enemigo(E, L)),
+               vida_maxima(E, Max),
+               set_vida(E, Max) )).
 aplicar_conocido(fijar_semilla(S)) :-
     S1 is S mod 65536,
     retractall(semilla(_)),
@@ -304,6 +325,7 @@ conocido(iniciar_combate/1). conocido(siguiente_turno/0). conocido(siguiente_ron
 conocido(alterar/3).      conocido(quitar_alteracion/2).  conocido(terminar_combate/0).
 conocido(invocar/1).      conocido(contrato_aceptar/1).   conocido(visitar/1).
 conocido(contrato_resolver/2). conocido(contrato_cobrar/1). conocido(contar/2). conocido(borrar_contador/1).
+conocido(ganar_xp/2).     conocido(nivelar_enemigos/1).
 
 nace_enemigo(E) :-
     E = e(Tipo, _),
@@ -319,13 +341,60 @@ set_vida(Id, V) :-
     retractall(vida(Id, _)),
     assertz(vida(Id, V)).
 
-% Vida maxima: la del catalogo, de la ficha del personaje o del tipo de la instancia de enemigo.
+% Vida maxima: la de la ficha del personaje o del tipo de la instancia de enemigo, mas lo que sume su nivel.
 tope_vida(Id, Max) :-
-    (   mundo:personaje(Id, _, _, vida(M), _, _, _)
-    ->  Max = M
-    ;   instancia(Id, Tipo),
-        mundo:enemigo(Tipo, vida(Max), _, _)
+    vida_maxima(Id, Max).
+
+% ---------------------------------------------------------------------------
+% Niveles (paquete D). Se DERIVAN de la experiencia, como la fase: no se guarda el nivel, se calcula.
+% ---------------------------------------------------------------------------
+% nivel_por_xp(+XP, -Nivel): el mayor nivel cuya experiencia total ya se tiene (como mucho, parametro(nivel_maximo)).
+nivel_por_xp(X, N) :-
+    mundo:parametro(nivel_maximo, Max),
+    findall(L, ( between(1, Max, L), mundo:xp_para(L, T), T =< X ), Ls),
+    max_list(Ls, N).
+
+% nivel_de(+Id, -Nivel): un miembro, por su experiencia; un enemigo, el de la zona del encuentro; si no, 1.
+nivel_de(Id, N) :-
+    (   xp(Id, X)          -> nivel_por_xp(X, N)
+    ;   nivel_enemigo(Id, L) -> N = L
+    ;   N = 1
     ).
+
+% bono_de_nivel(+Id, +Atributo, -Bono): lo que su nivel suma a vida, ataque o defensa (0 en el nivel 1 sin pasivas).
+bono_de_nivel(Id, Atributo, Bono) :-
+    nivel_de(Id, N),
+    bono_en_nivel(Id, N, Atributo, Bono).
+
+% bono_en_nivel(+Id, +Nivel, +Atributo, -Bono): el crecimiento de su rol por cada nivel sobre el 1 y las pasivas ganadas
+% (un miembro), o la escala de los enemigos (un enemigo; su defensa no crece).
+bono_en_nivel(Id, N, Atributo, Bono) :-
+    (   mundo:personaje(Id, _, Rol, _, _, _, _)
+    ->  mundo:crecimiento(Rol, vida(CV), ataque(CA), defensa(CD)),
+        segun_atributo(Atributo, CV, CA, CD, Paso),
+        findall(P, ( mundo:pasiva(Id, NP, _, B), NP =< N, B =.. [Atributo, P] ), Ps),
+        sumlist(Ps, Pasivas),
+        Bono is (N - 1) * Paso + Pasivas
+    ;   mundo:escala_enemigo(vida(EV), ataque(EA)),
+        segun_atributo(Atributo, EV, EA, 0, Paso),
+        Bono is (N - 1) * Paso
+    ).
+
+segun_atributo(vida,    V, _, _, V).
+segun_atributo(ataque,  _, A, _, A).
+segun_atributo(defensa, _, _, D, D).
+
+% vida_maxima(+Id, -Max) y vida_maxima_en(+Id, +Nivel, -Max): la de la ficha o del tipo, mas la del nivel.
+vida_maxima(Id, Max) :-
+    nivel_de(Id, N),
+    vida_maxima_en(Id, N, Max).
+
+vida_maxima_en(Id, N, Max) :-
+    (   mundo:personaje(Id, _, _, vida(Base), _, _, _) -> true
+    ;   instancia(Id, Tipo), mundo:enemigo(Tipo, vida(Base), _, _)
+    ),
+    bono_en_nivel(Id, N, vida, B),
+    Max is Base + B.
 
 % ---------------------------------------------------------------------------
 % Transaccion: si Meta falla o lanza una excepcion, el estado vuelve a como estaba.

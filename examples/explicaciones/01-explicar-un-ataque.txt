@@ -8,7 +8,7 @@ Escribe ayuda. para ver los comandos; explicar. y por_que_no(Accion). cuentan po
 
 == Taberna del Cuajo Torcido ==
 El Cuajo Torcido huele a sopa de ayer, a sudor de mercenario y a una promesa de pago que nadie ha visto cumplida. La puerta cuelga de una sola bisagra, que según Doña Mantecosa "le da carácter". Aquí se cobra, se firma y se duerme en camas que han visto cosas.
-Salidas: aldea (Aldea Requesón), camino_real (Camino Real)
+Salidas: aldea (Aldea Requesón), camino_real (Camino Real), granja (Granja de la Cabra Terca)
 Día 1 · Queso en la despensa: 12 · ración 4 al día (te alcanza para 3)
 Objetivo: acepta un contrato en el tablón de la taberna.
 
@@ -38,7 +38,7 @@ Por qué se pudo atacar(baldomero,bandido_torpe):
    [ok] \+ aturdido(baldomero)   [no demostrable]
    [ok] \+ (teme(baldomero, A), clase_de(e(bandido_torpe, 1), A))   [no demostrable]
 [ok] dano(baldomero, e(bandido_torpe, 1), 9)   [clausula 1]
-   [ok] ataque(baldomero, 11)   [clausula 1]   [+2 nodos]
+   [ok] ataque(baldomero, 11)   [clausula 1]   [+22 nodos]
    [ok] defensa(e(bandido_torpe, 1), 2)   [clausula 1]   [+9 nodos]
    [ok] modificador(baldomero, e(bandido_torpe, 1), 0)   [clausula 1]   [+17 nodos]
    [ok] 9 is max(1, 11-2+0)   [builtin]

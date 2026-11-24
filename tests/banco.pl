@@ -189,7 +189,7 @@ functor_valido(F) :-
                puede_viajar, puede_descansar, puede_pagar_sueldos, puede_atacar, dano, puede_habilidad,
                puede_aceptar, ignora_miedo, en_fila_alcanzable, vivo, modificador, queso_total,
                accion_enemigo, golpea_a_clotilde, teme, esta_en_huelga, rasgo, marca, contrato_activo,
-               contrato_cumplido, contratos_cumplidos_min, cura_aliado, curar_aliado, sale_encuentro, encuentro, visita, moral_media_min, miembros_en_pie_min,
+               contrato_cumplido, contratos_cumplidos_min, cura_aliado, curar_aliado, xp_victoria, xp_evento, sube_nivel, pasiva_nueva, enemigos_de_nivel, aviso_nivel, sale_encuentro, encuentro, visita, moral_media_min, miembros_en_pie_min,
                disponible, e, (<), atacar, embestir, hay_queso_para]).
 
 atomos_de(T, As) :-

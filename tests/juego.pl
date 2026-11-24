@@ -382,7 +382,7 @@ test(mirar_describe_la_zona_sin_cambiar_nada, [setup(nueva)]) :-
     cmd(mirar, Items),
     Items = [vista(zona, Datos)],
     memberchk(nombre('Taberna del Cuajo Torcido'), Datos),
-    memberchk(salidas([aldea-'Aldea Requesón', camino_real-'Camino Real']), Datos),
+    memberchk(salidas([aldea-'Aldea Requesón', camino_real-'Camino Real', granja-'Granja de la Cabra Terca']), Datos),
     memberchk(dia(1), Datos),
     memberchk(queso(12), Datos),
     memberchk(descripcion(D), Datos), atom(D),

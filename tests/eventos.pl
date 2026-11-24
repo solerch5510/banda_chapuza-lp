@@ -55,9 +55,9 @@ test(el_gato_es_el_evento_de_su_contrato, [nondet]) :-
     E == rescate_gato,
     Z == aldea.
 
-test(solo_el_gato_y_el_fantasma_tienen_evento, [nondet]) :-
+test(solo_el_gato_el_fantasma_y_las_cabras_tienen_evento, [nondet]) :-
     findall(C, eventos:evento_de_contrato(C, _, _), Cs),
-    Cs == [gato_en_el_arbol, fantasma_charlatan].
+    Cs == [gato_en_el_arbol, fantasma_charlatan, cabras_tercas].
 
 test(son_tres_intentos) :-
     eventos:intentos_maximos(rescate_gato, N),
@@ -297,18 +297,21 @@ test(la_apertura_pone_los_intentos_a_cero_y_marca, [setup(nueva_partida)]) :-
 test(trepar_marca_cierra_y_avisa, [setup(nueva_partida), nondet]) :-
     eventos:efectos_eleccion(rescate_gato, trepar, Efs),
     Efs == [marcar(gato_bajado_con_arte), mensaje(evento_elige, [rescate_gato, trepar]),
-            desmarcar(evento_abierto(rescate_gato))].
+            desmarcar(evento_abierto(rescate_gato)),
+            mensaje(xp_evento, [tuerca, 15]), ganar_xp(tuerca, 15)].             % al primer intento: 15 de experiencia
 
 test(el_hechizo_gasta_un_queso_y_marca, [setup(nueva_partida), nondet]) :-
     eventos:efectos_eleccion(rescate_gato, hechizo_de_raclette, Efs),
     Efs = [gastar_queso(cheddar, 0, 1), marcar(gato_bajado_con_arte),
            mensaje(evento_elige, [rescate_gato, hechizo_de_raclette]),
-           desmarcar(evento_abierto(rescate_gato))].
+           desmarcar(evento_abierto(rescate_gato)),
+           mensaje(xp_evento, [pimentina, 15]), ganar_xp(pimentina, 15)].
 
 test(sacudir_el_arbol_deja_la_marca_a_golpes, [setup(nueva_partida), nondet]) :-
     eventos:efectos_eleccion(rescate_gato, sacudir_arbol, Efs),
     Efs == [marcar(gato_bajado_a_golpes), mensaje(evento_elige, [rescate_gato, sacudir_arbol]),
-            desmarcar(evento_abierto(rescate_gato))].
+            desmarcar(evento_abierto(rescate_gato)),
+            mensaje(xp_evento, [baldomero, 15]), ganar_xp(baldomero, 15)].
 
 test(cantar_con_intentos_de_sobra_solo_cuenta, [setup(nueva_partida)]) :-
     eventos:efectos_eleccion(rescate_gato, cantar, Efs),
@@ -748,3 +751,35 @@ test(solve_da_lo_mismo_que_ejecutar_en_varios_estados) :-
            )).
 
 :- end_tests(ver_y_explicar_el_evento).
+
+
+% ---------------------------------------------------------------------------
+% Las cabras tercas (paquete C): el mismo motor, en la granja. La flauta y el queso las reunen (exito); la fondue las
+% espanta (a medias); perseguirlas solo gasta un intento.
+% ---------------------------------------------------------------------------
+:- begin_tests(las_cabras_tercas).
+
+con_las_cabras :-
+    nueva_partida,
+    ordena(aceptar(cabras_tercas), _),
+    ordena(ir(granja), _).
+
+test(al_llegar_a_la_granja_se_abre_el_evento, [setup(con_las_cabras)]) :-
+    assertion(eventos:evento_abierto(reunir_las_cabras)).
+
+test(la_flauta_de_rufino_lo_resuelve_con_exito, [setup(con_las_cabras)]) :-
+    ordena(elegir(tocar_la_flauta), _),
+    assertion(estado:contrato_por_cobrar(cabras_tercas, exito)).
+
+test(la_fondue_lo_deja_a_medias, [setup(con_las_cabras)]) :-
+    ordena(elegir(asustarlas_con_fondue), _),
+    assertion(estado:contrato_por_cobrar(cabras_tercas, a_medias)).
+
+test(perseguirlas_tres_veces_es_un_fracaso, [setup(con_las_cabras)]) :-
+    ordena(elegir(perseguirlas_con_honor), _),
+    ordena(elegir(perseguirlas_con_honor), _),
+    ordena(elegir(perseguirlas_con_honor), _),
+    assertion(\+ estado:contrato_activo(cabras_tercas)),
+    assertion(\+ contratos:contrato_cumplido(cabras_tercas)).
+
+:- end_tests(las_cabras_tercas).

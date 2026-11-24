@@ -252,6 +252,120 @@ opcion_charla(los_chillidos, ofrecerle_queso_azul, pimentina,
               [en_pie(pimentina), queso_min(1)],
               [perder_queso(1), moral(pimentina, 1)]).
 
+% --- el tercer lote: las zonas del norte (paquete C, docs/12-npcs.md §8). Igual que las demas: uno fijo y dos que
+% rotan (grupo A, dias 1 a 5; grupo B, del 6 en adelante) ---
+presente(tia_feta,            granja,      1, 99).
+presente(burrata,             granja,      1,  5).
+presente(halloumi,            granja,      6, 99).
+presente(bruja_gorgonzola,    pantano,     1, 99).
+presente(rana_taleggio,       pantano,     1,  5).
+presente(barquero_emmental,   pantano,     6, 99).
+presente(capataz_manchego,    mina_de_sal, 1, 99).
+presente(minero_cabrales,     mina_de_sal, 1,  5).
+presente(topo_parmigiano,     mina_de_sal, 6, 99).
+
+escena_de(tia_feta,          el_corral).
+escena_de(burrata,           el_mugido).
+escena_de(halloumi,          la_parrilla).
+escena_de(bruja_gorgonzola,  el_caldero).
+escena_de(rana_taleggio,     el_concierto).
+escena_de(barquero_emmental, la_barca).
+escena_de(capataz_manchego,  el_turno).
+escena_de(minero_cabrales,   la_galeria).
+escena_de(topo_parmigiano,   los_tuneles).
+
+opcion_charla(el_corral, examinar_las_barbas, pimentina,
+              [en_pie(pimentina)],
+              [saber(barbas_azules)]).
+opcion_charla(el_corral, ayudar_con_el_heno, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, 1)]).
+% La gente del norte no da queso neto al hablar: el total de las charlas sigue en 8 (docs/12 §4, la economia no se toca).
+% Lo que dan es moral, vida y diario; el queso del norte sale de los sucesos y de los contratos.
+opcion_charla(el_corral, birlar_un_queso_de_la_quesera, tuerca,
+              [en_pie(tuerca)],
+              [moral(tuerca, -1)]).
+
+opcion_charla(el_mugido, llamarla_vaca_con_respeto, baldomero,
+              [en_pie(baldomero)],
+              [moral(grupo, 1)]).
+opcion_charla(el_mugido, ensenarle_a_balar, rufino,
+              [en_pie(rufino)],
+              [moral(rufino, 1)]).
+opcion_charla(el_mugido, darle_queso_de_vaca, pimentina,
+              [en_pie(pimentina), queso_min(1)],
+              [perder_queso(1), curar(grupo, 3)]).
+
+opcion_charla(la_parrilla, pedir_la_receta, pimentina,
+              [en_pie(pimentina)],
+              [moral(pimentina, 1), saber(queso_que_no_se_funde)]).
+opcion_charla(la_parrilla, probar_sin_permiso, tuerca,
+              [en_pie(tuerca)],
+              [curar(grupo, 2)]).
+opcion_charla(la_parrilla, cantar_junto_al_fuego, rufino,
+              [en_pie(rufino)],
+              [moral(grupo, 1)]).
+
+opcion_charla(el_caldero, cocinar_con_ella, pimentina,
+              [en_pie(pimentina), queso_min(1)],
+              [perder_queso(1), moral(pimentina, 1), saber(moho_sube_por_los_arroyos)]).
+opcion_charla(el_caldero, vigilar_el_caldero, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, -1)]).
+opcion_charla(el_caldero, cantarle_al_caldero, rufino,
+              [en_pie(rufino)],
+              [saber(moho_sube_por_los_arroyos)]).
+
+opcion_charla(el_concierto, hacer_un_duo, rufino,
+              [en_pie(rufino)],
+              [moral(rufino, 1)]).
+opcion_charla(el_concierto, exigir_silencio, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, -1)]).
+opcion_charla(el_concierto, buscar_entre_los_juncos, tuerca,
+              [en_pie(tuerca)],
+              [moral(tuerca, 1)]).
+
+opcion_charla(la_barca, tapar_los_agujeros, pimentina,
+              [en_pie(pimentina), queso_min(1)],
+              [perder_queso(1), moral(grupo, 1)]).
+opcion_charla(la_barca, remar_con_honor, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, 1)]).
+opcion_charla(la_barca, regatear_el_pasaje, tuerca,
+              [en_pie(tuerca)],
+              [moral(tuerca, 1)]).
+
+opcion_charla(el_turno, picar_un_turno, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, 1)]).
+opcion_charla(el_turno, revisar_los_albaranes, tuerca,
+              [en_pie(tuerca)],
+              [saber(gremio_se_lleva_la_sal)]).
+opcion_charla(el_turno, pedir_sal_para_las_heridas, pimentina,
+              [en_pie(pimentina)],
+              [curar(grupo, 3)]).
+
+opcion_charla(la_galeria, cantar_una_cancion_de_mina, rufino,
+              [en_pie(rufino)],
+              [moral(grupo, 1)]).
+opcion_charla(la_galeria, buscar_una_veta, tuerca,
+              [en_pie(tuerca)],
+              [moral(tuerca, 1)]).
+opcion_charla(la_galeria, preguntar_por_el_sol, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, -1)]).
+
+opcion_charla(los_tuneles, escuchar_sus_tuneles, pimentina,
+              [en_pie(pimentina)],
+              [saber(tuneles_hasta_las_cuevas)]).
+opcion_charla(los_tuneles, ofrecerle_el_brazo, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, 1)]).
+opcion_charla(los_tuneles, pedirle_un_atajo, tuerca,
+              [en_pie(tuerca)],
+              [moral(tuerca, -1)]).
+
 % --- los sucesos de zona (docs/13-ampliacion.md §4): escenas unicas de un lugar, no de un personaje ---
 % suceso(Id, Zona, Condiciones): se abren solos la primera vez que se llega o con `explorar`.
 suceso(el_puente_de_setas,    bosque,      []).
@@ -259,12 +373,18 @@ suceso(el_pozo_de_los_deseos, aldea,       []).
 suceso(la_carreta_del_gremio, camino_real, []).
 suceso(la_bodega_del_rey,     castillo,    []).
 suceso(el_altar_del_moho,     cuevas,      [sabe(moho_con_hambre)]).
+suceso(la_valla_de_las_cabras, granja,      []).
+suceso(la_isla_que_flota,      pantano,     []).
+suceso(el_lago_de_salmuera,    mina_de_sal, []).
 
 escena_de(el_puente_de_setas,    el_puente_de_setas).
 escena_de(el_pozo_de_los_deseos, el_pozo_de_los_deseos).
 escena_de(la_carreta_del_gremio, la_carreta_del_gremio).
 escena_de(la_bodega_del_rey,     la_bodega_del_rey).
 escena_de(el_altar_del_moho,     el_altar_del_moho).
+escena_de(la_valla_de_las_cabras, la_valla_de_las_cabras).
+escena_de(la_isla_que_flota,      la_isla_que_flota).
+escena_de(el_lago_de_salmuera,    el_lago_de_salmuera).
 
 opcion_charla(el_puente_de_setas, cruzar_de_puntillas, tuerca,
               [en_pie(tuerca)],
@@ -316,6 +436,36 @@ opcion_charla(el_altar_del_moho, tocar_el_moho, baldomero,
               [en_pie(baldomero)],
               [moral(baldomero, -1)]).
 
+opcion_charla(la_valla_de_las_cabras, arreglar_la_valla, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, 1)]).
+opcion_charla(la_valla_de_las_cabras, colarse_en_la_quesera, tuerca,
+              [en_pie(tuerca)],
+              [ganar_queso(1)]).
+opcion_charla(la_valla_de_las_cabras, pastorear_con_musica, rufino,
+              [en_pie(rufino)],
+              [moral(grupo, 1)]).
+
+opcion_charla(la_isla_que_flota, saltar_a_la_isla, tuerca,      % sin queso: los sucesos no pasan de 4 entre todos
+              [en_pie(tuerca)],
+              [moral(tuerca, 1)]).
+opcion_charla(la_isla_que_flota, cuajar_la_isla, pimentina,
+              [en_pie(pimentina), queso_min(1)],
+              [perder_queso(1), objeto(pocion)]).
+opcion_charla(la_isla_que_flota, vadear_con_la_armadura, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, -1)]).
+
+opcion_charla(el_lago_de_salmuera, lavar_las_heridas_con_sal, pimentina,
+              [en_pie(pimentina)],
+              [curar(grupo, 5)]).
+opcion_charla(el_lago_de_salmuera, banarse_con_la_armadura, baldomero,
+              [en_pie(baldomero)],
+              [moral(baldomero, -1)]).
+opcion_charla(el_lago_de_salmuera, cantarle_al_lago, rufino,
+              [en_pie(rufino)],
+              [moral(rufino, 1)]).
+
 % saber(Marca): los fragmentos de historia, en el orden en que los ensena el diario: primero las seis piezas
 % del hilo del Gran Rancio y despues los de ambientacion.
 saber(moho_en_la_despensa).
@@ -332,6 +482,11 @@ saber(ratas_huyen_de_abajo).
 saber(sumiller_del_principe).
 saber(moho_en_la_bodega).
 saber(altar_alimentado).
+saber(barbas_azules).                 % los del norte (paquete C): ambientacion, no entran en el hilo
+saber(queso_que_no_se_funde).
+saber(moho_sube_por_los_arroyos).
+saber(gremio_se_lleva_la_sal).
+saber(tuneles_hasta_las_cuevas).
 
 % hilo(Marcas): las seis piezas con las que se entiende al Gran Roquefort. Con las seis, el diario cuenta la historia.
 hilo([moho_en_la_despensa, moho_con_hambre, principe_madura, el_eco_habla_solo, gremio_oculta, brieto_firmo]).

@@ -127,7 +127,8 @@ test(con_tres_contratos_cobrados_pero_otros_por_hacer_toca_aceptar) :-
 
 test(con_todos_los_demas_cobrados_y_el_castillo_sin_visitar_toca_explorar) :-
     nueva_partida,
-    forall(member(C, [ratas_del_granero, gato_en_el_arbol, gallina_noble, peaje_del_ganso, fantasma_charlatan]),
+    forall(member(C, [ratas_del_granero, gato_en_el_arbol, gallina_noble, peaje_del_ganso, fantasma_charlatan,
+                      cabras_tercas]),
            estado:aplicar_efectos([contrato_aceptar(C), contrato_resolver(C, exito), contrato_cobrar(C)])),
     contratos:objetivo_actual(P, Fs),
     assertion(P == explorar(castillo)), assertion(Fs == []).

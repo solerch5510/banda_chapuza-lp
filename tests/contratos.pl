@@ -50,10 +50,10 @@ listo_para_el_rey :-
 
 :- begin_tests(catalogo).
 
-test(hay_siete_contratos_los_cuatro_de_la_version_minima_y_tres_de_la_ampliacion) :-
+test(hay_diez_contratos_cuatro_de_la_version_minima_tres_de_la_ampliacion_y_tres_del_norte) :-
     findall(C, contratos:contrato(C, _, _, _, _), Cs),
     Cs == [ratas_del_granero, gato_en_el_arbol, gallina_noble, peaje_del_ganso, fantasma_charlatan,
-           paz_del_moho, despensa_real].
+           paz_del_moho, cabras_tercas, barro_con_hambre, motin_de_la_sal, despensa_real].
 
 test(cada_contrato_tiene_zona_conocida) :-
     forall(contratos:contrato(_, Z, _, _, _), mundo:zona(Z, _)).
@@ -403,18 +403,26 @@ test(nueva_partida_borra_los_contratos, [setup(nueva_partida)]) :-
 
 :- begin_tests(que_se_ve_y_que_se_acepta).
 
-test(al_empezar_se_ven_cinco_contratos_y_el_del_bosque_aun_no, [setup(nueva_partida)]) :-
+test(al_empezar_se_ven_seis_contratos_y_el_del_bosque_aun_no, [setup(nueva_partida)]) :-
     findall(C, contratos:visible(C), Cs),
-    Cs == [ratas_del_granero, gato_en_el_arbol, gallina_noble, peaje_del_ganso, fantasma_charlatan].
+    Cs == [ratas_del_granero, gato_en_el_arbol, gallina_noble, peaje_del_ganso, fantasma_charlatan, cabras_tercas].
+
+test(los_del_pantano_y_la_mina_aparecen_al_pasar_por_la_zona_anterior, [setup(nueva_partida)]) :-
+    % el camino del norte se descubre andando: en la granja se oye hablar del pantano, y en el pantano de la mina
+    assertion(\+ contratos:visible(barro_con_hambre)), assertion(\+ contratos:visible(motin_de_la_sal)),
+    aplicar_efecto(visitar(granja)),
+    assertion(contratos:visible(barro_con_hambre)), assertion(\+ contratos:visible(motin_de_la_sal)),
+    aplicar_efecto(visitar(pantano)),
+    assertion(contratos:visible(motin_de_la_sal)).
 
 test(la_despensa_real_no_se_ve_hasta_visitar_el_castillo, [setup(nueva_partida)]) :-
     \+ contratos:visible(despensa_real),
     aplicar_efecto(visitar(castillo)),
     contratos:visible(despensa_real).
 
-test(en_la_taberna_estan_disponibles_los_cinco_del_tablon, [setup(nueva_partida)]) :-
+test(en_la_taberna_estan_disponibles_los_seis_del_tablon, [setup(nueva_partida)]) :-
     findall(C, contratos:disponible(C), Cs),
-    Cs == [ratas_del_granero, gato_en_el_arbol, gallina_noble, peaje_del_ganso, fantasma_charlatan].
+    Cs == [ratas_del_granero, gato_en_el_arbol, gallina_noble, peaje_del_ganso, fantasma_charlatan, cabras_tercas].
 
 test(en_la_aldea_solo_estan_los_de_la_alcaldesa) :-
     nueva_partida,
@@ -435,9 +443,9 @@ test(en_el_bosque_no_hay_nada_disponible) :-
     findall(C, contratos:disponible(C), Cs),
     Cs == [].
 
-test(al_empezar_se_pueden_aceptar_cuatro_la_gallina_no, [setup(nueva_partida)]) :-
+test(al_empezar_se_pueden_aceptar_cinco_la_gallina_no, [setup(nueva_partida)]) :-
     findall(C, contratos:puede_aceptar(C), Cs),
-    Cs == [ratas_del_granero, gato_en_el_arbol, peaje_del_ganso, fantasma_charlatan].
+    Cs == [ratas_del_granero, gato_en_el_arbol, peaje_del_ganso, fantasma_charlatan, cabras_tercas].
 
 test(la_gallina_esta_bloqueada_sin_la_venda, [setup(nueva_partida), fail]) :-
     contratos:puede_aceptar(gallina_noble).
@@ -523,11 +531,11 @@ test(puede_aceptar_no_modifica_el_estado, [setup(nueva_partida)]) :-
 
 :- begin_tests(el_tablon).
 
-test(al_empezar_el_tablon_ensena_cinco_fichas, [setup(nueva_partida)]) :-
+test(al_empezar_el_tablon_ensena_seis_fichas, [setup(nueva_partida)]) :-
     ordena(contratos, [vista(contratos, Fichas)]),
     findall(Id-Estado, member(contrato(Id, _, _, _, Estado), Fichas), Ps),
     Ps == [ratas_del_granero-disponible, gato_en_el_arbol-disponible, gallina_noble-bloqueado,
-           peaje_del_ganso-disponible, fantasma_charlatan-disponible].
+           peaje_del_ganso-disponible, fantasma_charlatan-disponible, cabras_tercas-disponible].
 
 test(una_ficha_lleva_zona_dificultad_y_premio, [setup(nueva_partida), nondet]) :-
     ordena(contratos, [vista(contratos, Fichas)]),

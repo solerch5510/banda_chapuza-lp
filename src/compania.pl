@@ -6,7 +6,8 @@
 
 :- module(compania, [miembro/1, vivo/1, activo/1, en_pie/1, esta_en_huelga/1,
                      teme/2, ignora_miedo/1, nivel_moral/2, modificador_moral/2, moral_media/1,
-                     sueldo_de/2, puede_viajar/1, informe/1]).
+                     sueldo_de/2, puede_viajar/1, informe/1,
+                     progreso/5, nivel_medio/1, efectos_ganar_xp/3]).
 :- use_module(mundo).
 :- use_module(estado).
 
@@ -84,12 +85,48 @@ informe(Filas) :-
     findall(Ficha, ( miembro(Id), ficha(Id, Ficha) ), Filas).
 
 ficha(Id, miembro(Id, Nombre, Rol, Vida, VidaMax, Ataque, Defensa, Moral, Fila, Rasgo, Sueldo, Estado)) :-
-    mundo:personaje(Id, Nombre, Rol, vida(VidaMax), ataque(Ataque), defensa(Defensa), sueldo(Sueldo)),
+    mundo:personaje(Id, Nombre, Rol, _, ataque(A0), defensa(D0), sueldo(Sueldo)),
+    estado:vida_maxima(Id, VidaMax),
+    estado:bono_de_nivel(Id, ataque, BA), Ataque is A0 + BA,
+    estado:bono_de_nivel(Id, defensa, BD), Defensa is D0 + BD,
     estado:vida(Id, Vida),
     estado:moral(Id, Moral),
     estado:fila(Id, Fila),
     mundo:rasgo(Id, Rasgo),
     estado_de(Id, Estado).
+
+% progreso(+Id, -Nivel, -XP, -Siguiente, -Pasivas): su nivel, su experiencia, la que hace falta para el siguiente (o
+% `maximo`) y las pasivas ganadas (los nombres).
+progreso(Id, Nivel, XP, Siguiente, Pasivas) :-
+    (   estado:xp(Id, XP) -> true ; XP = 0 ),
+    estado:nivel_de(Id, Nivel),
+    mundo:parametro(nivel_maximo, Max),
+    (   Nivel < Max -> N1 is Nivel + 1, mundo:xp_para(N1, Siguiente) ; Siguiente = maximo ),
+    findall(P, ( mundo:pasiva(Id, L, P, _), L =< Nivel ), Pasivas).
+
+% nivel_medio(-N): el nivel de la Banda, la media de sus miembros redondeada hacia abajo.
+nivel_medio(N) :-
+    findall(L, ( miembro(Id), estado:nivel_de(Id, L) ), Ls),
+    Ls = [_|_],
+    sumlist(Ls, S), length(Ls, K),
+    N is S // K.
+
+% efectos_ganar_xp(+Id, +N, -Efectos): ganar N de experiencia y, si se sube de nivel, el aviso, las pasivas nuevas y la vida
+% que crece (se cura esa diferencia, asi subir de nivel no deja a nadie a medias).
+efectos_ganar_xp(Id, N, Efectos) :-
+    estado:nivel_de(Id, Antes),
+    (   estado:xp(Id, X0) -> true ; X0 = 0 ),
+    X1 is X0 + N,
+    estado:nivel_por_xp(X1, Despues),
+    (   Despues > Antes
+    ->  estado:vida_maxima_en(Id, Antes, V0),
+        estado:vida_maxima_en(Id, Despues, V1),
+        Cura is V1 - V0,
+        findall(mensaje(pasiva_nueva, [Id, P]), ( mundo:pasiva(Id, L, P, _), L > Antes, L =< Despues ), Pasivas),
+        (   Cura > 0, vivo(Id) -> Curar = [curar(Id, Cura)] ; Curar = [] ),
+        append([[ganar_xp(Id, N)], Curar, [mensaje(sube_nivel, [Id, Despues])], Pasivas], Efectos)
+    ;   Efectos = [ganar_xp(Id, N)]
+    ).
 
 estado_de(Id, Estado) :-
     (   \+ vivo(Id)         -> Estado = caido

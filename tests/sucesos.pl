@@ -90,9 +90,9 @@ test(los_fragmentos_que_dan_los_sucesos_estan_en_el_diario_y_tienen_texto) :-
     forall(( charlas:suceso(Id, _, _), charlas:escena_de(Id, E), charlas:opcion_charla(E, _, _, _, Efs), member(saber(M), Efs) ),
            (   assertion(charlas:saber(M)), narrador:texto_saber(M, T), assertion(atom(T)) )).
 
-test(hay_cinco_sucesos_uno_en_cada_zona_menos_la_taberna) :-
+test(hay_ocho_sucesos_uno_en_cada_zona_menos_la_taberna) :-
     findall(Z, charlas:suceso(_, Z, _), Zs), msort(Zs, S),
-    assertion(S == [aldea, bosque, camino_real, castillo, cuevas]).
+    assertion(S == [aldea, bosque, camino_real, castillo, cuevas, granja, mina_de_sal, pantano]).
 
 test(el_queso_de_todos_los_sucesos_no_pasa_de_cuatro) :-
     findall(Mejor,

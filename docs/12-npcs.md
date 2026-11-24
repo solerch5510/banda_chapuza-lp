@@ -56,8 +56,11 @@ Un personaje **fijo** por zona y uno que **rota**: A es del día 1 al 5; B, del 
 | Camino Real | **Ganso recaudador** | **Capitán Pecorino**, de ronda | **Lady Clotilde**, de vuelta del baile (si se la escoltó) o un **bandido arrepentido** |
 | Castillo | **Rey Brieto IV** | **Lord Tapanarices**, cortesano | **La Reina viuda Nata Doble** |
 | Cuevas | **El Eco** (repite lo que dices, con retraso) | **Rata exiliada**, la que escapó del granero y ahora hace de guía | **Murciélago azul**, que sabe más de lo que chilla |
+| Granja *(paquete C)* | **La Tía Feta**, que habla con las cabras de usted | **Burrata**, la cabra que se cree vaca | **El Pastor Halloumi**, el del queso que no se funde |
+| Pantano *(paquete C)* | **La Bruja Gorgonzola**, con su caldero sin fondo | **La Rana Taleggio**, tenor del pantano | **El Barquero Emmental** (la barca tiene más agujeros que tablas) |
+| Minas de sal *(paquete C)* | **El Capataz Manchego** | **El Minero Cabrales**, que ya no sabe si es de día | **El Topo Parmigiano**, que lo oye todo bajo tierra |
 
-Son **18 personajes con escena propia**: 6 fijos y 12 que rotan. Para empezar bastan los 6 fijos y el tramo A de la taberna y la aldea (**8 escenas**); el resto puede ir después.
+Son **27 personajes con escena propia**: 9 fijos y 18 que rotan. Los 18 primeros son los de la versión entregable; los 9 del norte llegaron con el paquete C (reparto acordado con el autor el 24 de noviembre).
 
 ## 6. El hilo de la historia (lo que cuentan, en orden de abajo arriba)
 
@@ -113,5 +116,7 @@ Pruebas en `tests/hablar.pl` (la regla `puede_hablar`, la presencia por día, ca
 - **Balance:** el techo de queso por hablar sigue en **8 en total** (2 por opción), comprobado por una prueba; las pociones (usables, nota 44) salen de dos charlas (Ricota y el aldeano perdido, esta pagando un queso).
 - **Validador y reparto fijado:** una prueba fija a cada personaje con su zona y sus días; otra comprueba que la historia entera se puede conseguir hablando de verdad.
 - **Simulador:** el jugador que habla con todos y elige siempre lo que más queso da acaba con **unos 5 quesos más** de media (11,5 frente a 6,3, con errores) y gana lo mismo salvo ruido (95 % frente a 96,5 %); sin errores, +7,5 quesos y 100 % en ambos casos.
+
+**Ampliación del 24 de noviembre (paquete C, rama `paquete-c-mapa`):** las tres zonas del norte traen nueve personajes más (tabla del §5), un suceso por zona (la Valla de las Cabras, la Isla que Flota y el Lago de Salmuera) y cinco fragmentos de ambientación (las barbas azules, el queso que no se funde, el moho que sube por los arroyos, la sal que se lleva el Gremio y los túneles del topo). El hilo sigue siendo de seis piezas. **La regla de oro no se toca:** la gente del norte no da queso neto (el total de las charlas sigue en 8 y el de los sucesos en 4, los dos con prueba); da moral, vida y diario, y el queso del norte sale de los contratos. La única poción nueva es la de la isla, y cuesta un queso.
 
 **Pendiente:** más personajes y escenas solo si se amplía el mundo (`docs/13-ampliacion.md`); añadir contenido sigue siendo solo datos (filas en `presente/4`, `escena_de/2`, `opcion_charla/5`, `saber/1` y sus textos; el validador avisa si falta algo).
