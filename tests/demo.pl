@@ -1,5 +1,5 @@
 % demo.pl (pruebas)
-% T-40: la demostracion reproducible. (1) Las cinco escenas (economia, combate, ia, gallina, venda) existen,
+% T-40: la demostracion reproducible. (1) Las seis escenas (economia, combate, ia, gallina, venda, habilidades) existen,
 % se montan sin error y dejan el estado que dicen; montarlas dos veces da lo mismo. (2) `demo.` las lista y
 % una escena desconocida es un error amable que no toca la partida. (3) Los guiones de examples/ se leen
 % y se pueden pasar enteros; sus transcripciones guardadas COINCIDEN, caracter a caracter, con lo que el
@@ -53,10 +53,10 @@ foto(f(Zona, Dia, Compania, Vidas, Marcas)) :-
 
 :- begin_tests(las_escenas).
 
-test(hay_cinco_escenas_en_orden) :-
+test(hay_seis_escenas_en_orden) :-
     escenas_de_demo(L),
     findall(N, member(N-_, L), Ns),
-    assertion(Ns == [economia, combate, ia, gallina, venda]).
+    assertion(Ns == [economia, combate, ia, gallina, venda, habilidades]).
 
 test(todas_tienen_titulo_descripcion_y_sugerencias) :-
     forall(demo:escena(N, T, D, P, S),
@@ -87,7 +87,7 @@ test(las_sugerencias_de_cada_escena_se_ejecutan_sin_error) :-
            )).
 
 test(montar_una_escena_dos_veces_da_la_misma_pantalla) :-
-    forall(member(N, [economia, combate, ia, gallina]),
+    forall(member(N, [economia, combate, ia, gallina, habilidades]),
            (   nueva_partida, preparar_escena(N, I1), pantalla(I1, T1),
                juego:ejecutar(inventario, _),
                preparar_escena(N, I2), pantalla(I2, T2),
@@ -151,13 +151,30 @@ test(con_la_venda_la_gallina_se_acepta) :-
     assertion(contiene(T, 'No falla nada')),
     assertion(contiene(T, 'Contrato aceptado')).
 
+test(habilidades_la_banda_en_el_nivel_2_con_la_vida_entera_y_tres_enemigos, [nondet]) :-
+    nueva_partida, preparar_escena(habilidades, _),
+    forall(compania:miembro(P),
+           (   estado:nivel_de(P, N), assertion(N == 2),
+               estado:vida(P, V), estado:vida_maxima(P, M), assertion(V == M)
+           )),
+    findall(T, estado:instancia(_, T), Ts), msort(Ts, Tipos),
+    assertion(Tipos == [ballestero_oxidado, bandido_torpe, ganso_de_peaje]).
+
+test(habilidades_el_escudo_y_la_punalada_tumban_al_ganso, [nondet]) :-
+    nueva_partida, preparar_escena(habilidades, _),
+    juego:ejecutar(habilidad(golpe_de_escudo, ganso_de_peaje), _),
+    juego:ejecutar(habilidad(raclette_derramada), _),
+    juego:ejecutar(habilidad(punalada_trapera, ganso_de_peaje), resultado(Items)),
+    assertion(memberchk(msg(golpe, [tuerca, e(ganso_de_peaje, 1), 16], _), Items)),
+    assertion(\+ compania:vivo(e(ganso_de_peaje, 1))).
+
 :- end_tests(el_estado_de_cada_escena).
 
 :- begin_tests(el_comando_demo).
 
-test(demo_lista_las_cinco_escenas) :-
+test(demo_lista_las_seis_escenas) :-
     sesion([demo, salir], T),
-    forall(member(N, [economia, combate, ia, gallina, venda]),
+    forall(member(N, [economia, combate, ia, gallina, venda, habilidades]),
            ( format(atom(F), 'demo(~w).', [N]), assertion(contiene(T, F)) )).
 
 test(demo_lista_no_toca_la_partida) :-

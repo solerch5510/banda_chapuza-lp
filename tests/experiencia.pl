@@ -163,7 +163,8 @@ test(sin_cambiar_de_nivel_solo_se_gana_experiencia) :-
 test(al_subir_se_avisa_y_se_cura_lo_que_crece_la_vida) :-
     nueva_partida,
     compania:efectos_ganar_xp(baldomero, 20, Efs),
-    assertion(Efs == [ganar_xp(baldomero, 20), curar(baldomero, 3), mensaje(sube_nivel, [baldomero, 2])]).
+    assertion(Efs == [ganar_xp(baldomero, 20), curar(baldomero, 3), mensaje(sube_nivel, [baldomero, 2]),
+                      mensaje(habilidad_nueva, [baldomero, golpe_de_escudo])]).
 
 test(subir_dos_niveles_de_golpe_da_la_pasiva_del_3) :-
     nueva_partida,

@@ -284,6 +284,24 @@ escribir_progreso(Id) :-
         ;   findall(N, ( member(P, Pasivas), narrador:nombre(P, N) ), Ns),
             atomic_list_concat(Ns, ', ', Lista),
             format(" · pasivas: ~w~n", [Lista])
-        )
+        ),
+        escribir_aprendidas(Id)
     ;   true
+    ).
+
+% escribir_aprendidas(+Id): las habilidades activas aprendidas y como se escriben (nada si aun no sabe ninguna).
+escribir_aprendidas(Id) :-
+    compania:habilidades_aprendidas(Id, Hs),
+    (   Hs == []
+    ->  true
+    ;   findall(T, ( member(H, Hs), orden_de_habilidad(H, T) ), Ts),
+        atomic_list_concat(Ts, ', ', Lista),
+        format("      habilidades aprendidas (una vez por combate): ~w~n", [Lista])
+    ).
+
+orden_de_habilidad(H, Texto) :-
+    narrador:nombre(H, N),
+    (   combate:objetivo_de_habilidad(H, ninguno)
+    ->  format(atom(Texto), "~w con habilidad(~w).", [N, H])
+    ;   format(atom(Texto), "~w con habilidad(~w, Objetivo).", [N, H])
     ).

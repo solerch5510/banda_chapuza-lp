@@ -509,6 +509,11 @@
       '<section><h3>Rasgo · ' + esc(f.rasgo_nombre) + "</h3><p>" + esc(f.rasgo_texto) + "</p></section>" +
       '<section><h3>Habilidad · ' + esc(h.nombre) + '</h3><p>' + esc(h.efecto) + '</p><p class="meta"><span class="coste">' + esc(h.coste) + "</span> " + esc(h.objetivo) +
       '. En el juego: <code>' + esc(h.comando) + "</code></p></section>" +
+      (f.aprendidas || []).map(function (a) {
+        var sabe = vivo && (vivo.habilidades || []).some(function (x) { return x.id === a.id; });
+        return '<section><h3>Nivel ' + a.nivel + " · " + esc(a.nombre) + (sabe ? " (ya la sabe)" : "") + '</h3><p>' + esc(a.efecto) + '</p><p class="meta"><span class="coste">' + esc(a.coste) + "</span> " + esc(a.objetivo) +
+          '. En el juego: <code>' + esc(a.comando) + "</code></p></section>";
+      }).join("") +
       '<section class="progresion"><h3>¿Suben de nivel?</h3><p><strong>' + (F.progresion.sube_de_nivel ? "Sí" : "No.") + "</strong> " + esc(F.progresion.texto) + "</p><p>" + esc(F.progresion.detalle) + "</p></section>" +
       '<section><h3>La moral</h3><ul class="moral">' + moral + '</ul><p class="nota">Con moral ' + F.reglas.huelga_si_moral_hasta + " o menos, el personaje se pone en <strong>huelga</strong> y no combate. Defender suma +" + F.reglas.bono_defender +
       " de defensa hasta tu próximo turno; descansar cuesta " + F.reglas.coste_descanso + " quesos.</p></section>" +
@@ -537,7 +542,7 @@
     var n = (String(e.id).match(/(\d+)\)?$/) || [])[1];
     var etiqueta = iniciales(e.nombre) + (repetidos[e.tipo_enemigo] > 1 && n ? n : "");
     var cls = "ficha enemigo" + (e.caido ? " caido" : "");
-    var titulo = e.nombre + " · vida " + e.vida + "/" + e.vida_max + (e.caido ? " · caído" : " · pulsa para atacarlo");
+    var titulo = e.nombre + " · vida " + e.vida + "/" + e.vida_max + (e.caido ? " · caído" : (e.aturdido ? " · aturdido" : "") + " · pulsa para atacarlo");
     var accion = e.caido ? "" : ' data-cmd="atacar(' + esc(e.id) + ')"';
     return '<span class="celda-ficha"><button class="' + cls + '"' + accion + (e.caido ? " disabled" : "") + ' title="' + esc(titulo) + '">' + esc(etiqueta) + "</button></span>";
   }
@@ -733,7 +738,7 @@
     return '<div class="enemy-strip">' + c.enemigos.map(function (e) {
       var pct = e.vida_max ? Math.max(0, e.vida / e.vida_max * 100) : 0;
       return '<article class="enemy-card"' + (e.caido ? ' style="opacity:.55"' : "") + '><div class="enemy-icon">' + icono("skull", 19) + "</div><div><strong>" + esc(e.nombre) + "</strong><span>" +
-        (e.caido ? "Caído" : esc(mayus(e.fila))) + '</span><div class="enemy-life"><i style="width:' + pct + '%"></i></div></div><b>' + e.vida + "/" + e.vida_max + "</b></article>";
+        (e.caido ? "Caído" : esc(mayus(e.fila)) + (e.aturdido ? " · aturdido" : "")) + '</span><div class="enemy-life"><i style="width:' + pct + '%"></i></div></div><b>' + e.vida + "/" + e.vida_max + "</b></article>";
     }).join("") + "</div>";
   }
 
@@ -777,10 +782,10 @@
 
   // ChoiceMenu del diseno: selector de zona, objetivo de ataque y objetivo de habilidad.
   var SELECTORES = {
-    ir: ["Ir a…", "Elige una zona conectada"], hablar: ["Hablar con…", "Elige con quién"], usar: ["Usar objeto…", "Elige a quién curar"], atacar: ["Atacar a…", "Elige un objetivo"], habilidad: ["Habilidad sobre…", "Elige un objetivo"]
+    ir: ["Ir a…", "Elige una zona conectada"], hablar: ["Hablar con…", "Elige con quién"], usar: ["Usar objeto…", "Elige a quién curar"], atacar: ["Atacar a…", "Elige un objetivo"], habilidad: ["Habilidad…", "Elige habilidad y objetivo"]
   };
 
-  function nombreDe(a) { return String(a.etiqueta).replace(/^(Ir a|Atacar a|Habilidad contra|Hablar con|Usar) /, ""); }
+  function nombreDe(a) { return String(a.etiqueta).replace(/^(Ir a|Atacar a|Hablar con|Usar) /, ""); }
 
   function razonDe(a) {
     if (!a.habilitada) return a.motivo || "No disponible";

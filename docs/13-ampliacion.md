@@ -10,7 +10,8 @@
 - **Hecho también (22 de noviembre, rama `paquete-d-niveles`):** el **paquete D mínimo** (§10): experiencia, niveles 1 a 5 con crecimiento por rol, dos pasivas por miembro (niveles 3 y 5), zonas con nivel para los encuentros y aviso al llegar. Decisiones tomadas con los valores por defecto: experiencia individual (combates: a repartir entre los que siguen en pie; eventos: a quien lo resuelve), **además** del queso, contenido hasta el nivel 5 (la curva llega al 20) y pasivas en lugar de habilidades activas nuevas.
 - **Hecho también (24 de noviembre, rama `paquete-c-mapa`, sacada de `paquete-d-niveles`):** el **paquete C reducido** que propuso el autor (§6.4): una sola taberna, ahora en el centro del mapa con tres vecinas, y tres zonas al norte a 1, 2 y 3 días (la granja, el pantano y las minas de sal), con su gente, sus sucesos, un contrato cada una y encuentros con nivel. Ningún camino de los de antes se acorta (una prueba compara las quince distancias). Las posiciones del mapa las manda el servidor.
 - **Hecho también (24 de noviembre):** las ramas D y C, fusionadas en `main` (commit `216d39c`); 40 suites y 2298 pruebas.
-- **Pendiente:** las habilidades activas nuevas, si hay tiempo.
+- **Hecho también (25 de noviembre, rama `paquete-habilidades`):** las **habilidades activas nuevas** (§10.6): una por miembro en el nivel 2, de una vez por combate, con su comando por nombre, su explicación, su escena de demostración (`demo(habilidades)`) y su medida en `docs/11-balance.md`; 41 suites y 2355 pruebas.
+- **Pendiente:** nada del plan de ampliación; lo que quede es pulir y ensayar.
 
 ## 1. Resumen
 
@@ -167,3 +168,16 @@ Hacer **D mínimo (niveles 1 a 5)** después de los encuentros (§5), que son su
 3. **Hasta qué nivel con contenido real:** ¿5 (propuesta) o más?
 4. **Qué habilidades:** ¿las propongo yo (8, con su texto) para que las corrijas?
 5. **Prioridad:** ¿D antes que C, C antes que D, o solo uno de los dos?
+
+### 10.6 Las habilidades aprendidas (hecho, 25 de noviembre)
+
+Lo que se propuso y aceptó el autor: **una habilidad activa por miembro en el nivel 2** (el nivel al que llega casi cualquier partida; el 3 y el 5 siguen dando pasivas), y **una vez por combate** cada una.
+
+| Miembro | Habilidad | Efecto | Se apoya en |
+|---|---|---|---|
+| Baldomero | Golpe de Escudo | su golpe y el enemigo pierde su próximo turno | el estado `aturdido`, que ya existía y que nada provocaba |
+| Pimentina | Raclette Derramada | 4 de daño a cada enemigo vivo, sin defensa; 2 quesos | el rasgo `hechizos_de_cocina` y `coste_queso/2` |
+| Rufino | Nana de Requesón | cura 4 a cada miembro en pie | el efecto `curar` |
+| Tuerca | Puñalada Trapera | su ataque sin la defensa; el doble contra un aturdido | `aturdido/1`: se combina con el escudo |
+
+**En datos:** `mundo:habilidad_en(Id, Nivel, Habilidad)` y `mundo:una_vez_por_combate(Habilidad)`. **En reglas:** `combate:conoce_habilidad/2` (la de siempre o una aprendida si el nivel llega) entra en `puede_habilidad/2`, junto a `\+ ya_usada(Id, Habilidad)`. La marca de uso es un estado alterado **fijo** con el nombre de la habilidad, así que se borra sola al terminar el combate, como todos. **Comandos:** `habilidad` y `habilidad(Objetivo)` siguen siendo la de siempre (ninguna prueba ni ejemplo anterior cambió por eso); las aprendidas se escriben `habilidad(Nombre)` o `habilidad(Nombre, Objetivo)`. `por_que_no` dice «todavía no sabe hacer eso» (falla `conoce_habilidad`) o «ya la gastó en este combate» (lo impide `ya_usada`). La web ofrece un botón por habilidad y objetivo, la ficha enseña la del nivel 2 y la tarjeta del enemigo dice si está aturdido.

@@ -44,6 +44,7 @@ comando(atacar,     1).
 comando(defender,   0).
 comando(habilidad,  0).
 comando(habilidad,  1).
+comando(habilidad,  2).
 comando(contratos,  0).
 comando(aceptar,    1).
 comando(elegir,     1).
@@ -105,14 +106,28 @@ objetivo_de_accion(atacar(Objetivo), Meta) :-
     objetivo_de_accion(atacar(Actor, Objetivo), Meta).
 objetivo_de_accion(defender, combate:puede_defender(Actor)) :-
     actor_del_turno(Actor).
-% habilidad (sin objetivo, la de Rufino) y habilidad(Objetivo): la del miembro al que le toca.
+% habilidad (sin objetivo, la de Rufino) y habilidad(Objetivo): la de siempre del miembro al que le toca.
+% habilidad(Nombre) y habilidad(Nombre, Objetivo): una habilidad por su nombre (las que se aprenden).
 objetivo_de_accion(habilidad, combate:puede_habilidad(Actor, Habilidad, ninguno)) :-
     actor_del_turno(Actor),
     mundo:habilidad_de(Actor, Habilidad).
+objetivo_de_accion(habilidad(Nombre), combate:puede_habilidad(Actor, Nombre, ninguno)) :-
+    es_habilidad(Nombre),
+    actor_del_turno(Actor).
 objetivo_de_accion(habilidad(Objetivo), combate:puede_habilidad(Actor, Habilidad, B)) :-
+    \+ es_habilidad(Objetivo),
     actor_del_turno(Actor),
     mundo:habilidad_de(Actor, Habilidad),
     resolver_objetivo(Objetivo, B).
+objetivo_de_accion(habilidad(Nombre, Objetivo), combate:puede_habilidad(Actor, Nombre, B)) :-
+    es_habilidad(Nombre),
+    actor_del_turno(Actor),
+    (   combate:objetivo_de_habilidad(Nombre, ninguno) -> B = ninguno ; resolver_objetivo(Objetivo, B) ).
+
+% es_habilidad(+X): X es el nombre de una habilidad del juego (y no un enemigo al que apuntar).
+es_habilidad(X) :-
+    atom(X),
+    combate:efecto_habilidad(X, _).
 
 % actor_del_turno(-Id): el miembro al que le toca (la cabeza de la cola de turnos).
 actor_del_turno(Actor) :-
@@ -143,6 +158,9 @@ misma_accion(atacar(Actor, Objetivo), atacar(Actor, B)) :-
 misma_accion(defender, defender(_)).
 misma_accion(habilidad, habilidad(_, ninguno)).
 misma_accion(habilidad(Objetivo), habilidad(_, B)) :-
+    atomo_o_instancia(Objetivo, B).
+misma_accion(habilidad(Nombre), habilidad(_, Nombre, ninguno)).
+misma_accion(habilidad(Nombre, Objetivo), habilidad(_, Nombre, B)) :-
     atomo_o_instancia(Objetivo, B).
 
 atomo_o_instancia(Objetivo, B) :-
@@ -314,11 +332,15 @@ ejecutar_en_fase(defender, _, Items) :-
 ejecutar_en_fase(habilidad, _, Items) :-
     usar_habilidad(ninguno, Items).
 ejecutar_en_fase(habilidad(Objetivo), _, Items) :-
-    (   actor_del_turno(Actor), mundo:habilidad_de(Actor, Habilidad),
+    (   es_habilidad(Objetivo)
+    ->  usar_habilidad_nombrada(Objetivo, ninguno, Items)   % habilidad(nana_de_requeson): por su nombre
+    ;   actor_del_turno(Actor), mundo:habilidad_de(Actor, Habilidad),
         combate:objetivo_de_habilidad(Habilidad, ninguno)
     ->  usar_habilidad(ninguno, Items)               % la balada no necesita a quien apuntar
     ;   usar_habilidad(Objetivo, Items)
     ).
+ejecutar_en_fase(habilidad(Nombre, Objetivo), _, Items) :-
+    usar_habilidad_nombrada(Nombre, Objetivo, Items).
 
 % contratos : el tablon. Cada contrato a la vista con su estado (disponible, bloqueado, lejos...).
 ejecutar_en_fase(contratos, _, [vista(contratos, Fichas)]) :-
@@ -497,6 +519,34 @@ usar_habilidad(Objetivo, Items) :-
         ;   Items = [error(no_puede_habilidad(Actor, Habilidad))]
         )
     ;   Items = [error(no_es_tu_turno)]
+    ).
+
+% usar_habilidad_nombrada(+Habilidad, +Objetivo, -Items): una habilidad por su nombre. Si no pide enemigo,
+% el objetivo se ignora; si lo pide y no se dio, se avisa. La prueba se guarda ANTES de aplicar los efectos.
+usar_habilidad_nombrada(Habilidad, Objetivo, Items) :-
+    (   \+ es_habilidad(Habilidad)
+    ->  Items = [error(habilidad_desconocida(Habilidad))]
+    ;   \+ actor_del_turno(_)
+    ->  Items = [error(no_es_tu_turno)]
+    ;   actor_del_turno(Actor),
+        (   combate:objetivo_de_habilidad(Habilidad, ninguno)
+        ->  B = ninguno
+        ;   Objetivo == ninguno
+        ->  B = ninguno
+        ;   resolver_objetivo(Objetivo, B)
+        ->  true
+        ;   B = desconocido
+        ),
+        (   B == desconocido
+        ->  Items = [error(objetivo_desconocido(Objetivo))]
+        ;   combate:puede_habilidad(Actor, Habilidad, B)
+        ->  accion_de_turno(habilidad(Actor, Habilidad, B), Actor, habilidad(Habilidad, B),
+                            combate:puede_habilidad(Actor, Habilidad, B), Items)
+        ;   B == ninguno, combate:conoce_habilidad(Actor, Habilidad),
+            \+ combate:objetivo_de_habilidad(Habilidad, ninguno)
+        ->  Items = [error(habilidad_pide_objetivo(Habilidad))]
+        ;   Items = [error(no_puede_habilidad(Actor, Habilidad))]
+        )
     ).
 
 % ---------------------------------------------------------------------------

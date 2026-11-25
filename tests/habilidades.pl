@@ -73,10 +73,14 @@ test(los_cuatro_efectos_son_los_del_diseno) :-
     efecto_habilidad(balada_inspiradora, moral_grupo(1)),
     efecto_habilidad(rebuscar_bolsillos, queso_del_bolsillo(1)).
 
-test(solo_la_balada_no_necesita_enemigo) :-
-    findall(H, objetivo_de_habilidad(H, ninguno), [balada_inspiradora]),
+test(sin_enemigo_van_la_balada_la_raclette_y_la_nana) :-
+    findall(H, objetivo_de_habilidad(H, ninguno), Ns),
+    msort(Ns, [balada_inspiradora, nana_de_requeson, raclette_derramada]),
     findall(H, objetivo_de_habilidad(H, enemigo), Hs),
-    msort(Hs, [carga_heroica, fondue_flamigera, rebuscar_bolsillos]).
+    msort(Hs, [carga_heroica, fondue_flamigera, golpe_de_escudo, punalada_trapera, rebuscar_bolsillos]).
+
+test(de_las_de_siempre_solo_la_balada_no_necesita_enemigo) :-
+    findall(H, ( mundo:habilidad_de(_, H), objetivo_de_habilidad(H, ninguno) ), [balada_inspiradora]).
 
 test(una_habilidad_inexistente_no_tiene_efecto, [fail]) :-
     efecto_habilidad(volar, _).
@@ -310,8 +314,11 @@ test(es_un_comando_valido_con_o_sin_objetivo) :-
 test(con_un_objetivo_sin_decir_es_un_error) :-
     validar_comando(habilidad(_), error(falta_argumento(_))).
 
-test(con_dos_argumentos_no_se_entiende) :-
-    validar_comando(habilidad(a, b), error(no_entiendo(_))).
+test(con_dos_argumentos_es_el_nombre_y_el_objetivo) :-
+    validar_comando(habilidad(golpe_de_escudo, bandido_torpe), ok(habilidad(golpe_de_escudo, bandido_torpe))).
+
+test(con_tres_argumentos_no_se_entiende) :-
+    validar_comando(habilidad(a, b, c), error(no_entiendo(_))).
 
 test(solo_se_permite_en_combate) :-
     permitido(combate, habilidad),

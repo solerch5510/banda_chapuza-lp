@@ -218,6 +218,7 @@ Victoria. Se recoge el botín, se cuenta el queso y se niega todo lo que haya sa
 Botín: 3 quesos frescos. Los guardaban «para emergencias». Esto lo era.
 El combate vale 20 de experiencia, a repartir: 5 para cada uno de los que siguen en pie. Los caídos, ninguna.
 Tuerca sube al nivel 2: más vida, más fuerza y la misma cara de no saber qué hace.
+Tuerca aprende la Puñalada Trapera: una vez por combate, habilidad(punalada_trapera, Objetivo). ignora la defensa.
 Contrato resuelto con éxito: «Lady Clotilde Plumífera». La recompensa os espera en la taberna, en cuanto Doña Mantecosa deje de contarla.
 Objetivo: vuelve a la taberna a cobrar lo que has resuelto.
 
@@ -458,8 +459,11 @@ El Moho Saltarín se deshace en esporas y en disculpas, por ese orden.
 Habéis ganado. Un par de testigos aplauden; el resto prefiere no mojarse.
 El combate vale 43 de experiencia, a repartir: 15 para cada uno de los que siguen en pie. Los caídos, ninguna.
 Sir Baldomero sube al nivel 2: más vida, más fuerza y la misma cara de no saber qué hace.
+Sir Baldomero aprende el Golpe de Escudo: una vez por combate, habilidad(golpe_de_escudo, Objetivo). deja al enemigo sin turno.
 Madame Pimentina sube al nivel 2: más vida, más fuerza y la misma cara de no saber qué hace.
+Madame Pimentina aprende la Raclette Derramada: una vez por combate, habilidad(raclette_derramada). quema a todos. Cuesta 2 quesos.
 Rufino sube al nivel 2: más vida, más fuerza y la misma cara de no saber qué hace.
+Rufino aprende la Nana de Requesón: una vez por combate, habilidad(nana_de_requeson). cura 4 de vida a toda la Banda.
 Contrato resuelto con éxito: «La Despensa Real». La recompensa os espera en la taberna, en cuanto Doña Mantecosa deje de contarla.
 Chapuza de toda la vida. Ganáis. Más o menos. El Gran Roquefort cae, el moho retrocede y el rey os paga... en dos plazos: el primero, hoy; el segundo, «cuando la despensa se recupere», que es una forma de decir «nunca».
 El Registro os sube al puesto 31, con una nota a lápiz: «a confirmar». Baldomero jura que lo planeó todo y Pimentina ha probado el moho y opina que le falta fondo.

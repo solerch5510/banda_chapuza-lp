@@ -52,7 +52,16 @@ test(en_combate_solo_hay_ordenes_de_combate) :-
     assertion(estado:en_combate(_)),
     simulador:candidatas(Cs),
     assertion(Cs \== []),
-    forall(member(_-C, Cs), assertion(memberchk(C, [atacar(_), habilidad(_), habilidad, defender]))).
+    forall(member(_-C, Cs), assertion(memberchk(C, [atacar(_), habilidad(_), habilidad(_, _), habilidad, defender]))).
+
+test(con_el_nivel_2_el_simulador_tambien_ofrece_las_aprendidas) :-
+    nueva_partida,
+    forall(compania:miembro(P), ( compania:efectos_ganar_xp(P, 20, Efs), estado:aplicar_efectos(Efs) )),
+    juego:ejecutar(aceptar(ratas_del_granero), _),
+    juego:ejecutar(ir(aldea), _),
+    juego:actor_del_turno(A), compania:habilidades_aprendidas(A, [H]),
+    simulador:candidatas(Cs),
+    assertion(( memberchk(_-habilidad(H), Cs) ; memberchk(_-habilidad(H, _), Cs) )), !.
 
 :- end_tests(las_ordenes_posibles).
 

@@ -366,11 +366,11 @@ test(la_respuesta_siempre_trae_el_estado) :-
     forall(member(K, [fase, dia, nivel, zona, mapa, banda, despensa, contratos, combate, fin, acciones]),
            assertion(campo(E, K, _))).
 
-test(demo_sin_argumentos_lista_las_cinco_escenas) :-
+test(demo_sin_argumentos_lista_las_seis_escenas) :-
     nueva_partida,
     orden(demo, R), item_de_tipo(R, escenas, I), campo(I, escenas, Es),
     findall(N, ( member(X, Es), campo(X, nombre, N) ), Ns),
-    assertion(Ns == [economia, combate, ia, gallina, venda]).
+    assertion(Ns == [economia, combate, ia, gallina, venda, habilidades]).
 
 test(demo_de_una_escena_la_monta) :-
     nueva_partida,
@@ -913,7 +913,7 @@ test(las_fichas_por_http) :-
 
 test(las_escenas_por_http) :-
     obtener('/api/escenas', J), campo(J, escenas, Es),
-    length(Es, N), assertion(N == 5).
+    length(Es, N), assertion(N == 6).
 
 test(un_archivo_estatico_se_sirve) :-
     estado_http('/index.html', C1), estado_http('/', C2),

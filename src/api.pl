@@ -385,14 +385,18 @@ miembro_json(miembro(Id, Nombre, Rol, Vida, VidaMax, Ataque, Defensa, Moral, Fil
              json([id=Id, nombre=Nombre, rol=Rol, vida=Vida, vida_max=VidaMax, ataque=Ataque,
                    defensa=Defensa, moral=Moral, moral_max=10, fila=Fila, rasgo=Rasgo, rasgo_texto=RT,
                    sueldo=Sueldo, estado=Estado, nivel=Nivel, xp=XP, xp_nivel=XPNivel, xp_siguiente=XPSig,
-                   pasivas=Pasivas])) :-
+                   pasivas=Pasivas, habilidades=Habs])) :-
     bonito(Rasgo, RT),
     compania:progreso(Id, Nivel, XP, Siguiente, Ps),
     mundo:xp_para(Nivel, XPNivel),
     (   Siguiente == maximo -> XPSig = @(null) ; XPSig = Siguiente ),
     findall(json([id=P, nombre=NP, nivel=L, texto=TP]),
             ( member(P, Ps), mundo:pasiva(Id, L, P, Bono), narrador:nombre(P, NP), texto_bono(Bono, TP) ),
-            Pasivas).
+            Pasivas),
+    compania:habilidades_aprendidas(Id, Hs),
+    findall(json([id=H, nombre=NH, nivel=L, usada=U]),
+            ( member(H, Hs), mundo:habilidad_en(Id, L, H), nombre_corto(H, NH), bool(combate:ya_usada(Id, H), U) ),
+            Habs).
 
 % texto_bono(+Bono, -Texto): ataque(2) -> '+2 de ataque'.
 texto_bono(Bono, Texto) :-
@@ -427,12 +431,13 @@ contrato_json(contrato(Id, Zona, Dificultad, Recompensa, Estado),
 combate_json(combate(Ronda, Turno, Enemigos),
              json([tipo=combate, ronda=Ronda, turno=json([id=Turno, nombre=NT]), enemigos=Es, orden=Orden])) :-
     nombre_corto(Turno, NT),
-    findall(json([id=Ide, nombre=N, tipo_enemigo=Tipo, vida=V, vida_max=Max, fila=Fila, caido=Caido]),
+    findall(json([id=Ide, nombre=N, tipo_enemigo=Tipo, vida=V, vida_max=Max, fila=Fila, caido=Caido, aturdido=Aturdido]),
             (   member(enemigo(E, V, Max, Fila), Enemigos),
                 nombre_corto(E, N),
                 ( E = e(Tipo, _) -> true ; Tipo = E ),
                 termino_texto(E, Ide),
-                bool(V =:= 0, Caido)
+                bool(V =:= 0, Caido),
+                bool(combate:aturdido(E), Aturdido)
             ),
             Es),
     (   estado:cola_turnos(Cola)
@@ -533,13 +538,22 @@ enemigos_vivos(Tipos) :-
     findall(T, ( estado:instancia(E, T), compania:vivo(E) ), Ts),
     sort(Ts, Tipos).
 
-% Rufino canta sin objetivo; las demas habilidades piden un enemigo.
+% Rufino canta sin objetivo; las demas habilidades piden un enemigo. La de siempre se escribe sin nombre;
+% las aprendidas, con el suyo (habilidad(Nombre) o habilidad(Nombre, Objetivo)).
 habilidad_candidata(Cmd) :-
     juego:actor_del_turno(Actor),
     mundo:habilidad_de(Actor, H),
     (   combate:objetivo_de_habilidad(H, ninguno)
     ->  Cmd = habilidad
     ;   enemigos_vivos(Tipos), member(T, Tipos), Cmd = habilidad(T)
+    ).
+habilidad_candidata(Cmd) :-
+    juego:actor_del_turno(Actor),
+    compania:habilidades_aprendidas(Actor, Hs),
+    member(H, Hs),
+    (   combate:objetivo_de_habilidad(H, ninguno)
+    ->  Cmd = habilidad(H)
+    ;   enemigos_vivos(Tipos), member(T, Tipos), Cmd = habilidad(H, T)
     ).
 
 accion_json(Fase, Cmd, Familia,
@@ -583,16 +597,24 @@ etiqueta_de(Cmd, Etiqueta) :-
     ->  ( mundo:zona(Z, N) -> true ; N = Z ), format(atom(Etiqueta), 'Ir a ~w', [N])
     ;   Cmd = atacar(T)
     ->  nombre_corto(T, N), format(atom(Etiqueta), 'Atacar a ~w', [N])
+    ;   Cmd = habilidad(H), juego:es_habilidad(H)
+    ->  nombre_corto(H, Etiqueta)
+    ;   Cmd = habilidad(H, T)
+    ->  nombre_corto(H, NH), nombre_corto(T, N), format(atom(Etiqueta), '~w contra ~w', [NH, N])
     ;   Cmd = habilidad(T)
-    ->  nombre_corto(T, N), format(atom(Etiqueta), 'Habilidad contra ~w', [N])
+    ->  habilidad_de_siempre(H), nombre_corto(H, NH), nombre_corto(T, N), format(atom(Etiqueta), '~w contra ~w', [NH, N])
     ;   Cmd = habilidad
-    ->  Etiqueta = 'Habilidad'
+    ->  habilidad_de_siempre(H), nombre_corto(H, Etiqueta)
     ;   Cmd = hablar(Npc)
     ->  narrador:nombre_visible(Npc, N), format(atom(Etiqueta), 'Hablar con ~w', [N])
     ;   Cmd = usar(Objeto, Miembro)
     ->  narrador:nombre_visible(Objeto, O), nombre_corto(Miembro, M), format(atom(Etiqueta), 'Usar ~w en ~w', [O, M])
     ;   functor(Cmd, F, _), bonito(F, Etiqueta)
     ).
+
+% habilidad_de_siempre(-H): la habilidad sin nombre del miembro al que le toca (o la palabra, si no hay turno).
+habilidad_de_siempre(H) :-
+    (   juego:actor_del_turno(A), mundo:habilidad_de(A, H0) -> H = H0 ; H = habilidad ).
 
 % ---------------------------------------------------------------------------
 % Las fichas de los personajes: que son, que hacen y que NO hay (niveles)
@@ -613,18 +635,21 @@ fichas_json(json([miembros=Ms, moral=Moral, reglas=Reglas, progresion=Prog])) :-
     mundo:parametro(nivel_maximo, NivelMax),
     findall(json([nivel=L, xp=X]), ( between(2, NivelMax, L), mundo:xp_para(L, X) ), Curva),
     Prog = json([sube_de_nivel= @(true), nivel_maximo=NivelMax, curva=Curva,
-                 texto='Los personajes ganan experiencia y suben de nivel: cada nivel suma vida y ataque según su rol, y en los niveles 3 y 5 aprenden una pasiva.',
+                 texto='Los personajes ganan experiencia y suben de nivel: cada nivel suma vida y ataque según su rol, en el nivel 2 aprenden una habilidad nueva y en los niveles 3 y 5, una pasiva.',
                  cambia=['vida', 'moral', 'equipo', 'nivel'],
                  detalle='La experiencia sale de los combates (la ganan los que siguen en pie al final: quien cae no aprende) y de resolver los eventos de los contratos (la gana quien lo resuelve, más cuanto antes). Las cifras de la ficha son las del nivel 1.']).
 
 ficha_json(Todos, Id, json([id=Id, nombre=Nombre, rol=Rol, vida_max=V, ataque=A, defensa=D, sueldo=S, fila=Fila,
                             alcance=Alcance, alcance_texto=AlcanceT, rasgo=Rasgo, rasgo_nombre=RasgoN, rasgo_texto=RasgoT,
-                            habilidad=Hab, fuertes=Fuertes, debiles=Debiles, maximos=json([vida=MV, ataque=MA, defensa=MD])])) :-
+                            habilidad=Hab, aprendidas=Aprendidas, fuertes=Fuertes, debiles=Debiles, maximos=json([vida=MV, ataque=MA, defensa=MD])])) :-
     mundo:personaje(Id, Nombre, Rol, vida(V), ataque(A), defensa(D), sueldo(S)),
     mundo:fila_preferida(Id, Fila),
     mundo:alcance(Id, Alcance), alcance_texto(Alcance, AlcanceT),
     mundo:rasgo(Id, Rasgo), bonito(Rasgo, RasgoN), rasgo_texto(Id, Rasgo, RasgoT),
     mundo:habilidad_de(Id, Habilidad), habilidad_json(Id, Habilidad, Hab),
+    findall(json([nivel=L|Campos]),
+            ( mundo:habilidad_en(Id, L, H), habilidad_json(Id, H, json(Campos)) ),
+            Aprendidas),
     findall(X, member(_-s(X, _, _), Todos), Vs), max_list(Vs, MV),
     findall(X, member(_-s(_, X, _), Todos), As), max_list(As, MA),
     findall(X, member(_-s(_, _, X), Todos), Ds), max_list(Ds, MD),
@@ -637,9 +662,12 @@ rasgo_texto(_, teme_caballos, Texto) :- !,
     mundo:parametro(dano_miedo, Miedo), mundo:parametro(penal_venda, Venda),
     format(atom(Texto), 'Teme a los caballos: no puede atacarlos y recibe +~w de daño de ellos. Con la venda de caballos se atreve, pero ataca con -~w contra ellos.', [Miedo, Venda]).
 rasgo_texto(Id, hechizos_de_cocina, Texto) :-
-    mundo:habilidad_de(Id, Hab), mundo:coste_queso(Hab, N), !,
-    ( N =:= 1 -> Q = 'queso' ; Q = 'quesos' ),
-    format(atom(Texto), 'Toda su magia necesita queso: lanzar su habilidad gasta ~w ~w (el más rancio), y sin queso en la despensa no puede lanzarla.', [N, Q]).
+    findall(H, ( mundo:habilidad_de(Id, H) ; mundo:habilidad_en(Id, _, H) ), Hs),
+    findall(T, ( member(H, Hs), mundo:coste_queso(H, N), nombre_corto(H, NH),
+                 ( N =:= 1 -> Q = 'queso' ; Q = 'quesos' ), format(atom(T), '~w, ~w ~w', [NH, N, Q]) ), Ts),
+    Ts = [_|_], !,
+    atomic_list_concat(Ts, '; ', Lista),
+    format(atom(Texto), 'Toda su magia necesita queso: cada hechizo gasta lo suyo (~w), los más rancios primero, y sin queso suficiente no puede lanzarlo.', [Lista]).
 rasgo_texto(_, _, 'Es de ambientación: de momento no cambia las reglas del juego.').
 
 % habilidad_json(+Id, +Habilidad, -Json): lo que hace, lo que cuesta, contra quien y como se escribe.
@@ -652,8 +680,18 @@ habilidad_json(Id, Habilidad, json([id=Habilidad, nombre=Nombre, efecto=Efecto, 
     ),
     combate:objetivo_de_habilidad(Habilidad, Tipo),
     (   Tipo == ninguno
-    ->  Objetivo = 'No necesita objetivo', Comando = 'habilidad.'
-    ;   Objetivo = 'Se usa contra un enemigo', Comando = 'habilidad(Tipo).'
+    ->  Objetivo = 'No necesita objetivo'
+    ;   Objetivo = 'Se usa contra un enemigo'
+    ),
+    comando_de_habilidad(Id, Habilidad, Tipo, Comando).
+
+% comando_de_habilidad(+Id, +Hab, +Tipo, -Comando): la de siempre va sin nombre; las aprendidas, con el suyo.
+comando_de_habilidad(Id, Habilidad, Tipo, Comando) :-
+    (   mundo:habilidad_de(Id, Habilidad)
+    ->  ( Tipo == ninguno -> Comando = 'habilidad.' ; Comando = 'habilidad(Tipo).' )
+    ;   Tipo == ninguno
+    ->  format(atom(Comando), 'habilidad(~w).', [Habilidad])
+    ;   format(atom(Comando), 'habilidad(~w, Tipo).', [Habilidad])
     ).
 
 efecto_texto(golpe_extra(N), T) :- format(atom(T), 'Su golpe de siempre, con +~w de daño.', [N]).
@@ -662,6 +700,12 @@ efecto_texto(moral_grupo(N), T) :- format(atom(T), '+~w de moral a toda la Banda
 efecto_texto(queso_del_bolsillo(N), T) :-
     ( N =:= 1 -> Q = 'queso' ; Q = 'quesos' ),
     format(atom(T), 'Si el enemigo lleva queso, te llevas ~w ~w. Solo una vez por enemigo en cada combate.', [N, Q]).
+efecto_texto(golpe_aturdidor, 'Su golpe de siempre y, si el enemigo sigue en pie, pierde su próximo turno. Una vez por combate.').
+efecto_texto(dano_a_todos(N), T) :- format(atom(T), '~w de daño fijo a cada enemigo, esté en la fila que esté. Una vez por combate.', [N]).
+efecto_texto(curar_grupo(N), T) :- format(atom(T), 'Cura ~w de vida a cada miembro de la Banda que siga en pie. Una vez por combate.', [N]).
+efecto_texto(sin_defensa(F), T) :-
+    ( F =:= 2 -> X = 'el doble' ; format(atom(X), '~w veces', [F]) ),
+    format(atom(T), 'Su ataque sin restar la defensa del enemigo; contra uno aturdido, ~w. Una vez por combate.', [X]).
 
 % extremos(+Id, +Todos, +Alcance, +Rasgo, +Habilidad, -Fuertes, -Debiles): lo que destaca, comparado con el resto de la Banda.
 extremos(Id, Todos, Alcance, Rasgo, Habilidad, Fuertes, Debiles) :-

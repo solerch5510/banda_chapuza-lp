@@ -149,11 +149,13 @@ En la segunda pestaña lanzo las pruebas (unos 20 segundos):
 swipl -q -s tests/todas -g "run_tests,halt" -t "halt(1)"
 ```
 
-Se ve: «40 suites en verde, 0 con fallos; 2298 pruebas declaradas» y «TODO EN VERDE».
+Se ve: «41 suites en verde, 0 con fallos; 2355 pruebas declaradas» y «TODO EN VERDE».
 
 > Para terminar: la verificación fue tan importante como el código. Veintiocho suites, más de mil setecientas pruebas, pruebas de mutación —rompo el código a propósito y compruebo que alguna prueba falla— y la prueba de equivalencia del meta-intérprete que les contaba.
 >
 > Y cada concepto del curso tiene su sitio: hechos y reglas en el combate, unificación en los resultados, resolución y retroceso en el árbol de derivación, negación como fallo en `por_que_no`, el corte en la IA, aritmética en el daño y el queso, metaprogramación en `explicar.pl` y base de datos dinámica aislada en `estado.pl`. No hay programación funcional, y lo digo abiertamente. Con más tiempo haría guardar y cargar, más contratos y un ajuste fino del balance. Gracias.
+
+*Extra (si preguntan por los niveles):* `demo(habilidades).` deja a la Banda en el nivel 2 contra el Ganso del Peaje, un Bandido Torpe y un Ballestero. Siguiendo las sugerencias, el golpe de escudo de Baldomero aturde al ganso, la raclette de Pimentina quema a los tres, la puñalada de Tuerca hace el doble contra el aturdido (16) y lo tumba, y `por_que_no(habilidad(golpe_de_escudo, bandido_torpe)).` en la ronda siguiente baja hasta la negación `\+ ya_usada(baldomero, golpe_de_escudo)`: una vez por combate. Dos reglas pequeñas que se combinan sin saber la una de la otra.
 
 *Extra (si sobran minutos o preguntan por la interfaz):* `swipl -q -s src/servidor -g "servidor(8080)" -t halt` y abrir `http://localhost:8080/`: la misma partida en el navegador; el botón «¿por qué no?» de una acción desactivada llama al mismo `por_que_no`. La web no contiene ninguna regla.
 

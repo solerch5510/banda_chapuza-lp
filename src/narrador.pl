@@ -159,6 +159,16 @@ frase(suceso(sube_nivel(P, N)), ambos,
       '~w sube al nivel ~w: más vida, más fuerza y la misma cara de no saber qué hace.'-[P, N]).
 frase(suceso(pasiva_nueva(P, H)), ambos,
       '~w aprende ~w. Se nota en cada golpe, aunque nadie sepa explicarlo.'-[P, H]).
+frase(suceso(habilidad_nueva(baldomero, golpe_de_escudo)), ambos,
+      'Sir Baldomero aprende el Golpe de Escudo: una vez por combate, habilidad(golpe_de_escudo, Objetivo). deja al enemigo sin turno.').
+frase(suceso(habilidad_nueva(pimentina, raclette_derramada)), ambos,
+      'Madame Pimentina aprende la Raclette Derramada: una vez por combate, habilidad(raclette_derramada). quema a todos. Cuesta 2 quesos.').
+frase(suceso(habilidad_nueva(rufino, nana_de_requeson)), ambos,
+      'Rufino aprende la Nana de Requesón: una vez por combate, habilidad(nana_de_requeson). cura 4 de vida a toda la Banda.').
+frase(suceso(habilidad_nueva(tuerca, punalada_trapera)), ambos,
+      'Tuerca aprende la Puñalada Trapera: una vez por combate, habilidad(punalada_trapera, Objetivo). ignora la defensa.').
+frase(suceso(habilidad_nueva(P, H)), ambos,
+      '~w aprende ~w, una habilidad nueva para el combate. Solo sale una vez por pelea.'-[P, H]).
 frase(suceso(enemigos_de_nivel(N)), ambos,
       'Estos son de nivel ~w: más vida y más mala leche que los de la taberna.'-[N]).
 frase(suceso(aviso_nivel(Z, N, B)), ambos,
@@ -567,6 +577,16 @@ frase(suceso(balada), ambos,
       'Rufino entona la Balada Inspiradora. La moral sube; los oídos se despiden.').
 frase(suceso(rebuscar(E, ok)), ambos,
       'Tuerca rebusca en los bolsillos de ~w y encuentra un queso. «Lo tomo prestado», dice.'-[E]).
+frase(suceso(golpe_de_escudo(B)), ambos,
+      'Sir Baldomero le estampa el escudo a ~w. Suena a campana de iglesia y deja un eco muy largo.'-[B]).
+frase(suceso(queda_aturdido(B)), ambos,
+      '~w ve estrellas, quesos y a su abuela. Pierde su próximo turno.'-[B]).
+frase(suceso(raclette), ambos,
+      'Madame Pimentina vuelca una raclette hirviendo sobre los enemigos. Nadie se libra, y todo huele a cena.').
+frase(suceso(nana), ambos,
+      'Rufino canta la Nana de Requesón. A la Banda se le cierran las heridas, y casi también los ojos.').
+frase(suceso(punalada(B)), ambos,
+      'Tuerca aparece detrás de ~w sin que nadie sepa cómo. Contra lo que no se ve, la armadura no sirve.'-[B]).
 frase(suceso(rebuscar(E, nada)), ambos,
       'Tuerca rebusca en ~w y no halla nada. Se queda con la dignidad, que no cotiza.'-[E]).
 frase(suceso(golpea_a_clotilde(E, N)), ambos,
@@ -651,7 +671,15 @@ frase(dano(A, B, D), ambos,
       '~w deja a ~w sin ~w puntos de vida. Es matemática, no rencor.'-[A, B, D]).
 frase(dano(_, B, 1), ambos,
       'Daño mínimo: un punto. ~w apenas lo nota, pero el reglamento exige que cuente.'-[B]).
-frase(puede_habilidad(pimentina, _, _), ambos,
+frase(puede_habilidad(baldomero, golpe_de_escudo, _), ambos,
+      'Golpe de escudo autorizado: Sir Baldomero lo sabe, está en pie y aún no lo ha gastado en este combate.').
+frase(puede_habilidad(pimentina, raclette_derramada, _), ambos,
+      'Hay dos quesos en la despensa y la raclette no se ha servido aún en este combate. Que pase el siguiente.').
+frase(puede_habilidad(rufino, nana_de_requeson, _), ambos,
+      'Rufino sabe la nana, tiene voz y no la ha cantado aún en este combate. La Banda se cura por reglamento.').
+frase(puede_habilidad(tuerca, punalada_trapera, _), ambos,
+      'Tuerca sabe dónde no mira nadie y aún no ha gastado la puñalada. Si el enemigo está aturdido, mejor.').
+frase(puede_habilidad(pimentina, fondue_flamigera, _), ambos,
       'Hay queso en la despensa, así que hay magia. La Ley del Cuajo saluda a Madame Pimentina.').
 frase(puede_habilidad(rufino, balada_inspiradora, _), ambos,
       'Rufino canta y la moral sube. Que el grupo quiera que pare es materia de otra regla.').
@@ -700,6 +728,10 @@ frase(impide(aturdido(P)), ambos,
       'A ~w le dan vueltas la sala, el reglamento y el desayuno. Que ataque otro día.'-[P]).
 frase(falla(en_fila_alcanzable(A, B)), ambos,
       'La retaguardia queda tras el frente: ~w no llega hasta ~w mientras alguien siga delante.'-[A, B]).
+frase(falla(conoce_habilidad(P, _)), ambos,
+      '~w todavía no sabe hacer eso. Se aprende al subir de nivel; de momento, sabe lo de siempre.'-[P]).
+frase(impide(ya_usada(P, H)), ambos,
+      '~w ya gastó ~w en este combate. Hay cosas que solo salen bien una vez, y esta ya salió.'-[P, H]).
 frase(falla(puede_habilidad(pimentina, _)), ambos,
       'Sin queso no hay hechizo. Madame Pimentina agita el cucharón y la despensa vacía le devuelve el eco.').
 frase(falla(puede_viajar(Z)), ambos,
@@ -775,6 +807,10 @@ nombre(carga_heroica,      'la Carga Heroica').
 nombre(fondue_flamigera,   'la Fondue Flamígera').
 nombre(balada_inspiradora, 'la Balada Inspiradora').
 nombre(rebuscar_bolsillos, 'Rebuscar Bolsillos').
+nombre(golpe_de_escudo,    'el Golpe de Escudo').
+nombre(raclette_derramada, 'la Raclette Derramada').
+nombre(nana_de_requeson,   'la Nana de Requesón').
+nombre(punalada_trapera,   'la Puñalada Trapera').
 nombre(venda_de_caballos,  'venda de caballos').
 nombre(rata_quesera,    'la Rata Quesera').
 nombre(bandido_torpe,   'el Bandido Torpe').
@@ -1356,7 +1392,14 @@ texto_error(no_puede_habilidad(Actor, Habilidad), Texto) :-
     format(atom(Texto), '~w no puede usar ~w ahora mismo: falta lo que necesita, o el objetivo no está a su alcance. Pregunta por_que_no(habilidad(...)).', [A, H]).
 texto_error(habilidad_pide_objetivo(Habilidad), Texto) :-
     nombre_visible(Habilidad, H),
-    format(atom(Texto), '~w necesita un enemigo: escribe habilidad(Objetivo).', [H]).
+    (   mundo:habilidad_de(_, Habilidad)
+    ->  format(atom(T0), '~w necesita un enemigo: escribe habilidad(Objetivo).', [H])
+    ;   format(atom(T0), '~w necesita un enemigo: escribe habilidad(~w, Objetivo).', [H, Habilidad])
+    ),
+    mayuscula_inicial(T0, Texto).
+texto_error(habilidad_desconocida(Habilidad), Texto) :-
+    como_texto(Habilidad, Dicho),
+    format(atom(Texto), 'No hay ninguna habilidad que se llame "~w". La ficha de cada personaje (compania.) dice cuáles sabe.', [Dicho]).
 texto_error(no_puede_defender(Actor), Texto) :-
     nombre_visible(Actor, A),
     format(atom(Texto), '~w no puede defenderse ahora mismo.', [A]).
@@ -1416,7 +1459,7 @@ ayuda_de(contratos, 'contratos.     el tablón: los contratos a la vista y si se
 ayuda_de(aceptar, 'aceptar(Contrato). acepta un contrato (en la taberna o donde lo ofrecen)').
 ayuda_de(atacar, 'atacar(Objetivo). solo en combate: golpea a un enemigo (un tipo o e(Tipo, N))').
 ayuda_de(defender, 'defender.      solo en combate: sube tu defensa hasta tu próximo turno').
-ayuda_de(habilidad, 'habilidad(Objetivo). solo en combate: usa la habilidad de tu personaje; la balada de Rufino se escribe habilidad.').
+ayuda_de(habilidad, 'habilidad(Objetivo). solo en combate: usa la habilidad de siempre de tu personaje (la balada de Rufino se escribe habilidad.). Las que se aprenden al subir de nivel van por su nombre: habilidad(Nombre, Objetivo). o habilidad(Nombre).').
 ayuda_de(por_que_no, 'por_que_no(Accion). por qué NO se puede una acción: qué regla falla y por qué (p. ej. por_que_no(aceptar(gallina_noble)).)').
 ayuda_de(nivel, 'nivel(N).      cuánto detalle tienen explicar y por_que_no: nivel(resumido). o nivel(detallado).').
 ayuda_de(demo, 'demo.          las escenas de la demostración (demo(Nombre). prepara una y la deja lista para jugar)').

@@ -61,3 +61,16 @@ escena(venda,
        'Se le pone a Baldomero la venda de caballos (el premio del contrato del gato). Ahora la misma pregunta ya no falla y la gallina se puede aceptar.',
        [ efectos([equipar(baldomero, venda_de_caballos)]) ],
        [por_que_no(aceptar(gallina_noble)), aceptar(gallina_noble)]).
+
+% La Banda en el nivel 2, con las habilidades aprendidas (docs/13 §0): el golpe de escudo deja aturdido al ganso y
+% la punalada de Tuerca hace el doble contra el. Las sugerencias van en el orden de los turnos.
+escena(habilidades,
+       'Las habilidades aprendidas: el escudo y la puñalada se combinan',
+       'Camino Real, la Banda en el nivel 2 contra el Ganso del Peaje, un Bandido Torpe y un Ballestero. Cada miembro sabe una habilidad nueva, de una vez por combate.',
+       [ reiniciar,
+         efectos([viajar(camino_real),
+                  ganar_xp(baldomero, 20), ganar_xp(pimentina, 20), ganar_xp(rufino, 20), ganar_xp(tuerca, 20),
+                  curar(baldomero, 9), curar(pimentina, 9), curar(rufino, 9), curar(tuerca, 9)]),
+         combate([ganso_de_peaje, bandido_torpe, ballestero_oxidado]) ],
+       [ habilidad(golpe_de_escudo, ganso_de_peaje), habilidad(raclette_derramada), habilidad(punalada_trapera, ganso_de_peaje),
+         habilidad(nana_de_requeson), por_que_no(habilidad(golpe_de_escudo, bandido_torpe)) ]).

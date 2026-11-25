@@ -17,6 +17,7 @@
 
 :- module(combate, [puede_atacar/2, en_fila_alcanzable/2, aturdido/1,
                     puede_habilidad/2, puede_habilidad/3, efecto_habilidad/2, objetivo_de_habilidad/2,
+                    conoce_habilidad/2, ya_usada/2,
                     efectos_habilidad/4, tipo_de/2, clase_de/2,
                     ataque_base/2, defensa_base/2, puede_actuar/1,
                     iniciativa/2, orden_turnos/1,
@@ -225,6 +226,8 @@ efectos_accion(A, defender, [alterar(A, defendiendo, 1), mensaje(defiende, [A])]
     puede_defender(A).
 efectos_accion(A, habilidad(B), Efectos) :-
     mundo:habilidad_de(A, Habilidad),
+    efectos_habilidad(A, Habilidad, B, Efectos).
+efectos_accion(A, habilidad(Habilidad, B), Efectos) :-      % una habilidad por su nombre (las aprendidas)
     efectos_habilidad(A, Habilidad, B, Efectos).
 efectos_accion(E, curarse, [gastar_objeto(E, Objeto, 1), curar(E, Cura), mensaje(se_cura, [E, Cura])]) :-
     curativos_de(E, [Objeto|_]),
@@ -481,10 +484,12 @@ efectos_ronda([siguiente_ronda(Orden)]) :-
     orden_turnos(Orden).
 
 % ---------------------------------------------------------------------------
-% Habilidades: una por personaje (mundo:habilidad_de/2). Lo que hace cada una es una tabla de
+% Habilidades: la de siempre (mundo:habilidad_de/2) y las que se aprenden al subir de nivel
+% (mundo:habilidad_en/3); conoce_habilidad/2 junta las dos. Lo que hace cada una es una tabla de
 % DATOS (efecto_habilidad/2) y cuenta con una regla que dice si se puede usar:
-%   puede_habilidad(+Id, +Hab)       el personaje puede usarla (en pie, sin aturdir y, si es magia
-%                                    de cocina, con queso); no mira el objetivo;
+%   puede_habilidad(+Id, +Hab)       el personaje puede usarla (la conoce, esta en pie, sin aturdir,
+%                                    no la ha gastado ya en este combate y, si es magia de cocina,
+%                                    con queso); no mira el objetivo;
 %   puede_habilidad(+Id, +Hab, +O)   ademas el objetivo vale: un enemigo al que alcanza, o ninguno.
 % Rasgo hechizos_de_cocina (Pimentina): "toda magia necesita queso"; cada hechizo gasta quesos
 % de la despensa (los mas rancios primero) y sin queso suficiente no se puede lanzar.
@@ -493,16 +498,41 @@ efecto_habilidad(carga_heroica,      golpe_extra(4)).         % el golpe de siem
 efecto_habilidad(fondue_flamigera,   dano_fijo(8)).           % 8 de dano, ignora la defensa
 efecto_habilidad(balada_inspiradora, moral_grupo(1)).         % +1 de moral a toda la compania
 efecto_habilidad(rebuscar_bolsillos, queso_del_bolsillo(1)).  % 1 queso si el enemigo lo lleva
+efecto_habilidad(golpe_de_escudo,    golpe_aturdidor).        % el golpe de siempre y el enemigo pierde su turno
+efecto_habilidad(raclette_derramada, dano_a_todos(4)).        % 4 de dano a cada enemigo, ignora la defensa
+efecto_habilidad(nana_de_requeson,   curar_grupo(4)).         % cura 4 a cada miembro en pie
+efecto_habilidad(punalada_trapera,   sin_defensa(2)).         % ignora la defensa; x2 si esta aturdido
 
 objetivo_de_habilidad(carga_heroica,      enemigo).
 objetivo_de_habilidad(fondue_flamigera,   enemigo).
 objetivo_de_habilidad(balada_inspiradora, ninguno).
 objetivo_de_habilidad(rebuscar_bolsillos, enemigo).
+objetivo_de_habilidad(golpe_de_escudo,    enemigo).
+objetivo_de_habilidad(raclette_derramada, ninguno).
+objetivo_de_habilidad(nana_de_requeson,   ninguno).
+objetivo_de_habilidad(punalada_trapera,   enemigo).
+
+% conoce_habilidad(+Id, +Hab): la de siempre, o una aprendida si su nivel ya llega. Una sola clausula con
+% si-entonces-si-no, para que no deje puntos de eleccion (en 5.10 el indice solo mira el primer argumento).
+conoce_habilidad(Id, Habilidad) :-
+    (   mundo:habilidad_de(Id, Habilidad)
+    ->  true
+    ;   mundo:habilidad_en(Id, Nivel, Habilidad),
+        estado:nivel_de(Id, Actual),
+        Actual >= Nivel
+    ).
+
+% ya_usada(+Id, +Hab): una habilidad de una vez por combate que ya gasto (la marca es un estado
+% alterado fijo con el nombre de la habilidad; se borra al terminar el combate, como todos).
+ya_usada(Id, Habilidad) :-
+    mundo:una_vez_por_combate(Habilidad),
+    estado:alterado(Id, Habilidad, _).
 
 puede_habilidad(Id, Habilidad) :-
-    mundo:habilidad_de(Id, Habilidad),
+    conoce_habilidad(Id, Habilidad),
     puede_actuar(Id),
     \+ aturdido(Id),
+    \+ ya_usada(Id, Habilidad),
     puede_pagar(Id, Habilidad).
 
 % Solo la magia de cocina cuesta queso; las demas habilidades son gratis.
@@ -535,7 +565,14 @@ efectos_habilidad(Id, Habilidad, Objetivo, Efectos) :-
     efecto_habilidad(Habilidad, Datos),
     efectos_de(Datos, Id, Habilidad, Objetivo, Propios),
     gasto_habilidad(Id, Habilidad, Gasto),
-    append(Gasto, Propios, Efectos).
+    marca_de_uso(Id, Habilidad, Marca),
+    append([Gasto, Marca, Propios], Efectos).
+
+marca_de_uso(Id, Habilidad, Marca) :-
+    (   mundo:una_vez_por_combate(Habilidad)
+    ->  Marca = [alterar(Id, Habilidad, fijo)]
+    ;   Marca = []
+    ).
 
 gasto_habilidad(Id, Habilidad, Gasto) :-
     (   mundo:rasgo(Id, hechizos_de_cocina), mundo:coste_queso(Habilidad, Coste)
@@ -563,6 +600,50 @@ efectos_de(queso_del_bolsillo(N), _, _, B, Efectos) :-
     ;   Efectos = [alterar(B, rebuscado, fijo), mensaje(rebuscar, [B, nada])]
     ).
 
+% El golpe de escudo: el golpe de siempre y, si el enemigo sigue en pie, pierde su proximo turno.
+efectos_de(golpe_aturdidor, A, Habilidad, B, Efectos) :-
+    dano(A, B, D),
+    aviso_de(Habilidad, B, Aviso),
+    efectos_caida(B, D, Caida),
+    estado:vida(B, V),
+    (   D < V
+    ->  Aturde = [alterar(B, aturdido, 1), mensaje(queda_aturdido, [B])]
+    ;   Aturde = []
+    ),
+    append([[Aviso, dano(B, D), mensaje(golpe, [A, B, D])], Caida, Aturde], Efectos).
+% La raclette: el mismo dano fijo a cada enemigo que sigue en pie, este en la fila que este.
+efectos_de(dano_a_todos(D), A, Habilidad, B, [Aviso|Golpes]) :-
+    aviso_de(Habilidad, B, Aviso),
+    findall(E, ( estado:combatiente(E, enemigo), compania:vivo(E) ), Enemigos),
+    golpes_fijos(Enemigos, A, D, Golpes).
+% La nana: cura a cada miembro de la compania que sigue en pie (sin pasar de su vida maxima).
+efectos_de(curar_grupo(N), _, Habilidad, B, [Aviso|Curas]) :-
+    aviso_de(Habilidad, B, Aviso),
+    findall(curar(Id, N), ( compania:miembro(Id), estado:combatiente(Id, jugador), compania:vivo(Id) ), Curas).
+% La punalada: el ataque sin restar la defensa del enemigo; contra uno aturdido, por Factor.
+efectos_de(sin_defensa(Factor), A, Habilidad, B, Efectos) :-
+    dano_sin_defensa(A, B, Factor, D),
+    aviso_de(Habilidad, B, Aviso),
+    efectos_caida(B, D, Caida),
+    append([Aviso, dano(B, D), mensaje(golpe, [A, B, D])], Caida, Efectos).
+
+% dano_sin_defensa(+A, +B, +Factor, -D): ataque y modificadores, sin la defensa; si B esta aturdido, por Factor.
+dano_sin_defensa(A, B, Factor, D) :-
+    ataque(A, Atq),
+    modificador(A, B, M),
+    D0 is max(1, Atq + M),
+    (   aturdido(B) -> D is D0 * Factor ; D = D0 ).
+
+golpes_fijos([], _, _, []).
+golpes_fijos([E|Es], A, D, Efectos) :-
+    efectos_caida(E, D, Caida),
+    golpes_fijos(Es, A, D, Resto),
+    append([[dano(E, D), mensaje(golpe, [A, E, D])], Caida, Resto], Efectos).
+
 aviso_de(carga_heroica,      B, mensaje(carga_heroica, [B])).
 aviso_de(fondue_flamigera,   B, mensaje(fondue, [B])).
 aviso_de(balada_inspiradora, _, mensaje(balada, [])).
+aviso_de(golpe_de_escudo,    B, mensaje(golpe_de_escudo, [B])).
+aviso_de(raclette_derramada, _, mensaje(raclette, [])).
+aviso_de(nana_de_requeson,   _, mensaje(nana, [])).
+aviso_de(punalada_trapera,   B, mensaje(punalada, [B])).

@@ -163,6 +163,7 @@ conocido(A) :- mundo:zona(A, _).
 conocido(A) :- mundo:enemigo(A, _, _, _).
 conocido(A) :- contratos:contrato(A, _, _, _, _).
 conocido(A) :- mundo:habilidad_de(_, A).
+conocido(A) :- mundo:habilidad_en(_, _, A).
 conocido(A) :- mundo:rasgo(_, A).
 conocido(A) :- charlas:presente(A, _, _, _).
 conocido(A) :- charlas:opcion_charla(_, A, _, _, _).
@@ -185,8 +186,9 @@ functor_valido(F) :-
                evento_abre, evento_elige, intento_fallido, objetivo, contrato_resuelto, cobra, acepta, contrato_nuevo, sin_botin, usa_objeto, charla_abre, charla_elige, charla_repite, saber_nuevo, diario_completo, cumplido, aparece,
                victoria, botin, derrota_combate, aturdido, pasa, se_cura, invoca_moho, roba_queso, embiste,
                defiende, carga_heroica, fondue, balada, rebuscar, nivel, golpea_a_clotilde, dia_nuevo,
+               golpe_de_escudo, queda_aturdido, raclette, nana, punalada, habilidad_nueva,
                % reglas
-               puede_viajar, puede_descansar, puede_pagar_sueldos, puede_atacar, dano, puede_habilidad,
+               puede_viajar, puede_descansar, puede_pagar_sueldos, puede_atacar, dano, puede_habilidad, conoce_habilidad, ya_usada,
                puede_aceptar, ignora_miedo, en_fila_alcanzable, vivo, modificador, queso_total,
                accion_enemigo, golpea_a_clotilde, teme, esta_en_huelga, rasgo, marca, contrato_activo,
                contrato_cumplido, contratos_cumplidos_min, cura_aliado, curar_aliado, xp_victoria, xp_evento, sube_nivel, pasiva_nueva, enemigos_de_nivel, aviso_nivel, sale_encuentro, encuentro, visita, moral_media_min, miembros_en_pie_min,

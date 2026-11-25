@@ -7,7 +7,7 @@
 :- module(compania, [miembro/1, vivo/1, activo/1, en_pie/1, esta_en_huelga/1,
                      teme/2, ignora_miedo/1, nivel_moral/2, modificador_moral/2, moral_media/1,
                      sueldo_de/2, puede_viajar/1, informe/1,
-                     progreso/5, nivel_medio/1, efectos_ganar_xp/3]).
+                     progreso/5, habilidades_aprendidas/2, nivel_medio/1, efectos_ganar_xp/3]).
 :- use_module(mundo).
 :- use_module(estado).
 
@@ -104,6 +104,11 @@ progreso(Id, Nivel, XP, Siguiente, Pasivas) :-
     (   Nivel < Max -> N1 is Nivel + 1, mundo:xp_para(N1, Siguiente) ; Siguiente = maximo ),
     findall(P, ( mundo:pasiva(Id, L, P, _), L =< Nivel ), Pasivas).
 
+% habilidades_aprendidas(+Id, -Habilidades): las activas que ya sabe por su nivel (mundo:habilidad_en/3).
+habilidades_aprendidas(Id, Habilidades) :-
+    estado:nivel_de(Id, Nivel),
+    findall(H, ( mundo:habilidad_en(Id, L, H), L =< Nivel ), Habilidades).
+
 % nivel_medio(-N): el nivel de la Banda, la media de sus miembros redondeada hacia abajo.
 nivel_medio(N) :-
     findall(L, ( miembro(Id), estado:nivel_de(Id, L) ), Ls),
@@ -123,8 +128,9 @@ efectos_ganar_xp(Id, N, Efectos) :-
         estado:vida_maxima_en(Id, Despues, V1),
         Cura is V1 - V0,
         findall(mensaje(pasiva_nueva, [Id, P]), ( mundo:pasiva(Id, L, P, _), L > Antes, L =< Despues ), Pasivas),
+        findall(mensaje(habilidad_nueva, [Id, H]), ( mundo:habilidad_en(Id, L, H), L > Antes, L =< Despues ), Activas),
         (   Cura > 0, vivo(Id) -> Curar = [curar(Id, Cura)] ; Curar = [] ),
-        append([[ganar_xp(Id, N)], Curar, [mensaje(sube_nivel, [Id, Despues])], Pasivas], Efectos)
+        append([[ganar_xp(Id, N)], Curar, [mensaje(sube_nivel, [Id, Despues])], Pasivas, Activas], Efectos)
     ;   Efectos = [ganar_xp(Id, N)]
     ).
 

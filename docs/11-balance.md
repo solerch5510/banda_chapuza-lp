@@ -178,6 +178,22 @@ Lectura: con niveles **el juego queda algo más duro que antes** (91–98 % del 
 
 Lectura: el norte **no rompe el equilibrio**. Gana algo más quien tiene plan (más contratos = más experiencia y más queso por cobrar), pero llega a la victoria con **menos queso de sobra** y, a veces, un día o dos más tarde: el norte está lejos y cada día de viaje es una ración. Las muertes por hambre suben un poco (de 2 a 6 de 200 en el atento con errores), que es justo lo que el autor quería que costara ir lejos. No hizo falta tocar ningún número.
 
+## Con las habilidades aprendidas (nivel 2)
+
+*(25 de noviembre de 2026, rama `paquete-habilidades`.)* En el nivel 2 cada miembro aprende una habilidad activa de una vez por combate: el golpe de escudo (aturde), la raclette derramada (4 a cada enemigo, 2 quesos), la nana de requesón (cura 4 a cada uno) y la puñalada trapera (sin defensa, el doble contra un aturdido). El «listo» las usa con criterio (la nana si alguien está por debajo de la mitad, la raclette con dos enemigos o más y 6 quesos o más, la puñalada contra un aturdido, el escudo al más peligroso); el combate al azar las tiene entre sus opciones. Mismo informe (`informe(200, 1)`), `main` contra la rama:
+
+| Jugador (combate) | `main` | Con las habilidades | Queso al ganar (media) |
+|---|---|---|---|
+| Atento sin errores, solo atacar | 189 (94,5 %) | 189 (94,5 %) | 36,3 → 36,3 |
+| Atento, 10 % de errores, solo atacar | 173 (86,5 %) | 168 (84 %) | 32,4 → 32,0 |
+| Atento sin errores, «listo» | 131 (65,5 %) | 145 (72,5 %) | 27,9 → 25,3 |
+| Atento, 10 % de errores, «listo» | 123 (61,5 %) | 142 (71 %) | 24,0 → 20,8 |
+| Con plan, combate al azar (lote 2) | 87 (43,5 %) | 113 (56,5 %) | 30,8 → 29,0 |
+| Con plan, combate al azar (lote 1 / 3) | 59 / 91 | 89 / 113 | — |
+| Al azar | 2 | 4 | — |
+
+Lectura: la primera fila es el **control**: quien no usa habilidades juega exactamente las mismas partidas, así que cualquier diferencia de las demás viene de las habilidades. Con errores, el que solo ataca pierde unas pocas más porque sus errores al azar ahora pueden caer en una habilidad (dentro del ruido). El «listo» gana entre 7 y 10 puntos y gasta algo más de queso (la raclette). Quien más gana es el jugador **sin criterio en el combate** (de 43,5 % a 56,5 %): tiene más opciones y las fuertes se gastan solas, así que pulsar al azar sale mejor que antes. Si se quiere que el juego no se ablande para el despistado, las palancas son el nivel en el que se aprenden (el 3 en lugar del 2) o la cura de la nana (3 en lugar de 4); no se ha tocado ningún número sin que lo decida el autor.
+
 ## Con grupos de 3 a 5 enemigos y enemigos con truco
 
 *(22 de noviembre de 2026.)* Dos enemigos nuevos —la **seta curandera** (12 de vida, desde atrás, cura 5 al aliado más herido, prioridad 5 de su lista, por delante de atacar) y el **ballestero oxidado** (10 de vida, 6 de ataque, a distancia: llega a la retaguardia)— y encuentros de 3 a 5 enemigos; el peaje del ganso y la paz del moho los llevan también (ahora pagan 15 y 22).

@@ -7,7 +7,7 @@
 
 :- module(mundo, [zona/2, descripcion_zona/2, conexion/2, adyacente/2, distancia/3, zona_pacifica/1, posicion/3,
                   personaje/7, fila_preferida/2, alcance/2, rasgo/2,
-                  habilidad_de/2, coste_queso/2,
+                  habilidad_de/2, habilidad_en/3, una_vez_por_combate/1, coste_queso/2,
                   enemigo/4, clase/2, lleva_queso/1, botin/3, numerar_grupo/2,
                   probabilidad_de_encuentro/2, encuentro/2,
                   xp_para/2, crecimiento/4, pasiva/4, xp_de/2, xp_por_intento/2, nivel_de_zona/2, escala_enemigo/2,
@@ -137,15 +137,29 @@ rasgo(pimentina, hechizos_de_cocina).
 rasgo(rufino,    cobra_por_callar).
 rasgo(tuerca,    manos_largas).
 
-% habilidad_de(Id, Habilidad): una habilidad por personaje en la version minima.
-% (Por ahora solo se usa la de Pimentina; las demas se programan con las habilidades.)
+% habilidad_de(Id, Habilidad): la habilidad de siempre, la que se sabe desde el principio.
+% Es la que usan `habilidad` y `habilidad(Objetivo)`, sin decir su nombre.
 habilidad_de(baldomero, carga_heroica).
 habilidad_de(pimentina, fondue_flamigera).
 habilidad_de(rufino,    balada_inspiradora).
 habilidad_de(tuerca,    rebuscar_bolsillos).
 
+% habilidad_en(Id, Nivel, Habilidad): una habilidad ACTIVA que se aprende al llegar al nivel. Se usa por su
+% nombre: habilidad(Nombre) o habilidad(Nombre, Objetivo). Son las del paquete de habilidades (docs/13 §0).
+habilidad_en(baldomero, 2, golpe_de_escudo).
+habilidad_en(pimentina, 2, raclette_derramada).
+habilidad_en(rufino,    2, nana_de_requeson).
+habilidad_en(tuerca,    2, punalada_trapera).
+
+% una_vez_por_combate(Habilidad): solo se puede usar una vez en cada combate (la marca se borra al terminar).
+una_vez_por_combate(golpe_de_escudo).
+una_vez_por_combate(raclette_derramada).
+una_vez_por_combate(nana_de_requeson).
+una_vez_por_combate(punalada_trapera).
+
 % coste_queso(Habilidad, N): quesos que gasta lanzar un hechizo de cocina (rasgo hechizos_de_cocina).
-coste_queso(fondue_flamigera, 1).
+coste_queso(fondue_flamigera,   1).
+coste_queso(raclette_derramada, 2).
 
 % alcance(Id, Alcance): cuerpo (solo alcanza a la primera fila) o distancia (llega tambien a la retaguardia).
 alcance(baldomero, cuerpo).

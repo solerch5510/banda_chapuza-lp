@@ -55,12 +55,20 @@ valida(Cmd) :-
 candidata(combate, atacar(T), 4) :- tipo_vivo(T).
 candidata(combate, habilidad(T), 2) :- tipo_vivo(T).
 candidata(combate, habilidad, 2).
+candidata(combate, habilidad(H), 2) :- aprendida_del_turno(H).                  % las aprendidas (docs/13 §0)
+candidata(combate, habilidad(H, T), 2) :- aprendida_del_turno(H), tipo_vivo(T).
 candidata(combate, defender, 1).
 candidata(F, ir(Z), 3) :- F \== combate, estado:en_zona(A), mundo:adyacente(A, Z).
 candidata(F, aceptar(C), 3) :- F \== combate, contratos:contrato(C, _, _, _, _).
 candidata(F, pagar, 2) :- F \== combate.
 candidata(F, descansar, 1) :- F \== combate.
 candidata(F, elegir(N), 6) :- F \== combate, between(1, 4, N).
+
+% aprendida_del_turno(-H): una habilidad que ya sabe por su nivel el miembro al que le toca.
+aprendida_del_turno(H) :-
+    juego:actor_del_turno(A),
+    compania:habilidades_aprendidas(A, Hs),
+    member(H, Hs).
 
 tipo_vivo(T) :-
     setof(Tipo, E^( estado:instancia(E, Tipo), compania:vivo(E) ), Tipos),
@@ -241,6 +249,8 @@ combatir_solo :-
 %   solo_atacar  atacar al primero que haya y, si no se puede, defender (el que solo pulsa «atacar»);
 %   listo        usa la habilidad de quien actua y va primero a quien mas daña: la seta curandera, luego los ballesteros, el
 %                bandido montado y el resto por vida. Es el jugador que entiende el combate (las habilidades, la fila, el curandero).
+%                Con las aprendidas: la nana si alguien esta por debajo de la mitad de su vida, la raclette si quedan dos
+%                enemigos o mas y sobra queso (6 o mas), la punalada contra un aturdido y el golpe de escudo al mas peligroso.
 % Las rutas guionizadas juegan el combate con solo_atacar (o con listo si se pide).
 fijar_estilo(E) :- nb_setval(sim_estilo, E).
 estilo_de_combate(E) :- ( catch(nb_getval(sim_estilo, E0), _, fail) -> E = E0 ; E = azar ).
@@ -256,11 +266,26 @@ orden_lista(Cmd) :-
     findall(P-V-T, ( tipo_vivo(T), estado:instancia(E, T), compania:vivo(E), estado:vida(E, V), peligro(T, P) ), L0),
     msort(L0, L),
     findall(T, member(_-_-T, L), Ts0), sort_estable(Ts0, Ts),
-    (   valida(habilidad) -> Cmd = habilidad
+    (   aprendida_util(Ts, C0) -> Cmd = C0
+    ;   valida(habilidad) -> Cmd = habilidad
     ;   member(T, Ts), valida(habilidad(T)) -> Cmd = habilidad(T)
     ;   member(T, Ts), valida(atacar(T)) -> Cmd = atacar(T)
     ;   Cmd = defender
     ).
+
+% aprendida_util(+Tipos, -Cmd): una habilidad aprendida que conviene ahora (Tipos va del mas peligroso al menos).
+aprendida_util(_, habilidad(nana_de_requeson)) :-
+    compania:miembro(Id), compania:vivo(Id), estado:vida(Id, V), estado:vida_maxima(Id, Max), V * 2 < Max,
+    valida(habilidad(nana_de_requeson)), !.
+aprendida_util(_, habilidad(raclette_derramada)) :-
+    findall(E, ( estado:combatiente(E, enemigo), compania:vivo(E) ), [_, _|_]),
+    economia:queso_total(Q), Q >= 6,
+    valida(habilidad(raclette_derramada)), !.
+aprendida_util(_, habilidad(punalada_trapera, E)) :-
+    estado:combatiente(E, enemigo), compania:vivo(E), combate:aturdido(E),
+    valida(habilidad(punalada_trapera, E)), !.
+aprendida_util(Ts, habilidad(golpe_de_escudo, T)) :-
+    member(T, Ts), valida(habilidad(golpe_de_escudo, T)), !.
 
 peligro(seta_curandera, 0) :- !.
 peligro(ballestero_oxidado, 1) :- !.
